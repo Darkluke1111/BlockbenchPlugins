@@ -39,11 +39,10 @@ export default function (data, path, asHologram) {
                         reduced_faces[direction] = { texture: tex, uv: e.faces[direction].uv, rotation: e.faces[direction].rotation };
 
                     } 
-                    // This gets ignored by Blockbench even though the API says it should work...
-                    // else {
-                    //     console.log("Disable face")
-                    //     reduced_faces[direction] = { enabled: false}
-                    // }
+                    //Enabled flag doesn't seem to do anything so we set texture to null for disabled faces...
+                    else {
+                        reduced_faces[direction] = { enabled: false, texture: null}
+                    }
                 }
                 let rotation: ArrayVector3 = [0, 0, 0]
                 let cube = new Cube({
@@ -57,26 +56,15 @@ export default function (data, path, asHologram) {
                     faces: reduced_faces,
                     rotation: rotation,
                 }) as VS_Cube
-                
-                // Hacky way to disable disabled faces which also doesn't work =/
-                // for (const direction of ['north', 'east', 'south', 'west', 'up', 'down']) {
-                //     if (!e.faces[direction]) {
-                //         console.log("Disable face")
-                //         //console.log(cube.faces[direction])
-                //         cube.faces[direction].enabled = false
-                //         console.log(cube.faces[direction]) // WTH?!
-                //     } 
-                // }
+        
 
                 if(asHologram) {
                     cube.hologram = path;
                 }
 
-                //if (e.children) {
+
                 cube.addTo(group);
-                //} else {
-                //    cube.addTo(parent);
-                //}
+
                 cube.init();
                 for (const direction of ['north', 'east', 'south', 'west', 'up', 'down']) {
                     if (e.faces[direction] && e.faces[direction].windMode) {

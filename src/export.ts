@@ -1,5 +1,5 @@
 import util from "./util"
-import { VS_Project, VS_Texture } from "./property";
+import { VS_Cube, VS_Face, VS_Group, VS_Project, VS_Texture } from "./property";
 import { Element, Content, CubeFace, CubeFaceDirection, Editor } from "./vs_types";
 
 export default function (options) {
@@ -10,7 +10,7 @@ export default function (options) {
             let parent_pos = parent ? parent.origin : [0, 0, 0];
             // Node is a Group
             if (n.children) {
-                let g = n;
+                let g = n as VS_Group;
                 let converted_rotation = util.zyx_to_xyz(g.rotation);
                 let e = {
                     name: g.name,
@@ -32,22 +32,22 @@ export default function (options) {
                 }
 
             } else { // Node is a Cube
-                let c = n;
+                let c = n as VS_Cube;
                 let reduced_faces = {}
 
                 for (const direction of ['north', 'east', 'south', 'west', 'up', 'down']) {
-                    if (c.faces[direction]) {
+                    let cube_face = c.faces[direction] as VS_Face
+                    // texture is false means texture is not set, texture is null means face is disabled...
+                    if (cube_face && cube_face.texture == null) {
                         reduced_faces[direction] = {};
-                        if (c.faces[direction].texture) {
-                            let texture = Texture.all.find((elem, _x, _y) => c.faces[direction].texture.toString() == elem.uuid.toString())
-                            let texture_name = texture ? texture.name : "unknown";
-                            reduced_faces[direction].texture = "#" + texture_name;
-                        }
+                        let texture = cube_face.getTexture()
+                        let texture_name = texture ? texture.name : "unknown";
+                        reduced_faces[direction].texture = "#" + texture_name;
                         reduced_faces[direction].uv = c.faces[direction].uv;
                         if (c.faces[direction].rotation != 0) {
                             reduced_faces[direction].rotation = c.faces[direction].rotation;
                         }
-                        reduced_faces[direction].windMode = c.faces[direction].windMode
+                        reduced_faces[direction].windMode = cube_face.windMode
                         reduced_faces[direction] = new oneLiner(reduced_faces[direction])
                     }
                 }
@@ -57,7 +57,7 @@ export default function (options) {
                     from: util.vector_sub(c.from, parent_pos),
                     to: util.vector_sub(c.to, parent_pos),
                     rotationOrigin: util.vector_sub(c.origin, parent_pos),
-                    uv: c.uv || undefined,
+                    ... (c.uv_offset[0] != 0 && c.uv_offset[1] != 0) && { uv: c.uv_offset},
                     faces: reduced_faces,
                     ... (converted_rotation[0] != 0) && { rotationX: converted_rotation[0] },
                     ... (converted_rotation[1] != 0) && { rotationY: converted_rotation[1] },
