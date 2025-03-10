@@ -1,9 +1,10 @@
 import { VS_Group, VS_Cube, VS_Face, VS_Texture, VS_Project } from "./property";
 import util from "./util"
+import { Content, Element } from "./vs_types";
 
 export default function (data, path, asHologram) {
 
-    let traverseImportTree = function (parent, object_space_pos : ArrayVector3, nodes) {
+    let traverseImportTree = function (parent: Group | null, object_space_pos : ArrayVector3, nodes: Element[]) {
         let group: VS_Group
         for (let i = 0; i < nodes.length; i++) {
             let e = nodes[i];
@@ -91,7 +92,7 @@ export default function (data, path, asHologram) {
         return group
     }
 
-    let content = autoParseJSON(data)
+    let content : Content = autoParseJSON(data)
 
     if (content.textureHeight) {
         Project.texture_height = content.textureHeight;
