@@ -38,7 +38,7 @@ export default function (options) {
                 for (const direction of ['north', 'east', 'south', 'west', 'up', 'down']) {
                     let cube_face = c.faces[direction] as VS_Face
                     // texture is false means texture is not set, texture is null means face is disabled...
-                    if (cube_face && cube_face.texture == null) {
+                    if (cube_face && cube_face.texture != null) {
                         reduced_faces[direction] = {};
                         let texture = cube_face.getTexture()
                         let texture_name = texture ? texture.name : "unknown";
