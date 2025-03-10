@@ -1,7 +1,8 @@
-const util = require("./util.js")
-const props = require("./property.js")
+import util from "./util"
+import { VS_Project, VS_Texture } from "./property";
+import { Element, Content, CubeFace, CubeFaceDirection, Editor } from "./vs_types";
 
-module.exports = function (options) {
+export default function (options) {
     let traverseExportTree = function (parent, nodes, accu) {
 
         for (let i = 0; i < nodes.length; i++) {
@@ -13,6 +14,7 @@ module.exports = function (options) {
                 let converted_rotation = util.zyx_to_xyz(g.rotation);
                 let e = {
                     name: g.name,
+                    ... (g.stepParentName) && { stepParentName: g.stepParentName },
                     from: util.vector_sub(g.origin, parent_pos),
                     to: util.vector_sub(g.origin, parent_pos),
                     rotationOrigin: util.vector_sub(g.origin, parent_pos),
@@ -20,10 +22,6 @@ module.exports = function (options) {
                     ... (converted_rotation[1] != 0) && { rotationY: converted_rotation[1] },
                     ... (converted_rotation[2] != 0) && { rotationZ: converted_rotation[2] },
                     children: []
-                }
-
-                if(g.stepParentName) {
-                    e.stepParentName = g.stepParentName
                 }
 
                 if(!g.hologram) {
@@ -49,7 +47,7 @@ module.exports = function (options) {
                         if (c.faces[direction].rotation != 0) {
                             reduced_faces[direction].rotation = c.faces[direction].rotation;
                         }
-                        props.windProp.copy(c.faces[direction], reduced_faces[direction]);
+                        reduced_faces[direction].windMode = c.faces[direction].windMode
                         reduced_faces[direction] = new oneLiner(reduced_faces[direction])
                     }
                 }
@@ -116,26 +114,19 @@ module.exports = function (options) {
 
 
     for (let i = 0; i < Texture.all.length; i++) {
-        let t = Texture.all[i];
-        let tmp = {};
-        props.textureLocationProp.copy(t, tmp);
-        data.textures[t.name] = tmp.textureLocation;
+        let t = Texture.all[i] as VS_Texture;
+        data.textures[t.name] = t.textureLocation
 
         //path.posix.relative('C:/Users/Lukas/AppData/Roaming/Vintagestory/assets/survival/textures/', t.path).split('.').slice(0, -1).join('.');
     }
 
+    let project = Project as VS_Project
 
-    if(Project.backDropShape) {
-        data.editor.backDropShape = Project.backDropShape
-    }
-    if(Project.allAngles) {
-        data.editor.allAngles = Project.allAngles
-    }
-    if(Project.entityTextureMode) {
-        data.editor.entityTextureMode = Project.entityTextureMode
-    }
-    if(Project.collapsedPaths) {
-        data.editor.collapsedPaths = Project.collapsedPaths
+    data.editor = {
+        ... (project.backDropShape) && { backDropShape: project.backDropShape },
+        ... (project.allAngles) && { allAngles: project.allAngles },
+        ... (project.entityTextureMode) && { entityTextureMode: project.entityTextureMode },
+        ... (project.collapsedPaths) && { collapsedPaths: project.collapsedPaths },
     }
 
     return autoStringify(data)

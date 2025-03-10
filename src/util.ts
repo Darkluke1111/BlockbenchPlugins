@@ -1,18 +1,19 @@
-const path = require("node:path");
+import * as THREE from "three";
 
+const path = require('node:path');
 
-let xyz_to_zyx = function (r) {
+let xyz_to_zyx = function (r: ArrayVector3): ArrayVector3 {
 
     let converted = new THREE.Euler(THREE.MathUtils.degToRad(r[0]), THREE.MathUtils.degToRad(r[1]), THREE.MathUtils.degToRad(r[2]), 'XYZ').reorder('ZYX').toArray();
-    let bla = [THREE.MathUtils.radToDeg(converted[0]), THREE.MathUtils.radToDeg(converted[1]), THREE.MathUtils.radToDeg(converted[2])]
+    let bla = [THREE.MathUtils.radToDeg(converted[0]), THREE.MathUtils.radToDeg(converted[1]), THREE.MathUtils.radToDeg(converted[2])] as ArrayVector3
 
     return bla;
 }
 
-let zyx_to_xyz = function (r) {
+let zyx_to_xyz = function (r: ArrayVector3): ArrayVector3 {
 
     let converted = new THREE.Euler(THREE.MathUtils.degToRad(r[0]), THREE.MathUtils.degToRad(r[1]), THREE.MathUtils.degToRad(r[2]), 'ZYX').reorder('XYZ').toArray();
-    let bla = [THREE.MathUtils.radToDeg(converted[0]), THREE.MathUtils.radToDeg(converted[1]), THREE.MathUtils.radToDeg(converted[2])]
+    let bla = [THREE.MathUtils.radToDeg(converted[0]), THREE.MathUtils.radToDeg(converted[1]), THREE.MathUtils.radToDeg(converted[2])] as ArrayVector3
 
     return bla;
 }
@@ -98,7 +99,7 @@ function setParent(child, parent) {
 function removeParent(child, parent) {
     visit_tree(child, {
         visit_cube: (child, _p) => {
-            child.moveVector([-parent.from[0], -parent.from[1],-parent.from[2]], null, true)
+            child.moveVector([-parent.from[0], -parent.from[1], -parent.from[2]], null, true)
             child.origin = [child.origin[0] - parent.from[0], child.origin[1] - parent.from[1], child.origin[2] - parent.from[2]]
         },
         visit_group: (child, _p) => {
@@ -127,32 +128,34 @@ function update_children(node) {
 
 }
 
-function vector_add(a, b) {
-    let c = []
-    for(let i = 0 ; i < a.length ; i++) {
-        c[i] = a[i] + b[i]
-    }
+function vector_add(a: ArrayVector3, b: ArrayVector3): ArrayVector3 {
+    let c: ArrayVector3 = [
+        a[0] + b[0],
+        a[1] + b[1],
+        a[2] + b[2],
+    ]
     return c
 }
 
-function vector_inv(a) {
-    let c = []
-    for(let i = 0 ; i < a.length ; i++) {
-        c[i] = - a[i]
-    }
-   
+function vector_inv(a: ArrayVector3): ArrayVector3 {
+    let c : ArrayVector3 = [
+        -a[0],
+        -a[1],
+        -a[2],
+    ]
     return c
 }
 
-function vector_sub(a,b) {
-    let c = []
-    for(let i = 0 ; i < a.length ; i++) {
-        c[i] = a[i] - b[i]
-    }
+function vector_sub(a, b) {
+    let c: ArrayVector3 = [
+        a[0] - b[0],
+        a[1] - b[1],
+        a[2] - b[2],
+    ]
     return c
 }
 
-module.exports = {
+export default {
     xyz_to_zyx,
     zyx_to_xyz,
     get_texture_location,

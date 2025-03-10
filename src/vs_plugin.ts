@@ -1,14 +1,11 @@
 
-const { debug } = require('console');
-const path = require('node:path');
-const ex = require("./export.js");
-const im = require("./import.js");
-const format_definition = require("./format_definition.js");
-const { editor_backDropShapeProp } = require('./property.js');
-const util = require('./util.js');
-const props = require('./property.js');
 
-
+import path from "node:path"
+import ex from "./export"
+import im from "./import"
+import format_definition from "./format_definition"
+import util from "./util"
+import { VS_Group, VS_Project } from "./property";
 
 let exportAction
 let importAction
@@ -16,7 +13,7 @@ let reExportAction
 let debugAction
 let onGroupAdd
 
-Plugin.register('vs_plugin', {
+BBPlugin.register('vs_plugin', {
     title: 'Vintage Story Format Support',
     icon: 'icon',
     author: 'Darkluke1111',
@@ -28,6 +25,7 @@ Plugin.register('vs_plugin', {
         //Init additional Attribute Properties
         let game_path_setting = new Setting("game_path", {
             name: "Game Path",
+            category: "general",
             description: "The path to your Vintage Story game folder. This is the folder that contains the assets, mods and lib folders.",
             type: "click",
             icon: "fa-folder-plus",
@@ -40,7 +38,8 @@ Plugin.register('vs_plugin', {
                         path: {
                             label: "Path to your texture folder",
                             type: "folder",
-                            value: Settings.get("game_path") || process.env.VINTAGE_STORY || null,
+                            value: Settings.get("game_path") || process.env.VINTAGE_STORY || "",
+                            default: ""
                         }
 
                     },
@@ -55,14 +54,16 @@ Plugin.register('vs_plugin', {
 
         onGroupAdd = function(_group) {
 
-            let group = Group.first_selected
-            let parent = group.parent
+            let group = Group.first_selected as VS_Group
+            let parent = group.parent as VS_Group | "root"
             console.log(group)
             console.log(parent)
-            if(parent.hologram) {
+            if(parent != "root") {
+                if(parent.hologram) {
 
-                group.stepParentName = parent.name.substring(0,parent.name.length - 6)
-                console.log(group.stepParentName)
+                    group.stepParentName = parent.name.substring(0,parent.name.length - 6)
+                    console.log(group.stepParentName)
+                }
             }
         }
 
@@ -88,11 +89,9 @@ Plugin.register('vs_plugin', {
         })
 
         function loadBackDropShape() {
-            let backDrop = {}
-            editor_backDropShapeProp.copy(Project, backDrop)
-            console.log(backDrop.backDropShape)
-            if (backDrop.backDropShape) {
-                Blockbench.read(util.get_shape_location(null, backDrop.backDropShape), {
+            let backDropShape = (Project as VS_Project).backDropShape
+            if (backDropShape) {
+                Blockbench.read(util.get_shape_location(null, backDropShape), {
                     readtype: "text", errorbox: false
                 }, (files) => {
                     im(files[0].content, files[0].path, true)
@@ -105,10 +104,9 @@ Plugin.register('vs_plugin', {
 
         function resolveStepparentTransforms() {
             for (var g of Group.all) {
-                let p = {}
-                props.stepParentProp.copy(g, p)
-                if (p.stepParentName) {
-                    let spg = Group.all.find(g => g.name === (p.stepParentName + "_group"))
+                let stepParentName = (g as VS_Group).stepParentName
+                if (stepParentName) {
+                    let spg = Group.all.find(g => g.name === (stepParentName + "_group"))
                     if (spg) {
                         let sp = spg.children[0]
                         console.log(sp)
@@ -122,10 +120,10 @@ Plugin.register('vs_plugin', {
 
         function resetStepparentTransforms() {
             for (var g of Group.all) {
-                let p = {}
-                props.stepParentProp.copy(g, p)
-                if (!g.hologram) {
-                    let spg = Group.all.find(g => g.name === (p.stepParentName + "_group"))
+                let vs_g = g as VS_Group
+                let stepParentName = vs_g.stepParentName
+                if (!vs_g.hologram) {
+                    let spg = Group.all.find(g => g.name === (stepParentName + "_group"))
                     if (spg) {
                         let sp = spg.children[0]
                         console.log(sp)
@@ -167,7 +165,7 @@ Plugin.register('vs_plugin', {
                     type: 'json',
                     extensions: ['json'],
                 }, function (files) {
-                    codecVS.parse(files[0].content)
+                    codecVS.parse(files[0].content, files[0].path)
                 });
             }
 
@@ -196,7 +194,7 @@ Plugin.register('vs_plugin', {
                                 let project = new ModelProject({ format: formatVS })
                                 project.select()
                                 try {
-                                    let = Blockbench.read(test_folder + path.sep + test_file, { readtype: "text", errorbox: false }, (files) => {
+                                    Blockbench.read([test_folder + path.sep + test_file], { readtype: "text", errorbox: false }, (files) => {
                                         console.log("Importing " + test_file)
                                         codecVS.parse(files[0].content, test_folder + path.sep + test_file, false);
                                         console.log("Exporting " + test_file)

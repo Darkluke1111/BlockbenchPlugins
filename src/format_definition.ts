@@ -1,4 +1,4 @@
-module.exports = (codec) => new ModelFormat("formatVS", {
+export default (codec) => new ModelFormat("formatVS", {
     name: "Vintage Story Base Format",
     codec: codec,
     icon: "fa-cookie-bite",

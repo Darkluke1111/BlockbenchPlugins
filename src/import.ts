@@ -1,10 +1,10 @@
-const util = require("./util.js")
-const props = require("./property.js")
+import { VS_Group, VS_Cube, VS_Face, VS_Texture, VS_Project } from "./property";
+import util from "./util"
 
-module.exports = function (data, path, asHologram) {
+export default function (data, path, asHologram) {
 
-    let traverseImportTree = function (parent, object_space_pos, nodes) {
-        let group = {}
+    let traverseImportTree = function (parent, object_space_pos : ArrayVector3, nodes) {
+        let group: VS_Group
         for (let i = 0; i < nodes.length; i++) {
             let e = nodes[i];
 
@@ -14,14 +14,14 @@ module.exports = function (data, path, asHologram) {
                 //stepParentName: e.stepParentName,
                 origin: e.rotationOrigin ? util.vector_add(e.rotationOrigin, object_space_pos) : object_space_pos,
                 rotation: util.xyz_to_zyx([e.rotationX || 0, e.rotationY || 0, e.rotationZ || 0]),
-            })
+            }) as VS_Group
 
             if(asHologram) {
                 group.hologram = path;
             }
 
             if (e.stepParentName) {
-                props.stepParentProp.merge(group, e);
+                group.stepParentName = e.stepParentName
             }
 
 
@@ -44,7 +44,7 @@ module.exports = function (data, path, asHologram) {
                     //     reduced_faces[direction] = { enabled: false}
                     // }
                 }
-                let rotation = [0, 0, 0]
+                let rotation: ArrayVector3 = [0, 0, 0]
                 let cube = new Cube({
                     name: e.name,
                     from: util.vector_add(e.from, object_space_pos),
@@ -55,7 +55,7 @@ module.exports = function (data, path, asHologram) {
                     shade: true,
                     faces: reduced_faces,
                     rotation: rotation,
-                })
+                }) as VS_Cube
                 
                 // Hacky way to disable disabled faces which also doesn't work =/
                 // for (const direction of ['north', 'east', 'south', 'west', 'up', 'down']) {
@@ -79,7 +79,7 @@ module.exports = function (data, path, asHologram) {
                 cube.init();
                 for (const direction of ['north', 'east', 'south', 'west', 'up', 'down']) {
                     if (e.faces[direction] && e.faces[direction].windMode) {
-                        props.windProp.merge(cube.faces[direction], e.faces[direction]);
+                        (cube.faces[direction] as VS_Face).windMode = e.faces[direction].windMode
                     }
                 }
             }
@@ -118,23 +118,23 @@ module.exports = function (data, path, asHologram) {
             texture.uv_height = content.textureSizes[t][1]
         }
         texture.add().load();
-        let tmp = { textureLocation: content.textures[t] };
-        props.textureLocationProp.merge(texture, tmp);
+        (texture as VS_Texture).textureLocation = content.textures[t]
     }
 
     if (content.editor) {
+        let project = Project as VS_Project
         if(content.editor.backDropShape) {
-            props.editor_backDropShapeProp.merge(Project, content.editor)            
+            project.backDropShape = content.editor.backDropShape          
         }
         if(content.editor.allAngles) {
-            props.editor_allAnglesProp.merge(Project, content.editor)
+            project.allAngles = content.editor.allAngles
         }
         if(content.editor.entityTextureMode) {
-            props.editor_entityTextureModeProp.merge(Project, content.editor)
+            project.entityTextureMode = content.editor.entityTextureMode
         }
 
         if(content.editor.collapsedPaths) {
-            props.editor_collapsedPathsProp.merge(Project, content.editor)
+            project.collapsedPaths = content.editor.collapsedPaths
         }
     }
 
