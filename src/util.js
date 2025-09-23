@@ -1,19 +1,28 @@
 const path = require("node:path");
 
+let fps = 30;
 
 let xyz_to_zyx = function (r) {
-
     let converted = new THREE.Euler(THREE.MathUtils.degToRad(r[0]), THREE.MathUtils.degToRad(r[1]), THREE.MathUtils.degToRad(r[2]), 'XYZ').reorder('ZYX').toArray();
     let bla = [THREE.MathUtils.radToDeg(converted[0]), THREE.MathUtils.radToDeg(converted[1]), THREE.MathUtils.radToDeg(converted[2])]
+    return bla;
+}
 
+let xyz_to_zyx_flip_x = function (r) {
+    let converted = new THREE.Euler(THREE.MathUtils.degToRad(r[0]), THREE.MathUtils.degToRad(r[1]), THREE.MathUtils.degToRad(r[2]), 'XYZ').reorder('ZYX').toArray();
+    let bla = [THREE.MathUtils.radToDeg(converted[0]), THREE.MathUtils.radToDeg(converted[1]), THREE.MathUtils.radToDeg(converted[2])]
     return bla;
 }
 
 let zyx_to_xyz = function (r) {
-
     let converted = new THREE.Euler(THREE.MathUtils.degToRad(r[0]), THREE.MathUtils.degToRad(r[1]), THREE.MathUtils.degToRad(r[2]), 'ZYX').reorder('XYZ').toArray();
     let bla = [THREE.MathUtils.radToDeg(converted[0]), THREE.MathUtils.radToDeg(converted[1]), THREE.MathUtils.radToDeg(converted[2])]
+    return bla;
+}
 
+let zyx_to_xyz_flip_x = function (r) {
+    let converted = new THREE.Euler(THREE.MathUtils.degToRad(r[0]), THREE.MathUtils.degToRad(r[1]), THREE.MathUtils.degToRad(r[2]), 'ZYX').reorder('XYZ').toArray();
+    let bla = [-THREE.MathUtils.radToDeg(converted[0]), THREE.MathUtils.radToDeg(converted[1]), THREE.MathUtils.radToDeg(converted[2])]
     return bla;
 }
 
@@ -153,8 +162,11 @@ function vector_sub(a,b) {
 }
 
 module.exports = {
+    fps,
     xyz_to_zyx,
+    xyz_to_zyx_flip_x,
     zyx_to_xyz,
+    zyx_to_xyz_flip_x,
     get_texture_location,
     get_shape_location,
     visit_tree,
