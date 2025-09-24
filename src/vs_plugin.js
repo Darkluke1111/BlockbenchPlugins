@@ -38,7 +38,7 @@ Plugin.register('vs_plugin', {
                     title: "Select Game Path",
                     form: {
                         path: {
-                            label: "Path to your texture folder",
+                            label: "Path to your game folder",
                             type: "folder",
                             value: Settings.get("game_path") || process.env.VINTAGE_STORY || null,
                         }
