@@ -15,7 +15,8 @@ module.exports = function importAnimations(animations) {
         const animation = new Animation({
             name: vsAnimation.name,
             loop: isLooping ? 'loop' : 'once',
-            length: animationLength
+            length: animationLength,
+            snapping: FPS
         }).add();
 
         vsAnimation.keyframes.forEach(vsKeyframe => {
