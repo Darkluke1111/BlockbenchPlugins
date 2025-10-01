@@ -9,7 +9,15 @@ function processFaces(faces) {
         const faceData = faces[direction];
         if (faceData) {
             const texture_name = faceData.texture ? faceData.texture.substring(1) : null;
-            const texture = Texture.all.find(t => t.name === texture_name);
+            let texture = Texture.all.find(t => t.name === texture_name);
+
+            if (!texture && texture_name) {
+                // If the texture is not found, create a new blank 64x64 texture
+                texture = new Texture({
+                    name: texture_name
+                });
+                texture.fromDataURL(texture.getBase64(64, 64)).add()
+            }
             reduced_faces[direction] = { texture, uv: faceData.uv, rotation: faceData.rotation };
         }
     }

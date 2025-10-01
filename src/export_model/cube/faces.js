@@ -18,7 +18,12 @@ function processFaces(faces) {
                 ...(face.rotation !== 0 && { rotation: face.rotation })
             };
             props.windProp.copy(face, reduced_faces[direction]);
-            reduced_faces[direction] = new oneLiner(reduced_faces[direction]);
+        } else {
+            reduced_faces[direction] = {
+                uv: face.uv,
+                ...(face.rotation !== 0 && { rotation: face.rotation })
+            };
+            props.windProp.copy(face, reduced_faces[direction]);           
         }
     }
     return reduced_faces;
