@@ -19,9 +19,9 @@ let onGroupAdd
 Plugin.register('vs_plugin', {
     title: 'Vintage Story Format Support',
     icon: 'icon',
-    author: 'Darkluke1111',
+    author: 'Darkluke1111, codename_B',
     description: 'Adds the Vintage Story format export/import options.',
-    version: '0.7.0',
+    version: '0.8.0',
     variant: 'desktop',
 
     onload() {
@@ -38,7 +38,7 @@ Plugin.register('vs_plugin', {
                     title: "Select Game Path",
                     form: {
                         path: {
-                            label: "Path to your texture folder",
+                            label: "Path to your game folder",
                             type: "folder",
                             value: Settings.get("game_path") || process.env.VINTAGE_STORY || null,
                         }

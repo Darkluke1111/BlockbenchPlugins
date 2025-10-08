@@ -14,7 +14,17 @@ For Blockbench to figure out texture paths from the base game on its own, I adde
 
 # This still needs work:
 
-- Animation export and import not implemented yet
+- ~~Animation export and import not implemented yet~~ 
 - Automatic BackDropShape handling not implemented yet
 - Attachment points not implemented yet
 - Reexported file structure is more complicated than it needs to be
+
+# Building the Plugin
+
+You can build the plugin with
+
+```console
+npm install
+npm run build
+```
+This should build the plugin with webpack into .../dist/vs_plugin.js which can then be imported to BB.
