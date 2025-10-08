@@ -10,6 +10,12 @@ function processFaces(faces) {
 
     for (const direction of ['north', 'east', 'south', 'west', 'up', 'down']) {
         const face = faces[direction];
+
+        // Skip disabled faces
+        if (face.enabled === false) {
+            continue;
+        }
+
         if (face.texture) {
             const texture = Texture.all.find(t => t.uuid === face.texture);
             reduced_faces[direction] = {
@@ -23,7 +29,7 @@ function processFaces(faces) {
                 uv: face.uv,
                 ...(face.rotation !== 0 && { rotation: face.rotation })
             };
-            props.windProp.copy(face, reduced_faces[direction]);           
+            props.windProp.copy(face, reduced_faces[direction]);
         }
     }
     return reduced_faces;
