@@ -11,10 +11,16 @@ const util = require("../../util.js");
  */
 function createVsElement(parent, node, parent_pos, offset, faces) {
     const converted_rotation = util.zyx_to_xyz(node.rotation);
-    
+
     let from = util.vector_sub(node.from, parent_pos);
     let to = util.vector_sub(node.to, parent_pos);
     let rotationOrigin = util.vector_sub(node.origin, parent_pos);
+
+    // Apply inflate value - expands the cube equally in all directions
+    if (node.inflate && node.inflate !== 0) {
+        from = [from[0] - node.inflate, from[1] - node.inflate, from[2] - node.inflate];
+        to = [to[0] + node.inflate, to[1] + node.inflate, to[2] + node.inflate];
+    }
 
     if (parent === null) {
         from = util.vector_add(from, offset);
