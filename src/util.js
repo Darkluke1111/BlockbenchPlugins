@@ -1,4 +1,5 @@
-const path = require("node:path");
+const fs = requireNativeModule('fs');
+const path = requireNativeModule('path');
 
 let fps = 30;
 

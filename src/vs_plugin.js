@@ -1,12 +1,16 @@
 
-const { debug } = require('console');
-const path = require('node:path');
+//const console = require('console');
+const path = require('path');
 const ex = require("./export.js");
 const im = require("./import.js");
 const format_definition = require("./format_definition.js");
 const { editor_backDropShapeProp } = require('./property.js');
 const util = require('./util.js');
 const props = require('./property.js');
+const fs = requireNativeModule('fs');
+const process = requireNativeModule('process', {
+    message: 'This permission is required to access the VINATGE_STORY environment variable to setup texture paths.'
+});
 
 
 
@@ -21,7 +25,7 @@ Plugin.register('vs_plugin', {
     icon: 'icon',
     author: 'Darkluke1111, codename_B',
     description: 'Adds the Vintage Story format export/import options.',
-    version: '0.8.0',
+    version: '0.9.0',
     variant: 'desktop',
 
     onload() {
@@ -40,7 +44,7 @@ Plugin.register('vs_plugin', {
                         path: {
                             label: "Path to your game folder",
                             type: "folder",
-                            value: Settings.get("game_path") || process.env.VINTAGE_STORY || null,
+                            value: Settings.get("game_path") || process.env.VINTAGE_STORY || "",
                         }
 
                     },
