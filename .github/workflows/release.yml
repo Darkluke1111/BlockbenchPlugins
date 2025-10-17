@@ -19,6 +19,8 @@ jobs:
 
     steps:
 
+    - uses: actions/checkout@v4
+
     - name: Get next version
       uses: reecetech/version-increment@2024.10.1
       id: version
@@ -26,7 +28,7 @@ jobs:
         scheme: semver
         increment: ${{ github.event.inputs.release_type }}
 
-    - uses: actions/checkout@v4
+
 
     - name: Replace Version Number
       uses: jacobtomlinson/gha-find-replace@v3
