@@ -23,7 +23,7 @@ module.exports = function exportAnimations() {
                     const dataPoint = kf.data_points[0];
                     switch (kf.channel) {
                         case 'rotation':
-                            const rot = util.zyx_to_xyz_flip_x([dataPoint.x, dataPoint.y, dataPoint.z]);
+                            const rot = util.zyx_to_xyz([dataPoint.x, dataPoint.y, dataPoint.z]);
                             keyframes[frame].elements[bone_name].rotationX = Number(rot[0]);
                             keyframes[frame].elements[bone_name].rotationY = Number(rot[1]);
                             keyframes[frame].elements[bone_name].rotationZ = Number(rot[2]);
