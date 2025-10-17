@@ -46,7 +46,6 @@ function transformUV(uv, rotation) {
 /**
  * Processes the face data from a Blockbench cube.
  * @param {object} faces The faces object from the Blockbench cube.
- * @param {object} node The cube node (needed for UV transformation).
  * @returns {object} The processed face data for the VS element.
  */
 function processFaces(faces) {
