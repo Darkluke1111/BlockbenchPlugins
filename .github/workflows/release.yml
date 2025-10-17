@@ -1,7 +1,12 @@
 name: Release
 
 on: workflow_dispatch
-
+  inputs:
+    release_type:
+      description: 'release type (major,minor,patch)'
+      required: true
+    release_description: 
+      required: true
 
 jobs:
   release:
@@ -12,7 +17,25 @@ jobs:
         node-version: [22.x,]
 
     steps:
+
+    - name: Get next version
+      uses: reecetech/version-increment@2024.10.1
+      id: version
+      with:
+        scheme: semver
+        increment: ${{ github.event.inputs.release_type }}
+
     - uses: actions/checkout@v4
+
+    - name: Replace Version Number
+      uses: jacobtomlinson/gha-find-replace@v3
+      with:
+        include: 'src/vs_plugin.js'
+        find: >
+          version: '0.9.1'
+        replace: >
+          version: ${{ steps.version.outputs.version }}
+        regex: true
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
@@ -24,21 +47,15 @@ jobs:
         npm install
         npx webpack
 
-    - name: Get next version
-      uses: reecetech/version-increment@2024.10.1
-      id: version
-      with:
-        scheme: semver
-        increment: minor
     - name: release
       uses: actions/create-release@v1
       id: create_release
       with:
-        draft: false
+        draft: true
         prerelease: false
         release_name: ${{ steps.version.outputs.version }}
         tag_name: ${{ steps.version.outputs.version }}
-        body: "Test Release"
+        body: ${{ github.event.inputs.release_description }}
         #body_path: CHANGELOG.md
       env:
         GITHUB_TOKEN: ${{ github.token }}
