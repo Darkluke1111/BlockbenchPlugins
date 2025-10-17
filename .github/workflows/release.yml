@@ -1,12 +1,13 @@
 name: Release
 
-on: workflow_dispatch
-  inputs:
-    release_type:
-      description: 'release type (major,minor,patch)'
-      required: true
-    release_description: 
-      required: true
+on: 
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'release type (major,minor,patch)'
+        required: true
+      release_description: 
+        required: true
 
 jobs:
   release:
