@@ -29,7 +29,7 @@ module.exports = function importAnimations(animations) {
                     const animator = animation.getBoneAnimator(bone);
 
                     if (transform.rotationX != null || transform.rotationY != null || transform.rotationZ != null) {
-                        const rotation = util.xyz_to_zyx_flip_x([transform.rotationX || 0, transform.rotationY || 0, transform.rotationZ || 0]);
+                        const rotation = util.xyz_to_zyx([transform.rotationX || 0, transform.rotationY || 0, transform.rotationZ || 0]);
                         animator.addKeyframe({ interpolation: interpolationMode, time, channel: 'rotation', data_points: [{ x: rotation[0], y: rotation[1], z: rotation[2] }] });
                     }
 
