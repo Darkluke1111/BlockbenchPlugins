@@ -68,7 +68,7 @@ function processFaces(faces) {
         const isUvDefault = face.uv[0] === 0 && face.uv[1] === 0 && face.uv[2] === 0 && face.uv[3] === 0;
 
         const rotation = face.rotation || 0;
-        const transformed = transformUV(face.uv, direction, rotation, node);
+        const transformed = transformUV(face.uv, rotation);
         const transformedUV = transformed.uv;
         const transformedRotation = transformed.rotation;
 
