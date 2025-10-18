@@ -34,9 +34,9 @@ jobs:
       uses: jacobtomlinson/gha-find-replace@v3
       with:
         include: '**/vs_plugin.js'
-        find: >
+        find: >-
           version: '(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)'
-        replace: >
+        replace: >-
           version: ${{ steps.version.outputs.version }}
         regex: true
 
