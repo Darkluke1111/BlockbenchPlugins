@@ -73,13 +73,13 @@ function processFaces(faces) {
 
         // Export face with texture
         const texture = Texture.all.find(t => t.uuid === face.texture);
-        reduced_faces[direction] = {
+        reduced_faces[direction] = new oneLiner({
             texture: `#${texture.name}`,
             ...(!isUvDefault && { uv: transformedUV }),
             ...(transformedRotation !== 0 && { rotation: transformedRotation }),
             autoUv: false,
             snapUv: false
-        };
+        });
         props.windProp.copy(face, reduced_faces[direction]);
     }
     return reduced_faces;

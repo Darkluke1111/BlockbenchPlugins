@@ -41,7 +41,18 @@ module.exports = function exportAnimations() {
                     }
                 });
             }
+
+            // Wraps all animation elements into oneLiner wrappers
+            for(let keyframe of Object.values(keyframes)) {
+                const wrapped_elements = {};
+                for (let [element, content] of Object.entries(keyframe.elements)) {
+                    wrapped_elements[element] = new oneLiner(content);
+                }
+                keyframe.elements = wrapped_elements;
+            }
         });
+
+        
 
         const vsAnimation = {
             name: animation.name,
