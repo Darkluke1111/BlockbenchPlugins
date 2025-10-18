@@ -37,7 +37,7 @@ jobs:
         find: >-
           version: '(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)'
         replace: >-
-          version: ${{ steps.version.outputs.version }}
+          version: ${{ steps.version.outputs.major-version }}.${{ steps.version.outputs.minor-version }}.${{ steps.version.outputs.patch-version }}
         regex: true
 
     - name: Use Node.js ${{ matrix.node-version }}
