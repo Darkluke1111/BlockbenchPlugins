@@ -20,7 +20,7 @@ module.exports = (codec) => new ModelFormat("formatVS", {
     integer_size: false,
     meshes: false,
     texture_meshes: false,
-    locators: false, // Not quite sure what that is
+    locators: true, // Not quite sure what that is
     rotation_limit: false,
     rotation_snap: false,
     uv_rotation: true,
