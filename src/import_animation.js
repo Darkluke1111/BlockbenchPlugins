@@ -44,18 +44,5 @@ module.exports = function importAnimations(animations) {
                 }
             }
         });
-
-        if (isLooping) {
-            for (const animatorUUID in animation.animators) {
-                const animator = animation.animators[animatorUUID];
-                for (const channel of ['rotation', 'position', 'scale']) {
-                    const firstKeyframe = animator.keyframes.find(kf => kf.channel === channel && kf.time === 0);
-                    if (firstKeyframe) {
-                        const lastKeyframe = animator.addKeyframe(firstKeyframe.getUndoCopy(), true);
-                        lastKeyframe.time = animationLength;
-                    }
-                }
-            }
-        }
     });
 };
