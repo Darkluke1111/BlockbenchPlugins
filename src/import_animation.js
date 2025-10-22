@@ -53,21 +53,27 @@ BoneAnimator.prototype.displayFrame = function (multiplier = 1) {
     this.getGroup()
     Animator.MolangParser.context.animation = this.animation;
 
-    if (!this.muted.rotation) this.displayRotation(this.interpolate('rotation'), multiplier)
+    const rotation = this.interpolate('rotation');
+    const position = this.interpolate('position');
+
+    if (!this.muted.rotation) this.displayRotation(rotation, multiplier)
+
     if (!this.muted.position) {
-        if (!this.interpolate('rotation')) {
-            this.displayPosition(this.interpolate('position'), multiplier)
+        if (!rotation) {
+            this.displayPosition(position, multiplier)
         } else {
-            if (this.interpolate('position')) {
-                let vec = this.interpolate('position').V3_toThree();
-                vec = vec.applyEuler(new THREE.Euler(
-                    THREE.MathUtils.degToRad(this.interpolate('rotation')[0]),
-                    THREE.MathUtils.degToRad(this.interpolate('rotation')[1]),
-                    THREE.MathUtils.degToRad(this.interpolate('rotation')[2])), "XYZ");
-                //console.log(this.interpolate('rotation')[0]);
+            if (position) {
+                const vec = position
+                    .V3_toThree()
+                    .applyEuler(new THREE.Euler(
+                        THREE.MathUtils.degToRad(rotation[0]),
+                        THREE.MathUtils.degToRad(rotation[1]),
+                        THREE.MathUtils.degToRad(rotation[2])
+                    ), Format.euler_order);
                 this.displayPosition(vec.toArray(), multiplier);
             }
         }
     }
+
     if (!this.muted.scale) this.displayScale(this.interpolate('scale'), multiplier)
 }
