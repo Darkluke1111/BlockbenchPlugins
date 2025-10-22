@@ -46,3 +46,28 @@ module.exports = function importAnimations(animations) {
         });
     });
 };
+
+// Modify the BoneAnimator to apply position offsets after rotation.
+BoneAnimator.prototype.displayFrame = function (multiplier = 1) {
+    if (!this.doRender()) return;
+    this.getGroup()
+    Animator.MolangParser.context.animation = this.animation;
+
+    if (!this.muted.rotation) this.displayRotation(this.interpolate('rotation'), multiplier)
+    if (!this.muted.position) {
+        if (!this.interpolate('rotation')) {
+            this.displayPosition(this.interpolate('position'), multiplier)
+        } else {
+            if (this.interpolate('position')) {
+                let vec = this.interpolate('position').V3_toThree();
+                vec = vec.applyEuler(new THREE.Euler(
+                    THREE.MathUtils.degToRad(this.interpolate('rotation')[0]),
+                    THREE.MathUtils.degToRad(this.interpolate('rotation')[1]),
+                    THREE.MathUtils.degToRad(this.interpolate('rotation')[2])), "XYZ");
+                console.log(this.interpolate('rotation')[0]);
+                this.displayPosition(vec.toArray(), multiplier);
+            }
+        }
+    }
+    if (!this.muted.scale) this.displayScale(this.interpolate('scale'), multiplier)
+}
