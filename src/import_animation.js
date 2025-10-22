@@ -35,7 +35,7 @@ module.exports = function importAnimations(animations) {
 
                     if (transform.offsetX != null || transform.offsetY != null || transform.offsetZ != null) {
                         const position = [transform.offsetX || 0, transform.offsetY || 0, transform.offsetZ || 0];
-                        animator.addKeyframe({ interpolation: interpolationMode, time, channel: 'position', data_points: [{ x: position[0] || 0, y: position[1] || 0, z: [position[2]] || 0 }] });
+                        animator.addKeyframe({ interpolation: interpolationMode, time, channel: 'position', data_points: [{ x: position[0] || 0, y: position[1] || 0, z: position[2] || 0 }] });
                     }
 
                     if (transform.scaleX != null || transform.scaleY != null || transform.scaleZ != null) {
@@ -64,7 +64,7 @@ BoneAnimator.prototype.displayFrame = function (multiplier = 1) {
                     THREE.MathUtils.degToRad(this.interpolate('rotation')[0]),
                     THREE.MathUtils.degToRad(this.interpolate('rotation')[1]),
                     THREE.MathUtils.degToRad(this.interpolate('rotation')[2])), "XYZ");
-                console.log(this.interpolate('rotation')[0]);
+                //console.log(this.interpolate('rotation')[0]);
                 this.displayPosition(vec.toArray(), multiplier);
             }
         }
