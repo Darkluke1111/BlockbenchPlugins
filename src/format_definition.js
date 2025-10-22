@@ -1,5 +1,6 @@
 module.exports = (codec) => new ModelFormat("formatVS", {
     name: "Vintage Story Base Format",
+    id: "vs_format",
     codec: codec,
     icon: "fa-cookie-bite",
     box_uv: false,
@@ -43,5 +44,7 @@ module.exports = (codec) => new ModelFormat("formatVS", {
     // node_name_regex: null,
     render_sides: "front", //Seems right to me but I havent tested how VS does it
     euler_order: "XYZ",
-    animation_loop_wrapping: true
+    animation_loop_wrapping: true,
+    quaternion_interpolation: false,
+    per_animator_rotation_interpolation: false,
 })
