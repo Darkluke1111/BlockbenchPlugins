@@ -10,7 +10,7 @@ const util = require("../../util.js");
  * @returns {object} The new VS element.
  */
 function createVsElement(parent, node, parent_pos, offset, faces) {
-    const converted_rotation = util.zyx_to_xyz(node.rotation);
+    const converted_rotation = node.rotation;
 
     let from = util.vector_sub(node.from, parent_pos);
     let to = util.vector_sub(node.to, parent_pos);

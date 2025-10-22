@@ -20,7 +20,7 @@ module.exports = (codec) => new ModelFormat("formatVS", {
     integer_size: false,
     meshes: false,
     texture_meshes: false,
-    locators: true, // Not quite sure what that is
+    locators: true,
     rotation_limit: false,
     rotation_snap: false,
     uv_rotation: true,
@@ -42,4 +42,5 @@ module.exports = (codec) => new ModelFormat("formatVS", {
     cullfaces: false, // Not sure if Vintage Story supports this
     // node_name_regex: null,
     render_sides: "front", //Seems right to me but I havent tested how VS does it
+    euler_order: "XYZ"
 })

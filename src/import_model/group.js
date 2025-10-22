@@ -14,7 +14,7 @@ function processGroup(parent, object_space_pos, vsElement, path, asHologram) {
     const group = new Group({
         name: vsElement.name + '_group',
         origin: vsElement.rotationOrigin ? util.vector_add(vsElement.rotationOrigin, object_space_pos) : object_space_pos,
-        rotation: util.xyz_to_zyx([vsElement.rotationX || 0, vsElement.rotationY || 0, vsElement.rotationZ || 0]),
+        rotation: [vsElement.rotationX || 0, vsElement.rotationY || 0, vsElement.rotationZ || 0],
     });
 
     if (asHologram) {

@@ -10,7 +10,7 @@ const util = require("../util.js");
  */
 function processGroup(parent, node, accu, traverse, offset) {
     const parent_pos = parent ? parent.origin : [0, 0, 0];
-    const converted_rotation = util.zyx_to_xyz(node.rotation);
+    const converted_rotation = node.rotation;
 
     let from = util.vector_sub(node.origin, parent_pos);
     let to = util.vector_sub(node.origin, parent_pos);

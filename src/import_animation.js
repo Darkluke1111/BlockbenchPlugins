@@ -29,12 +29,12 @@ module.exports = function importAnimations(animations) {
                     const animator = animation.getBoneAnimator(bone);
 
                     if (transform.rotationX != null || transform.rotationY != null || transform.rotationZ != null) {
-                        const rotation = util.xyz_to_zyx([transform.rotationX || 0, transform.rotationY || 0, transform.rotationZ || 0]);
+                        const rotation = [transform.rotationX || 0, transform.rotationY || 0, transform.rotationZ || 0];
                         animator.addKeyframe({ interpolation: interpolationMode, time, channel: 'rotation', data_points: [{ x: rotation[0], y: rotation[1], z: rotation[2] }] });
                     }
 
                     if (transform.offsetX != null || transform.offsetY != null || transform.offsetZ != null) {
-                        const position = util.xyz_to_zyx([transform.offsetX || 0, transform.offsetY || 0, transform.offsetZ || 0]);
+                        const position = [transform.offsetX || 0, transform.offsetY || 0, transform.offsetZ || 0];
                         animator.addKeyframe({ interpolation: interpolationMode, time, channel: 'position', data_points: [{ x: position[0] || 0, y: position[1] || 0, z: [position[2]] || 0 }] });
                     }
 
