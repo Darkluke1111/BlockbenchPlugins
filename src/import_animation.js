@@ -35,7 +35,7 @@ module.exports = function importAnimations(animations) {
 
                     if (transform.offsetX != null || transform.offsetY != null || transform.offsetZ != null) {
                         const position = [transform.offsetX || 0, transform.offsetY || 0, transform.offsetZ || 0];
-                        animator.addKeyframe({ interpolation: interpolationMode, time, channel: 'position', data_points: [{ x: position[0] || 0, y: position[1] || 0, z: [position[2]] || 0 }] });
+                        animator.addKeyframe({ interpolation: interpolationMode, time, channel: 'position', data_points: [{ x: position[0] || 0, y: position[1] || 0, z: position[2] || 0 }] });
                     }
 
                     if (transform.scaleX != null || transform.scaleY != null || transform.scaleZ != null) {
@@ -44,18 +44,5 @@ module.exports = function importAnimations(animations) {
                 }
             }
         });
-
-        if (isLooping) {
-            for (const animatorUUID in animation.animators) {
-                const animator = animation.animators[animatorUUID];
-                for (const channel of ['rotation', 'position', 'scale']) {
-                    const firstKeyframe = animator.keyframes.find(kf => kf.channel === channel && kf.time === 0);
-                    if (firstKeyframe) {
-                        const lastKeyframe = animator.addKeyframe(firstKeyframe.getUndoCopy(), true);
-                        lastKeyframe.time = animationLength;
-                    }
-                }
-            }
-        }
     });
 };

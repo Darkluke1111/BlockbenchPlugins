@@ -42,5 +42,8 @@ module.exports = (codec) => new ModelFormat("formatVS", {
     cullfaces: false, // Not sure if Vintage Story supports this
     // node_name_regex: null,
     render_sides: "front", //Seems right to me but I havent tested how VS does it
-    euler_order: "XYZ"
+    euler_order: "XYZ",
+    animation_loop_wrapping: true,
+    quaternion_interpolation: false,
+    per_animator_rotation_interpolation: false,
 })
