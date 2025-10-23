@@ -1,6 +1,6 @@
 node_modules/
 test_models/
-json_schemas/
+src/generated/
 dist/
 *.zip
 *.psd
