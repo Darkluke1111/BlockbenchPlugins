@@ -10,15 +10,14 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
-            },
-            {
-                test: /\.css$/,
-                use: [ 'to-string-loader', 'css-loader' ]
+                loader: 'ts-loader',
+                options: { 
+                    reportFiles: ['src/**/*.{ts,tsx}'] 
+                },               
             },
         ],
     },
+
     output: {
         filename: 'vs_plugin.js',
         path: path.resolve(__dirname, 'dist'),
