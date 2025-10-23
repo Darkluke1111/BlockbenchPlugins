@@ -81,7 +81,7 @@ Plugin.register('vs_plugin', {
                 type: 'text',
                 condition(model) {
                     const content = autoParseJSON(model);
-                    return content && content.textures;
+                    return content && content.textureWidth;
                 }
             },
             compile(options) {
