@@ -1,5 +1,6 @@
 node_modules/
 test_models/
+json_schemas/
 dist/
 *.zip
 *.psd

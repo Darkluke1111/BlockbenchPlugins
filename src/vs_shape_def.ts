@@ -1,65 +1,64 @@
 
-interface VS_Shape {
+export interface VS_Shape {
     editor: VS_EditorSettings | undefined,
     textureWidth: number,
     textureHeight: number,
     textureSizes: Record<string, [number,number]>,
     textures: Record<string, string>,
     elements: Array<VS_Element>,
-    animations: Array<VS_Animation> | undefined,
+    animations?: Array<VS_Animation>,
 }
 
-interface VS_EditorSettings {
-    collapsedPaths: string | undefined,
-    allAngles: boolean | undefined,
-    entityTextureMode: boolean | undefined,
+export interface VS_EditorSettings {
+    collapsedPaths?: string,
+    allAngles?: boolean,
+    entityTextureMode?: boolean,
 }
 
-interface VS_Element {
+export interface VS_Element {
     name: string,
     from: [number, number, number],
     to: [number, number, number],
-    autoUnwrap: boolean | undefined
+    autoUnwrap?: boolean,
     uv: [number,number],
-    rotationOrigin: [number,number,number]
-    rotationX: number | undefined,
-    rotationY: number | undefined,
-    rotationZ: number | undefined,
-    faces: Record<VS_Direction,VS_Face>,
-    stepParentName: string | undefined,
-    children: Array<VS_Element>,
+    rotationOrigin?: [number,number,number]
+    rotationX?: number,
+    rotationY?: number,
+    rotationZ?: number,
+    faces: Partial<Record<VS_Direction,VS_Face>>,
+    stepParentName?: string,
+    children?: Array<VS_Element>,
 }
 
-type VS_Direction = "north" | "east" | "south" | "west" | "up" | "down"
+export type VS_Direction = "north" | "east" | "south" | "west" | "up" | "down"
 
-interface VS_Face {
+export interface VS_Face {
     texture: string,
     uv: [number,number,number,number],
-    rotation: number | undefined,
-    windMode: [number,number,number,number],
+    rotation?: number,
+    windMode?: [number,number,number,number],
 }
 
-interface VS_Animation {
+export interface VS_Animation {
     name: string,
     code: string,
     quantityframes: number,
     onActivityStopped: VS_OnActivityStopped,
     onAnimationEnd: VS_OnAnimationEnd,
+    easeAnimationSpeed?: boolean,
     keyframes: Array<VS_Keyframe>
 }
 
-// TODO: Look up other options
-type VS_OnActivityStopped = "EaseOut"
+export type VS_OnActivityStopped = "PlayTillEnd" | "Rewind" | "Stop" | "EaseOut"
 
-// TODO: Look up other options
-type VS_OnAnimationEnd = "Repeat"
+export type VS_OnAnimationEnd = "Hold" | "Repeat" | "Stop" | "EaseOut"
 
-interface VS_Keyframe {
+export interface VS_Keyframe {
     frame: number,
     elements: Record<string, Partial<VS_AnimationKey>>,
 }
 
-interface VS_AnimationKey {
+export interface VS_AnimationKey {
     offsetX: number,
     offsetY: number,
     offsetZ: number,

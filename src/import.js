@@ -6,6 +6,9 @@ const importAnimations = require("./import_animation.js");
 module.exports = function (data, path, asHologram) {
     const content = autoParseJSON(data);
 
+    
+
+
     // Set project texture dimensions
     Project.texture_width = content.textureWidth || 16;
     Project.texture_height = content.textureHeight || 16;

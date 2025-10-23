@@ -1,16 +1,18 @@
-
-//const console = require('console');
-const path = require('path');
 const ex = require("./export.js");
 const im = require("./import.js");
 const format_definition = require("./format_definition.js");
 const { editor_backDropShapeProp } = require('./property.js');
 const util = require('./util.js');
 const props = require('./property.js');
+const vs_schema = require("./generated/vs_shape_schema.js");
+
 const fs = requireNativeModule('fs');
+const path = require('path');
+const Ajv = require("ajv")
 const process = requireNativeModule('process', {
     message: 'This permission is required to access the VINATGE_STORY environment variable to setup texture paths.'
 });
+
 
 
 
@@ -81,7 +83,7 @@ Plugin.register('vs_plugin', {
                 type: 'text',
                 condition(model) {
                     const content = autoParseJSON(model);
-                    return content && content.textureWidth;
+                    return validate_json(content);
                 }
             },
             compile(options) {
@@ -247,3 +249,11 @@ Plugin.register('vs_plugin', {
         Blockbench.removeListener('add_group', onGroupAdd)
     }
 });
+
+function validate_json(content) {   
+    const ajv = new Ajv()
+    const validate = ajv.compile(vs_schema)
+    const valid = validate(content)
+    if (!valid) console.log(validate.errors)
+    return valid;
+}
