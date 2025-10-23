@@ -79,6 +79,10 @@ Plugin.register('vs_plugin', {
             load_filter: {
                 extensions: ["json"],
                 type: 'text',
+                condition(model) {
+                    const content = autoParseJSON(model);
+                    return content && content.textures;
+                }
             },
             compile(options) {
                 resetStepparentTransforms()
