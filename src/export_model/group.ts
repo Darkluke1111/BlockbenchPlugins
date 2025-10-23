@@ -1,4 +1,7 @@
-const util = require("../util.js");
+import { GroupExtension } from "../property";
+import { VS_Element } from "../vs_shape_def";
+
+const util = require("../util");
 
 /**
  * Processes a Blockbench Group and converts it to a VS element.
@@ -8,7 +11,13 @@ const util = require("../util.js");
  * @param {function} traverse The traverse function to process child nodes.
  * @param {Array<number>} offset The position offset to apply.
  */
-function processGroup(parent, node, accu, traverse, offset) {
+export function process_group(
+    parent: Group, 
+    node: GroupExtension, 
+    accu: Array<VS_Element>, 
+    traverse: (parent: OutlinerNode, nodes: Array<OutlinerNode>, accu: Array<VS_Element>, offset: Array<number>) => void, 
+    offset: [number,number,number]
+) {
     const parent_pos = parent ? parent.origin : [0, 0, 0];
     const converted_rotation = node.rotation;
 
@@ -22,7 +31,7 @@ function processGroup(parent, node, accu, traverse, offset) {
         rotationOrigin = util.vector_add(rotationOrigin, offset);
     }
 
-    const vsElement = {
+    const vsElement: VS_Element = {
         name: node.name.replace('_group', ''),
         from: from,
         to: to,
@@ -44,5 +53,3 @@ function processGroup(parent, node, accu, traverse, offset) {
         traverse(node, node.children, accu, offset);
     }
 }
-
-module.exports = processGroup;

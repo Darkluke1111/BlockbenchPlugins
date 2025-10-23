@@ -1,14 +1,15 @@
-const util = require("./util.js");
+import { VS_Animation, VS_AnimationKey, VS_Keyframe } from "./vs_shape_def";
+import * as util from "./util";
 
 /**
  * Exports Blockbench animations to the Vintage Story animation format.
- * @returns {Array<object>} An array of VS animations.
+ * @returns An array of VS animations.
  */
-module.exports = function exportAnimations() {
+export function export_animations(): Array<VS_Animation> {
     const animations = [];
 
-    Animation.all.forEach(animation => {
-        const keyframes = {};
+    (Animation as unknown as typeof _Animation).all.forEach(animation => {
+        const keyframes: Record<number,VS_Keyframe> = {};
         const fps = util.fps;
         const animators = Object.values(animation.animators || {});
         animators.forEach(animator => {
@@ -54,11 +55,10 @@ module.exports = function exportAnimations() {
 
         
 
-        const vsAnimation = {
+        const vsAnimation : VS_Animation = {
             name: animation.name,
             code: animation.name.toLowerCase().replace(/ /g, ''),
             quantityframes: Math.round(animation.length * fps),
-            fps: fps,
             onActivityStopped: "EaseOut",
             onAnimationEnd: animation.loop === 'loop' ? "Repeat" : "Hold",
             keyframes: Object.values(keyframes).sort((a, b) => a.frame - b.frame)

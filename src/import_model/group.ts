@@ -1,5 +1,6 @@
-const util = require("../util.js");
-const props = require("../property.js");
+import { VS_Element } from "../vs_shape_def";
+import * as util from "../util";
+import * as props from "../property";
 
 /**
  * Processes a Vintage Story element and creates a Blockbench Group.
@@ -10,7 +11,7 @@ const props = require("../property.js");
  * @param {boolean} asHologram Whether to import as a hologram.
  * @returns {object} The created Blockbench Group.
  */
-function processGroup(parent, object_space_pos, vsElement, path, asHologram) {
+export function process_group(parent: OutlinerNode, object_space_pos: [number,number,number], vsElement: VS_Element, path: string, asHologram: boolean) {
     const group = new Group({
         name: vsElement.name + '_group',
         origin: vsElement.rotationOrigin ? util.vector_add(vsElement.rotationOrigin, object_space_pos) : object_space_pos,
@@ -21,11 +22,9 @@ function processGroup(parent, object_space_pos, vsElement, path, asHologram) {
         group.hologram = path;
     }
     if (vsElement.stepParentName) {
-        props.stepParentProp.merge(group, { stepParentName: vsElement.stepParentName });
+        props.stepParentProp.merge(group as any, { stepParentName: vsElement.stepParentName } as any);
     }
 
     group.addTo(parent).init();
     return group;
 }
-
-module.exports = processGroup;

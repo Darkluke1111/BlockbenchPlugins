@@ -1,18 +1,19 @@
-const ex = require("./export.js");
-const im = require("./import.js");
-const format_definition = require("./format_definition.js");
-const { editor_backDropShapeProp } = require('./property.js');
-const util = require('./util.js');
-const props = require('./property.js');
-const vs_schema = require("./generated/vs_shape_schema.js");
-const patchBoneAnimator = require("./patches/boneAnimatorPatch.js");
+import {im} from "./import"
+import {ex} from "./export";
+import {get_format} from "./format_definition";
+import {editor_backdropShapeProp} from './property';
+import * as util from './util';
+import * as props from './property';
+import * as vs_schema from "./generated/vs_shape_schema";
+import patchBoneAnimator from "./patches/boneAnimatorPatch";
+
+import Ajv from "ajv"
+
 
 const fs = requireNativeModule('fs');
-const path = require('path');
-const Ajv = require("ajv")
-const process = requireNativeModule('process', {
-    message: 'This permission is required to access the VINATGE_STORY environment variable to setup texture paths.'
-});
+const path = requireNativeModule('path');
+
+import * as process from "process";
 
 
 
@@ -23,7 +24,7 @@ let reExportAction
 let debugAction
 let onGroupAdd
 
-Plugin.register('vs_plugin', {
+BBPlugin.register('vs_plugin', {
     title: 'Vintage Story Format Support',
     icon: 'icon',
     author: 'Darkluke1111, codename_B',
@@ -64,12 +65,11 @@ Plugin.register('vs_plugin', {
 
         onGroupAdd = function(_group) {
 
-            let group = Group.first_selected
-            let parent = group.parent
+            let group = Group.first_selected;
+            let parent = group.parent as any;
             console.log(group)
             console.log(parent)
-            if(parent.hologram) {
-
+            if(parent != "root" && parent.hologram) {
                 group.stepParentName = parent.name.substring(0,parent.name.length - 6)
                 console.log(group.stepParentName)
             }
@@ -101,11 +101,11 @@ Plugin.register('vs_plugin', {
         })
 
         function loadBackDropShape() {
-            let backDrop = {}
-            editor_backDropShapeProp.copy(Project, backDrop)
-            console.log(backDrop.backDropShape)
-            if (backDrop.backDropShape) {
-                Blockbench.read(util.get_shape_location(null, backDrop.backDropShape), {
+            let backdrop = {} as any;
+            editor_backdropShapeProp.copy(Project as any, backdrop)
+
+            if (backdrop.backdropShape) {
+                Blockbench.read(util.get_shape_location(null, backdrop.backdropShape), {
                     readtype: "text", errorbox: false
                 }, (files) => {
                     im(files[0].content, files[0].path, true)
@@ -118,8 +118,8 @@ Plugin.register('vs_plugin', {
 
         function resolveStepparentTransforms() {
             for (var g of Group.all) {
-                let p = {}
-                props.stepParentProp.copy(g, p)
+                let p = {} as any;
+                props.stepParentProp.copy(g as any, p)
                 if (p.stepParentName) {
                     let spg = Group.all.find(g => g.name === (p.stepParentName + "_group"))
                     if (spg) {
@@ -135,8 +135,8 @@ Plugin.register('vs_plugin', {
 
         function resetStepparentTransforms() {
             for (var g of Group.all) {
-                let p = {}
-                props.stepParentProp.copy(g, p)
+                let p = {} as any;
+                props.stepParentProp.copy(g as any, p)
                 if (!g.hologram) {
                     let spg = Group.all.find(g => g.name === (p.stepParentName + "_group"))
                     if (spg) {
@@ -150,7 +150,7 @@ Plugin.register('vs_plugin', {
             }
         }
 
-        let formatVS = format_definition(codecVS)
+        let formatVS = get_format(codecVS)
         codecVS.format = formatVS
 
 
@@ -180,7 +180,7 @@ Plugin.register('vs_plugin', {
                     type: 'json',
                     extensions: ['json'],
                 }, function (files) {
-                    codecVS.parse(files[0].content)
+                    codecVS.parse(files[0].content, files[0].path);
                 });
             }
 
@@ -209,9 +209,9 @@ Plugin.register('vs_plugin', {
                                 let project = new ModelProject({ format: formatVS })
                                 project.select()
                                 try {
-                                    let = Blockbench.read(test_folder + path.sep + test_file, { readtype: "text", errorbox: false }, (files) => {
+                                    Blockbench.read(test_folder + path.sep + test_file, { readtype: "text", errorbox: false }, (files) => {
                                         console.log("Importing " + test_file)
-                                        codecVS.parse(files[0].content, test_folder + path.sep + test_file, false);
+                                        codecVS.parse(files[0].content, test_folder + path.sep + test_file);
                                         console.log("Exporting " + test_file)
                                         let reexport_content = codecVS.compile()
                                         let reexport_path = test_folder + path.sep + "reexport_" + path.basename(test_file)

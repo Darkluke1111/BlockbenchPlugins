@@ -1,5 +1,5 @@
-const fs = requireNativeModule('fs');
-const path = requireNativeModule('path');
+import * as fs from "fs";
+import * as path from "path";
 
 let fps = 30;
 
@@ -113,8 +113,8 @@ function update_children(node) {
 
 }
 
-function vector_add(a, b) {
-    let c = []
+function vector_add(a: [number,number,number], b: [number,number,number]): [number,number,number] {
+    let c: [number,number,number] = [0,0,0];
     for(let i = 0 ; i < a.length ; i++) {
         c[i] = a[i] + b[i]
     }
@@ -130,15 +130,15 @@ function vector_inv(a) {
     return c
 }
 
-function vector_sub(a,b) {
-    let c = []
+function vector_sub(a: [number,number,number], b: [number,number,number]): [number,number,number] {
+    let c: [number,number,number] = [0,0,0];
     for(let i = 0 ; i < a.length ; i++) {
         c[i] = a[i] - b[i]
     }
     return c
 }
 
-module.exports = {
+export {
     fps,
     get_texture_location,
     get_shape_location,

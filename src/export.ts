@@ -1,10 +1,10 @@
-const util = require("./util.js");
-const props = require("./property.js");
-const exportModel = require("./export_model.js");
-const exportAnimations = require("./export_animation.js");
+import * as props from "./property";
+import {export_model} from "./export_model";
+import {export_animations} from "./export_animation";
+import { VS_Shape } from "./vs_shape_def";
 
-module.exports = function (options) {
-    const data = {
+export function ex(options) {
+    const data: VS_Shape = {
         editor: {},
         textureWidth: Project.texture_width,
         textureHeight: Project.texture_height,
@@ -23,22 +23,22 @@ module.exports = function (options) {
 
     // Populate Textures
     for (const texture of Texture.all) {
-        let tmp = {};
-        props.textureLocationProp.copy(texture, tmp);
+        let tmp = {} as any;
+        props.textureLocationProp.copy(texture as any, tmp as any);
         data.textures[texture.name] = tmp.textureLocation;
     }
     
     // Populate Editor Info
-    if (Project.backDropShape) data.editor.backDropShape = Project.backDropShape;
+    if (Project.backDropShape) data.editor.backdropShape = Project.backdropShape;
     if (Project.allAngles) data.editor.allAngles = Project.allAngles;
     if (Project.entityTextureMode) data.editor.entityTextureMode = Project.entityTextureMode;
     if (Project.collapsedPaths) data.editor.collapsedPaths = Project.collapsedPaths;
 
     // Export Model Elements
-    data.elements = exportModel();
+    data.elements = export_model();
 
     // Export Animations
-    data.animations = exportAnimations();
+    data.animations = export_animations();
 
     return autoStringify(data);
 }

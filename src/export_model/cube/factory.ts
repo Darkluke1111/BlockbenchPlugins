@@ -1,15 +1,16 @@
-const util = require("../../util.js");
+import { VS_Direction, VS_Element, VS_Face } from "../../vs_shape_def";
+import * as util from "../../util";
 
 /**
  * Creates a new Vintage Story element from a Blockbench cube.
- * @param {object} parent The parent node in the hierarchy.
- * @param {object} node The Cube node to process.
- * @param {Array<number>} parent_pos The position of the parent object.
- * @param {Array<number>} offset The position offset to apply.
- * @param {object} faces The processed face data.
- * @returns {object} The new VS element.
+ * @param parent The parent node in the hierarchy.
+ * @param node The Cube node to process.
+ * @param parent_pos The position of the parent object.
+ * @param offset The position offset to apply.
+ * @param faces The processed face data.
+ * @returns The new VS element.
  */
-function createVsElement(parent, node, parent_pos, offset, faces) {
+export function create_VS_element(parent: Group, node: Cube, parent_pos: [number,number,number], offset: [number,number,number], faces: Partial<Record<VS_Direction, VS_Face>>): VS_Element {
     const converted_rotation = node.rotation;
 
     let from = util.vector_sub(node.from, parent_pos);
@@ -33,12 +34,10 @@ function createVsElement(parent, node, parent_pos, offset, faces) {
         from: from,
         to: to,
         rotationOrigin: rotationOrigin,
-        uv: node.uv,
+        uv: node.uv_offset,
         faces: faces,
         ...(converted_rotation[0] !== 0 && { rotationX: converted_rotation[0] }),
         ...(converted_rotation[1] !== 0 && { rotationY: converted_rotation[1] }),
         ...(converted_rotation[2] !== 0 && { rotationZ: converted_rotation[2] }),
     };
 }
-
-module.exports = createVsElement;

@@ -1,11 +1,13 @@
+import { VS_Direction, VS_Face } from "../../vs_shape_def";
+
 /**
  * Processes the face data from a Vintage Story element.
  * @param {object} faces The faces object from the VS element.
  * @returns {object} The processed face data for Blockbench.
  */
-function processFaces(faces) {
-    const reduced_faces = {};
-    for (const direction of ['north', 'east', 'south', 'west', 'up', 'down']) {
+export function process_faces(faces: Partial<Record<VS_Direction, VS_Face>>): Partial<Record<CardinalDirection, CubeFaceOptions>> {
+    const processed_faces = {};
+    for (const direction of Object.values(VS_Direction)) {
         const faceData = faces[direction];
         if (faceData) {
             const texture_name = faceData.texture ? faceData.texture.substring(1) : null;
@@ -16,12 +18,10 @@ function processFaces(faces) {
                 texture = new Texture({
                     name: texture_name
                 });
-                texture.fromDataURL(texture.getBase64(64, 64)).add()
+                texture.fromDataURL(texture.getBase64()).add()
             }
-            reduced_faces[direction] = { texture, uv: faceData.uv, rotation: faceData.rotation };
+            processed_faces[direction] = { texture, uv: faceData.uv, rotation: faceData.rotation };
         }
     }
-    return reduced_faces;
+    return processed_faces;
 }
-
-module.exports = processFaces;

@@ -1,6 +1,13 @@
 {
-  "dependencies": {
-    "typescript": "^5.7.2",
-    "module": "commonjs"
-  }
+  "compilerOptions": {
+    "types": ["blockbench-types", "node"],
+    "module": "es2022",
+    "target": "es2022",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "allowJs": true,
+  },
+  "exclude": [
+    "node_modules"
+  ]
 }

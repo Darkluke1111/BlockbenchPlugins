@@ -1,13 +1,14 @@
-const props = require("../../property.js");
+import * as props from "../../property";
+import { VS_Direction, VS_Face } from "../../vs_shape_def";
 
 /**
  * Transforms UV coordinates for up/down faces to match VS coordinate space.
  * BlockBench and VS use different UV orientations for top/bottom faces.
- * @param {Array<number>} uv - The UV coordinates [x1, y1, x2, y2]
- * @param {number} rotation - The face rotation in degrees (0, 90, 180, 270)
- * @returns {object} Object with transformed UV and rotation
+ * @param uv - The UV coordinates [x1, y1, x2, y2]
+ * @param rotation - The face rotation in degrees (0, 90, 180, 270)
+ * @returns Object with transformed UV and rotation
  */
-function transformUV(uv, rotation) {
+function transformUV(uv: [number,number,number,number], rotation: number): { uv: [number,number,number,number], rotation: number } {
     // For up/down faces with 90° or 270° rotation, normalize UVs
     if (rotation === 90 || rotation === 270) {
         // Check if UV is mirrored/flipped
@@ -45,13 +46,13 @@ function transformUV(uv, rotation) {
 
 /**
  * Processes the face data from a Blockbench cube.
- * @param {object} faces The faces object from the Blockbench cube.
- * @returns {object} The processed face data for the VS element.
+ * @param faces The faces object from the Blockbench cube.
+ * @returns The processed face data for the VS element.
  */
-function processFaces(faces) {
+export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>>): Partial<Record<VS_Direction, VS_Face>> {
     const reduced_faces = {};
 
-    for (const direction of ['north', 'east', 'south', 'west', 'up', 'down']) {
+    for (const direction of Object.values(VS_Direction)) {
         const face = faces[direction];
 
         // Skip disabled faces - they should not be exported
@@ -80,9 +81,7 @@ function processFaces(faces) {
             autoUv: false,
             snapUv: false
         });
-        props.windProp.copy(face, reduced_faces[direction]);
+        props.windProp.copy(face as any, reduced_faces[direction] as any);
     }
     return reduced_faces;
 }
-
-module.exports = processFaces;
