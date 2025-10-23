@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
+    "outDir": "/dist",
     "types": ["blockbench-types", "node"],
-    "module": "es2022",
+    "module": "node16",
     "target": "es2022",
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "allowJs": true,
   },
   "exclude": [
