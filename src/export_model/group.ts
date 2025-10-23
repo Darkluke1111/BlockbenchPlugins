@@ -5,11 +5,11 @@ const util = require("../util");
 
 /**
  * Processes a Blockbench Group and converts it to a VS element.
- * @param {object} parent The parent node in the hierarchy.
- * @param {object} node The Group node to process.
- * @param {Array<object>} accu The accumulator for the VS elements.
- * @param {function} traverse The traverse function to process child nodes.
- * @param {Array<number>} offset The position offset to apply.
+ * @param parent The parent node in the hierarchy.
+ * @param node The Group node to process.
+ * @param accu The accumulator for the VS elements.
+ * @param traverse The traverse function to process child nodes.
+ * @param offset The position offset to apply.
  */
 export function process_group(
     parent: Group, 

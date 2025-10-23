@@ -2,8 +2,8 @@ import { VS_Direction, VS_Face } from "../../vs_shape_def";
 
 /**
  * Processes the face data from a Vintage Story element.
- * @param {object} faces The faces object from the VS element.
- * @returns {object} The processed face data for Blockbench.
+ * @param faces The faces object from the VS element.
+ * @returns The processed face data for Blockbench.
  */
 export function process_faces(faces: Partial<Record<VS_Direction, VS_Face>>): Partial<Record<CardinalDirection, CubeFaceOptions>> {
     const processed_faces = {};

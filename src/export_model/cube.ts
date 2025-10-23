@@ -5,10 +5,10 @@ import {create_VS_element} from "./cube/factory";
 
 /**
  * Processes a Blockbench Cube and converts it to a VS element.
- * @param {object} parent The parent node in the hierarchy.
- * @param {object} node The Cube node to process.
- * @param {Array<object>} accu The accumulator for the VS elements.
- * @param {Array<number>} offset The position offset to apply.
+ * @param parent The parent node in the hierarchy.
+ * @param node The Cube node to process.
+ * @param accu The accumulator for the VS elements.
+ * @param offset The position offset to apply.
  */
 export function process_cube(parent: Group, node: CubeExtension, accu: Array<VS_Element>, offset: [number,number,number]) {
     const parent_pos: [number,number,number] = parent ? parent.origin : [0, 0, 0];

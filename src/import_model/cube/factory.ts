@@ -4,10 +4,10 @@ import { CubeExtension } from "../../property";
 
 /**
  * Creates a new Blockbench Cube object.
- * @param {Array<number>} object_space_pos The position in the object space.
- * @param {object} vsElement The Vintage Story element to process.
- * @param {object} faces The processed face data.
- * @returns {object} The new Blockbench Cube object.
+ * @param object_space_pos The position in the object space.
+ * @param vsElement The Vintage Story element to process.
+ * @param faces The processed face data.
+ * @returns The new Blockbench Cube object.
  */
 export function create_cube(object_space_pos: [number,number,number], vsElement: VS_Element, faces: Partial<Record<CardinalDirection, CubeFaceOptions>>): CubeExtension {
     const cube_options: ICubeOptions = {

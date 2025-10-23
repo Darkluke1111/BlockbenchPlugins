@@ -4,12 +4,12 @@ import * as props from "../property";
 
 /**
  * Processes a Vintage Story element and creates a Blockbench Group.
- * @param {object} parent The parent Blockbench object.
- * @param {Array<number>} object_space_pos The position in the object space.
- * @param {object} vsElement The Vintage Story element to process.
- * @param {string} path The file path.
- * @param {boolean} asHologram Whether to import as a hologram.
- * @returns {object} The created Blockbench Group.
+ * @param parent The parent Blockbench object.
+ * @param object_space_pos The position in the object space.
+ * @param vsElement The Vintage Story element to process.
+ * @param path The file path.
+ * @param asHologram Whether to import as a hologram.
+ * @returns The created Blockbench Group.
  */
 export function process_group(parent: OutlinerNode, object_space_pos: [number,number,number], vsElement: VS_Element, path: string, asHologram: boolean) {
     const group = new Group({
