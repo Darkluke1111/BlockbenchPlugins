@@ -25,6 +25,11 @@ You can build the plugin with
 
 ```console
 npm install
+npm run gen_schema
 npm run build
 ```
 This should build the plugin with webpack into .../dist/vs_plugin.js which can then be imported to BB.
+You only need to rerun gen_schema when vs_shape_defs.ts has changed, otherwise further builds only require running
+```console
+npm run build
+```
