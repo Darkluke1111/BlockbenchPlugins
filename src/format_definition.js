@@ -1,6 +1,5 @@
 module.exports = (codec) => new ModelFormat("formatVS", {
     name: "Vintage Story Base Format",
-    id: "vs_format",
     codec: codec,
     icon: "fa-cookie-bite",
     box_uv: false,

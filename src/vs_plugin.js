@@ -5,6 +5,7 @@ const { editor_backDropShapeProp } = require('./property.js');
 const util = require('./util.js');
 const props = require('./property.js');
 const vs_schema = require("./generated/vs_shape_schema.js");
+const patchBoneAnimator = require("./patches/boneAnimatorPatch.js");
 
 const fs = requireNativeModule('fs');
 const path = require('path');
@@ -31,6 +32,8 @@ Plugin.register('vs_plugin', {
     variant: 'desktop',
 
     onload() {
+        patchBoneAnimator();
+        
         //Init additional Attribute Properties
         let game_path_setting = new Setting("game_path", {
             name: "Game Path",
