@@ -56,7 +56,7 @@ export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>
         const face = faces[direction];
 
         // Skip disabled faces - they should not be exported
-        if (face.enabled === false) {
+        if (!face || face.enabled === false) {
             continue;
         }
 
@@ -73,9 +73,9 @@ export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>
         const transformedRotation = transformed.rotation;
 
         // Export face with texture
-        const texture = Texture.all.find(t => t.uuid === face.texture);
+        const texture_name = get_texture_name(face.texture);
         reduced_faces[direction] = new oneLiner({
-            texture: `#${texture.name}`,
+            texture: `#${texture_name}`,
             ...(!isUvDefault && { uv: transformedUV }),
             ...(transformedRotation !== 0 && { rotation: transformedRotation }),
             autoUv: false,
@@ -84,4 +84,20 @@ export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>
         props.windProp.copy(face as any, reduced_faces[direction] as any);
     }
     return reduced_faces;
+}
+
+/**
+ * Tries to get the texture name from a face texture UUID.
+ * @param face_texture The UUID of the face texture.
+ * @returns The name of the texture, or 'missing_texture' if not found.
+ */
+function get_texture_name(face_texture: string): string {
+    const texture = Texture.all.find(t => t.uuid === face_texture);
+    if(texture) {
+        return texture.name;
+    } else
+        {
+        console.error("Texture not found for UUID:", face_texture);
+        return 'missing_texture';
+    }
 }

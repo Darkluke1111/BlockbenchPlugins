@@ -1,5 +1,6 @@
-import { GroupExtension } from "../property";
+import { GroupExt } from "../property";
 import { VS_Element } from "../vs_shape_def";
+import { traverse } from "./traverse";
 
 const util = require("../util");
 
@@ -8,14 +9,12 @@ const util = require("../util");
  * @param parent The parent node in the hierarchy.
  * @param node The Group node to process.
  * @param accu The accumulator for the VS elements.
- * @param traverse The traverse function to process child nodes.
  * @param offset The position offset to apply.
  */
 export function process_group(
-    parent: Group, 
-    node: GroupExtension, 
-    accu: Array<VS_Element>, 
-    traverse: (parent: OutlinerNode, nodes: Array<OutlinerNode>, accu: Array<VS_Element>, offset: Array<number>) => void, 
+    parent: GroupExt | null , 
+    node: GroupExt, 
+    accu: Array<VS_Element>,
     offset: [number,number,number]
 ) {
     const parent_pos = parent ? parent.origin : [0, 0, 0];
@@ -48,7 +47,7 @@ export function process_group(
 
     if (!node.hologram) {
         accu.push(vsElement);
-        traverse(node, node.children, vsElement.children, offset);
+        traverse(node, node.children, vsElement.children!, offset);
     } else {
         traverse(node, node.children, accu, offset);
     }

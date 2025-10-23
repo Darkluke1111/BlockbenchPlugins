@@ -1,6 +1,7 @@
 import { VS_Element } from "../vs_shape_def";
 import * as util from "../util";
-import * as props from "../property";
+import { GroupExt, stepParentProp } from "../property";
+
 
 /**
  * Processes a Vintage Story element and creates a Blockbench Group.
@@ -11,7 +12,7 @@ import * as props from "../property";
  * @param asHologram Whether to import as a hologram.
  * @returns The created Blockbench Group.
  */
-export function process_group(parent: OutlinerNode, object_space_pos: [number,number,number], vsElement: VS_Element, path: string, asHologram: boolean) {
+export function process_group(parent: GroupExt | null, object_space_pos: [number,number,number], vsElement: VS_Element, path: string, asHologram: boolean): GroupExt {
     const group = new Group({
         name: vsElement.name + '_group',
         origin: vsElement.rotationOrigin ? util.vector_add(vsElement.rotationOrigin, object_space_pos) : object_space_pos,
@@ -22,9 +23,9 @@ export function process_group(parent: OutlinerNode, object_space_pos: [number,nu
         group.hologram = path;
     }
     if (vsElement.stepParentName) {
-        props.stepParentProp.merge(group as any, { stepParentName: vsElement.stepParentName } as any);
+        stepParentProp.merge(group as any, { stepParentName: vsElement.stepParentName } as any);
     }
 
-    group.addTo(parent).init();
+    group.addTo(parent ? parent : "root").init();
     return group;
 }

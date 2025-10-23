@@ -1,3 +1,7 @@
+/**
+ * Interfaces that define the structure of Vintage Story shape files.
+ * Remember to run 'npm run gen_schema' after modifying this file to generate the updated JSON schema for validation.
+ */
 
 export interface VS_Shape {
     editor?: VS_EditorSettings | undefined,

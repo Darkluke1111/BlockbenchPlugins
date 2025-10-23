@@ -7,6 +7,10 @@ import { VS_Shape } from "./vs_shape_def";
 export function im(data, path, asHologram) {
     const content = autoParseJSON(data) as VS_Shape;
 
+    if(!Project) {
+        throw new Error("No project loaded during import");
+    }
+    
     // Set project texture dimensions
     Project.texture_width = content.textureWidth || 16;
     Project.texture_height = content.textureHeight || 16;

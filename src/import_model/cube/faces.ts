@@ -5,8 +5,15 @@ import { VS_Direction, VS_Face } from "../../vs_shape_def";
  * @param faces The faces object from the VS element.
  * @returns The processed face data for Blockbench.
  */
-export function process_faces(faces: Partial<Record<VS_Direction, VS_Face>>): Partial<Record<CardinalDirection, CubeFaceOptions>> {
+export function process_faces(faces: Partial<Record<VS_Direction, VS_Face>> | undefined): Partial<Record<CardinalDirection, CubeFaceOptions>> {
+    
+    // If no faces are provided, return empty object
+    if (!faces) {
+        return {};
+    }
+
     const processed_faces = {};
+
     for (const direction of Object.values(VS_Direction)) {
         const faceData = faces[direction];
         if (faceData) {

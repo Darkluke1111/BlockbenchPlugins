@@ -41,7 +41,7 @@ BBPlugin.register('vs_plugin', {
             description: "The path to your Vintage Story game folder. This is the folder that contains the assets, mods and lib folders.",
             type: "click",
             icon: "fa-folder-plus",
-            value: Settings.get("asset_path") || process.env.VINTAGE_STORY || null,
+            value: Settings.get("asset_path") || process.env.VINTAGE_STORY || "",
             click() {
 
                 new Dialog("gamePathSelect", {
@@ -66,9 +66,8 @@ BBPlugin.register('vs_plugin', {
         onGroupAdd = function(_group) {
 
             let group = Group.first_selected;
+            if(!group) return;
             let parent = group.parent as any;
-            console.log(group)
-            console.log(parent)
             if(parent != "root" && parent.hologram) {
                 group.stepParentName = parent.name.substring(0,parent.name.length - 6)
                 console.log(group.stepParentName)
@@ -144,7 +143,7 @@ BBPlugin.register('vs_plugin', {
                         console.log(sp)
 
                         util.removeParent(g, sp)
-                        g.addTo(null);
+                        g.addTo("root");
                     }
                 }
             }
@@ -158,7 +157,9 @@ BBPlugin.register('vs_plugin', {
             name: 'Export into VS Format',
             icon: 'fa-cookie-bite',
             click: function () {
-
+                if(!Project) {
+                    throw new Error("No project loaded during export");
+                }
                 Blockbench.export({
                     name: Project.name,
                     type: 'json',
@@ -180,7 +181,7 @@ BBPlugin.register('vs_plugin', {
                     type: 'json',
                     extensions: ['json'],
                 }, function (files) {
-                    codecVS.parse(files[0].content, files[0].path);
+                    codecVS.parse!(files[0].content, files[0].path);
                 });
             }
 
@@ -203,7 +204,7 @@ BBPlugin.register('vs_plugin', {
                     onConfirm(form_result) {
                         let test_folder = form_result.select_folder;
 
-                        let test_files = fs.readdirSync(test_folder);
+                        let test_files = fs!.readdirSync(test_folder);
                         for (var test_file of test_files) {
                             if (!test_file.includes("reexport")) {
                                 let project = new ModelProject({ format: formatVS })
@@ -211,7 +212,7 @@ BBPlugin.register('vs_plugin', {
                                 try {
                                     Blockbench.read(test_folder + path.sep + test_file, { readtype: "text", errorbox: false }, (files) => {
                                         console.log("Importing " + test_file)
-                                        codecVS.parse(files[0].content, test_folder + path.sep + test_file);
+                                        codecVS.parse!(files[0].content, test_folder + path.sep + test_file);
                                         console.log("Exporting " + test_file)
                                         let reexport_content = codecVS.compile()
                                         let reexport_path = test_folder + path.sep + "reexport_" + path.basename(test_file)

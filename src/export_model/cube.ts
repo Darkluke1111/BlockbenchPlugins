@@ -1,4 +1,4 @@
-import { CubeExtension } from "../property";
+import { CubeExt, GroupExt } from "../property";
 import { VS_Element } from "../vs_shape_def";
 import {process_faces} from "./cube/faces";
 import {create_VS_element} from "./cube/factory";
@@ -10,7 +10,7 @@ import {create_VS_element} from "./cube/factory";
  * @param accu The accumulator for the VS elements.
  * @param offset The position offset to apply.
  */
-export function process_cube(parent: Group, node: CubeExtension, accu: Array<VS_Element>, offset: [number,number,number]) {
+export function process_cube(parent: GroupExt | null, node: CubeExt, accu: Array<VS_Element>, offset: [number,number,number]) {
     const parent_pos: [number,number,number] = parent ? parent.origin : [0, 0, 0];
     const reduced_faces = process_faces(node.faces);
     const vsElement = create_VS_element(parent, node, parent_pos, offset, reduced_faces);

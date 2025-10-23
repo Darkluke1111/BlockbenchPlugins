@@ -1,5 +1,6 @@
 import { VS_Direction, VS_Element, VS_Face } from "../../vs_shape_def";
 import * as util from "../../util";
+import { CubeExt, GroupExt } from "../../property";
 
 /**
  * Creates a new Vintage Story element from a Blockbench cube.
@@ -10,7 +11,7 @@ import * as util from "../../util";
  * @param faces The processed face data.
  * @returns The new VS element.
  */
-export function create_VS_element(parent: Group, node: Cube, parent_pos: [number,number,number], offset: [number,number,number], faces: Partial<Record<VS_Direction, VS_Face>>): VS_Element {
+export function create_VS_element(parent: GroupExt | null, node: CubeExt, parent_pos: [number,number,number], offset: [number,number,number], faces: Partial<Record<VS_Direction, VS_Face>>): VS_Element {
     const converted_rotation = node.rotation;
 
     let from = util.vector_sub(node.from, parent_pos);

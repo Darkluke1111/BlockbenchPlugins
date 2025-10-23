@@ -121,8 +121,8 @@ function vector_add(a: [number,number,number], b: [number,number,number]): [numb
     return c
 }
 
-function vector_inv(a) {
-    let c = []
+function vector_inv(a: [number,number,number]): [number,number,number] {
+    let c: [number,number,number] = [0,0,0];
     for(let i = 0 ; i < a.length ; i++) {
         c[i] = - a[i]
     }

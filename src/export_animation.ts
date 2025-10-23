@@ -6,7 +6,7 @@ import * as util from "./util";
  * @returns An array of VS animations.
  */
 export function export_animations(): Array<VS_Animation> {
-    const animations = [];
+    const animations: Array<VS_Animation> = [];
 
     (Animation as unknown as typeof _Animation).all.forEach(animation => {
         const keyframes: Record<number,VS_Keyframe> = {};
