@@ -1,7 +1,6 @@
 const fs = requireNativeModule('fs');
 const path = requireNativeModule('path');
 
-// Vintage Story uses 30 FPS as the standard animation frame rate
 let fps = 30;
 
 let get_texture_location = function (domain, rel_path) {
