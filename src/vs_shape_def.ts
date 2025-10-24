@@ -14,7 +14,7 @@ export interface VS_Shape {
 }
 
 export interface VS_EditorSettings {
-    backdropShape?: string,
+    backDropShape?: string,
     collapsedPaths?: string,
     allAngles?: boolean,
     entityTextureMode?: boolean,

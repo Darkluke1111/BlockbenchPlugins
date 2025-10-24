@@ -28,7 +28,7 @@ export function im(data, path, asHologram) {
 
     // Load editor properties
     if (content.editor) {
-        props.editor_backdropShapeProp.merge(Project as any, content.editor as any);
+        props.editor_backDropShapeProp.merge(Project as any, content.editor as any);
         props.editor_allAnglesProp.merge(Project as any, content.editor as any);
         props.editor_entityTextureModeProp.merge(Project as any, content.editor as any);
         props.editor_collapsedPathsProp.merge(Project as any, content.editor as any);

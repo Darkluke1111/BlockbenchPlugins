@@ -28,7 +28,7 @@ export function ex(options) {
     
     // Populate Editor Info
     const editor: VS_EditorSettings = {};
-    if (Project.backDropShape) editor.backdropShape = Project.backdropShape;
+    if (Project.backDropShape) editor.backDropShape = Project.backDropShape;
     if (Project.allAngles) editor.allAngles = Project.allAngles;
     if (Project.entityTextureMode) editor.entityTextureMode = Project.entityTextureMode;
     if (Project.collapsedPaths) editor.collapsedPaths = Project.collapsedPaths;

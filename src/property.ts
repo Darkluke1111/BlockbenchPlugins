@@ -8,7 +8,7 @@ export const textureLocationProp = new Property(Texture, "string", "textureLocat
 export type TextureExt = Texture & { textureLocation?: string };
 
 
-export const editor_backdropShapeProp= new Property(ModelProject, "string", "backdropShape", {exposed: false,});
+export const editor_backDropShapeProp= new Property(ModelProject, "string", "backDropShape", {exposed: false,});
 export const editor_allAnglesProp= new Property(ModelProject, "boolean", "allAngles", {exposed: false,});
 export const editor_entityTextureModeProp= new Property(ModelProject, "boolean", "entityTextureMode", {exposed: false,});
 export const editor_collapsedPathsProp= new Property(ModelProject, "string", "collapsedPaths", {exposed: false,});

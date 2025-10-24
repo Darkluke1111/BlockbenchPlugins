@@ -1,7 +1,7 @@
 import { im } from "./import"
 import { ex } from "./export";
 import { get_format } from "./format_definition";
-import { editor_backdropShapeProp } from './property';
+import { editor_backDropShapeProp } from './property';
 import * as util from './util';
 import * as props from './property';
 import * as vs_schema from "./generated/vs_shape_schema";
@@ -70,7 +70,6 @@ BBPlugin.register('vs_plugin', {
             let parent = group.parent as any;
             if (parent != "root" && parent.hologram) {
                 group.stepParentName = parent.name.substring(0, parent.name.length - 6)
-                console.log(group.stepParentName)
             }
         }
 
@@ -89,22 +88,24 @@ BBPlugin.register('vs_plugin', {
                 }
             },
             compile(options) {
-                resetStepparentTransforms()
+                // Removed for now since it doesn't work
+                // resetStepparentTransforms()
                 return ex(options)
             },
             parse(data, file_path, add) {
                 im(data, file_path, false)
-                loadBackDropShape()
-                resolveStepparentTransforms()
+                // Removed for now since it doesn't work
+                // loadBackDropShape()
+                // resolveStepparentTransforms()
             },
         })
 
         function loadBackDropShape() {
             let backdrop = {} as any;
-            editor_backdropShapeProp.copy(Project as any, backdrop)
+            editor_backDropShapeProp.copy(Project as any, backdrop)
 
-            if (backdrop.backdropShape) {
-                Blockbench.read(util.get_shape_location(null, backdrop.backdropShape), {
+            if (backdrop.backDropShape) {
+                Blockbench.read(util.get_shape_location(null, backdrop.backDropShape), {
                     readtype: "text", errorbox: false
                 }, (files) => {
                     im(files[0].content, files[0].path, true)
@@ -123,7 +124,6 @@ BBPlugin.register('vs_plugin', {
                     let spg = Group.all.find(g => g.name === (p.stepParentName + "_group"))
                     if (spg) {
                         let sp = spg.children[0]
-                        console.log(sp)
 
                         util.setParent(g, sp)
                         g.addTo(spg);
@@ -140,7 +140,6 @@ BBPlugin.register('vs_plugin', {
                     let spg = Group.all.find(g => g.name === (p.stepParentName + "_group"))
                     if (spg) {
                         let sp = spg.children[0]
-                        console.log(sp)
 
                         util.removeParent(g, sp)
                         g.addTo("root");
