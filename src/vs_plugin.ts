@@ -1,7 +1,7 @@
-import {im} from "./import"
-import {ex} from "./export";
-import {get_format} from "./format_definition";
-import {editor_backdropShapeProp} from './property';
+import { im } from "./import"
+import { ex } from "./export";
+import { get_format } from "./format_definition";
+import { editor_backdropShapeProp } from './property';
 import * as util from './util';
 import * as props from './property';
 import * as vs_schema from "./generated/vs_shape_schema";
@@ -34,7 +34,7 @@ BBPlugin.register('vs_plugin', {
 
     onload() {
         patchBoneAnimator();
-        
+
         //Init additional Attribute Properties
         let game_path_setting = new Setting("game_path", {
             name: "Game Path",
@@ -63,18 +63,18 @@ BBPlugin.register('vs_plugin', {
             }
         })
 
-        onGroupAdd = function(_group) {
+        onGroupAdd = function (_group) {
 
             let group = Group.first_selected;
-            if(!group) return;
+            if (!group) return;
             let parent = group.parent as any;
-            if(parent != "root" && parent.hologram) {
-                group.stepParentName = parent.name.substring(0,parent.name.length - 6)
+            if (parent != "root" && parent.hologram) {
+                group.stepParentName = parent.name.substring(0, parent.name.length - 6)
                 console.log(group.stepParentName)
             }
         }
 
-        Blockbench.on('add_group',onGroupAdd);
+        Blockbench.on('add_group', onGroupAdd);
 
         let codecVS = new Codec("codecVS", {
             name: "Vintage Story Codec",
@@ -157,7 +157,7 @@ BBPlugin.register('vs_plugin', {
             name: 'Export into VS Format',
             icon: 'fa-cookie-bite',
             click: function () {
-                if(!Project) {
+                if (!Project) {
                     throw new Error("No project loaded during export");
                 }
                 Blockbench.export({
@@ -203,29 +203,38 @@ BBPlugin.register('vs_plugin', {
                     },
                     onConfirm(form_result) {
                         let test_folder = form_result.select_folder;
-
-                        let test_files = fs!.readdirSync(test_folder);
+                        console.log(test_folder);
+                        let test_files = fs!.readdirSync(test_folder, { recursive: true, encoding: "utf-8" });
                         for (var test_file of test_files) {
-                            if (!test_file.includes("reexport")) {
-                                let project = new ModelProject({ format: formatVS })
-                                project.select()
+                            if (!test_file.includes("reexport_")) {
+
+                                const test_file_rel_path = test_folder + path.sep + path.dirname(test_file);
+                                const test_file_name = path.basename(test_file)
+
+                                const input_path = path.resolve(test_folder, test_file_rel_path, test_file_name);
+                                const output_path = path.resolve(test_folder, test_file_rel_path, `reexport_${test_file_name}`);
+
+                                if (!fs?.statSync(input_path).isFile()) continue;
                                 try {
-                                    Blockbench.read(test_folder + path.sep + test_file, { readtype: "text", errorbox: false }, (files) => {
-                                        console.log("Importing " + test_file)
-                                        codecVS.parse!(files[0].content, test_folder + path.sep + test_file);
-                                        console.log("Exporting " + test_file)
+
+
+                                    Blockbench.readFile([input_path], {}, (files) => {
+                                        loadModelFile(files[0],[])
+
                                         let reexport_content = codecVS.compile()
-                                        let reexport_path = test_folder + path.sep + "reexport_" + path.basename(test_file)
-                                        Blockbench.writeFile(reexport_path, {
+
+                                        Blockbench.writeFile(output_path, {
                                             content: reexport_content,
                                             savetype: "text"
                                         })
-                                    });
-                                    //fs.writeFileSync(test_folder + path.sep  + "diff_" + path.basename(test_file), jsonDiff.diffString(JSON.parse(content),JSON.parse(reexport_content), { precision: 3}))
+                                    })
+
+                                    
+
                                 } catch (e) {
                                     console.error(e);
                                 }
-                                project.close(true)
+                                // project.close(true)
                             }
                         }
                     }
@@ -254,7 +263,7 @@ BBPlugin.register('vs_plugin', {
     }
 });
 
-function validate_json(content) {   
+function validate_json(content) {
     const ajv = new Ajv()
     const validate = ajv.compile(vs_schema)
     const valid = validate(content)
