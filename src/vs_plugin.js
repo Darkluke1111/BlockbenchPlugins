@@ -66,12 +66,9 @@ Plugin.register('vs_plugin', {
 
             let group = Group.first_selected
             let parent = group.parent
-            console.log(group)
-            console.log(parent)
             if(parent.hologram) {
 
                 group.stepParentName = parent.name.substring(0,parent.name.length - 6)
-                console.log(group.stepParentName)
             }
         }
 
@@ -103,7 +100,6 @@ Plugin.register('vs_plugin', {
         function loadBackDropShape() {
             let backDrop = {}
             editor_backDropShapeProp.copy(Project, backDrop)
-            console.log(backDrop.backDropShape)
             if (backDrop.backDropShape) {
                 Blockbench.read(util.get_shape_location(null, backDrop.backDropShape), {
                     readtype: "text", errorbox: false
@@ -124,7 +120,6 @@ Plugin.register('vs_plugin', {
                     let spg = Group.all.find(group => group.name === (p.stepParentName + "_group"))
                     if (spg) {
                         let sp = spg.children[0]
-                        console.log(sp)
 
                         util.setParent(g, sp)
                         g.addTo(spg);
@@ -141,7 +136,6 @@ Plugin.register('vs_plugin', {
                     let spg = Group.all.find(group => group.name === (p.stepParentName + "_group"))
                     if (spg) {
                         let sp = spg.children[0]
-                        console.log(sp)
 
                         util.removeParent(g, sp)
                         g.addTo(null);
