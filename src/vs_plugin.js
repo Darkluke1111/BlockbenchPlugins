@@ -121,7 +121,7 @@ Plugin.register('vs_plugin', {
                 let p = {}
                 props.stepParentProp.copy(g, p)
                 if (p.stepParentName) {
-                    let spg = Group.all.find(g => g.name === (p.stepParentName + "_group"))
+                    let spg = Group.all.find(group => group.name === (p.stepParentName + "_group"))
                     if (spg) {
                         let sp = spg.children[0]
                         console.log(sp)
@@ -138,7 +138,7 @@ Plugin.register('vs_plugin', {
                 let p = {}
                 props.stepParentProp.copy(g, p)
                 if (!g.hologram) {
-                    let spg = Group.all.find(g => g.name === (p.stepParentName + "_group"))
+                    let spg = Group.all.find(group => group.name === (p.stepParentName + "_group"))
                     if (spg) {
                         let sp = spg.children[0]
                         console.log(sp)
