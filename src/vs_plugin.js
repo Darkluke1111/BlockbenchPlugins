@@ -209,7 +209,7 @@ Plugin.register('vs_plugin', {
                                 let project = new ModelProject({ format: formatVS })
                                 project.select()
                                 try {
-                                    let = Blockbench.read(test_folder + path.sep + test_file, { readtype: "text", errorbox: false }, (files) => {
+                                    Blockbench.read(test_folder + path.sep + test_file, { readtype: "text", errorbox: false }, (files) => {
                                         console.log("Importing " + test_file)
                                         codecVS.parse(files[0].content, test_folder + path.sep + test_file, false);
                                         console.log("Exporting " + test_file)
