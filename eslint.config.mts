@@ -6,7 +6,7 @@ import "eslint-plugin-only-warn";
 
 export default defineConfig([
   {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"],
+    files: ["src/**/*.{js,mjs,cjs,ts,mts,cts,vue}"],
     rules: {
       "semi": ["warn","always"],
       "no-unused-vars": "off",

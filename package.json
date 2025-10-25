@@ -15,7 +15,8 @@
   },
   "scripts": {
     "gen_schema": "npx tsx src/buildtime_scripts/gen_schema.ts",
-    "build": "webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js",
+    "lint": "npx eslint ."
   },
   "dependencies": {
     "ajv": "^8.17.1",
