@@ -28,6 +28,7 @@ export function ex(options) {
     if (Project.allAngles) editor.allAngles = Project.allAngles;
     if (Project.entityTextureMode) editor.entityTextureMode = Project.entityTextureMode;
     if (Project.collapsedPaths) editor.collapsedPaths = Project.collapsedPaths;
+    if (Project.singleTexture) editor.singleTexture = Project.singleTexture;
 
     const data: VS_Shape = {
         editor: editor,

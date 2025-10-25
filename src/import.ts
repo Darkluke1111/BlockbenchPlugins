@@ -32,6 +32,7 @@ export function im(data, path, asHologram) {
         Project.allAngles = content.editor.allAngles;
         Project.entityTextureMode = content.editor.entityTextureMode;
         Project.collapsedPaths = content.editor.collapsedPaths;
+        Project.singleTexture = content.editor.singleTexture;
     }
 
     // Build the model structure using the dedicated module
