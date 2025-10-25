@@ -1,9 +1,7 @@
 import { GroupExt } from "../property";
 import { VS_Element } from "../vs_shape_def";
 import { traverse } from "./traverse";
-
-const util = require("../util");
-
+import * as util from "../util";
 /**
  * Processes a Blockbench Group and converts it to a VS element.
  * @param parent The parent node in the hierarchy.
@@ -17,7 +15,7 @@ export function process_group(
     accu: Array<VS_Element>,
     offset: [number,number,number]
 ) {
-    const parent_pos = parent ? parent.origin : [0, 0, 0];
+    const parent_pos: [number,number,number] = parent ? parent.origin : [0, 0, 0];
     const converted_rotation = node.rotation;
 
     let from = util.vector_sub(node.origin, parent_pos);
