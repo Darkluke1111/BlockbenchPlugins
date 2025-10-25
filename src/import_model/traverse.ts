@@ -2,7 +2,6 @@ import { VS_Element } from "../vs_shape_def";
 import {process_group} from "./group";
 import {process_cube} from "./cube";
 import * as util from "../util";
-import { GroupExt } from "../property";
 
 
 /**
@@ -13,7 +12,7 @@ import { GroupExt } from "../property";
  * @param path The file path.
  * @param asHologram Whether to import as a hologram.
  */
-export function traverse(parent: GroupExt | null, object_space_pos: [number,number,number], vsElements: Array<VS_Element>, path: string, asHologram: boolean) {
+export function traverse(parent: Group | null, object_space_pos: [number,number,number], vsElements: Array<VS_Element>, path: string, asHologram: boolean) {
     for (const vsElement of vsElements) {
         const group = process_group(parent, object_space_pos, vsElement, path, asHologram);
 
