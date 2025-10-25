@@ -1,4 +1,4 @@
-import { im } from "./import"
+import { im } from "./import";
 import { ex } from "./export";
 import { get_format } from "./format_definition";
 import { editor_backDropShapeProp } from './property';
@@ -7,7 +7,7 @@ import * as props from './property';
 import * as vs_schema from "./generated/vs_shape_schema";
 import patchBoneAnimator from "./patches/boneAnimatorPatch";
 
-import Ajv from "ajv"
+import Ajv from "ajv";
 
 
 const fs = requireNativeModule('fs');
@@ -18,11 +18,11 @@ import * as process from "process";
 
 
 
-let exportAction
-let importAction
-let reExportAction
-let debugAction
-let onGroupAdd
+let exportAction;
+let importAction;
+let reExportAction;
+let debugAction;
+let onGroupAdd;
 
 BBPlugin.register('vs_plugin', {
     title: 'Vintage Story Format Support',
@@ -43,7 +43,6 @@ BBPlugin.register('vs_plugin', {
             icon: "fa-folder-plus",
             value: Settings.get("asset_path") || process.env.VINTAGE_STORY || "",
             click() {
-
                 new Dialog("gamePathSelect", {
                     title: "Select Game Path",
                     form: {
@@ -52,14 +51,12 @@ BBPlugin.register('vs_plugin', {
                             type: "folder",
                             value: Settings.get("game_path") || process.env.VINTAGE_STORY || "",
                         }
-
                     },
                     onConfirm(formResult) {
                         game_path_setting.set(formResult.path);
-                        Settings.save()
+                        Settings.save();
                     }
                 }).show();
-
             }
         })
 
@@ -69,7 +66,7 @@ BBPlugin.register('vs_plugin', {
             if (!group) return;
             let parent = group.parent as any;
             if (parent != "root" && parent.hologram) {
-                group.stepParentName = parent.name.substring(0, parent.name.length - 6)
+                group.stepParentName = parent.name.substring(0, parent.name.length - 6);
             }
         }
 
@@ -89,43 +86,39 @@ BBPlugin.register('vs_plugin', {
             },
             compile(options) {
                 // Removed for now since it doesn't work
-                // resetStepparentTransforms()
-                return ex(options)
+                // resetStepparentTransforms();
+                return ex(options);
             },
             parse(data, file_path, add) {
-                im(data, file_path, false)
+                im(data, file_path, false);
                 // Removed for now since it doesn't work
-                // loadBackDropShape()
-                // resolveStepparentTransforms()
+                // loadBackDropShape();
+                // resolveStepparentTransforms();
             },
         })
 
         function loadBackDropShape() {
             let backdrop = {} as any;
-            editor_backDropShapeProp.copy(Project as any, backdrop)
+            editor_backDropShapeProp.copy(Project as any, backdrop);
 
             if (backdrop.backDropShape) {
                 Blockbench.read(util.get_shape_location(null, backdrop.backDropShape), {
                     readtype: "text", errorbox: false
                 }, (files) => {
-                    im(files[0].content, files[0].path, true)
-                })
-
+                    im(files[0].content, files[0].path, true);
+                });
             }
         }
-
-
 
         function resolveStepparentTransforms() {
             for (var g of Group.all) {
                 let p = {} as any;
-                props.stepParentProp.copy(g as any, p)
+                props.stepParentProp.copy(g as any, p);
                 if (p.stepParentName) {
-                    let spg = Group.all.find(g => g.name === (p.stepParentName + "_group"))
+                    let spg = Group.all.find(group => group.name === (p.stepParentName + "_group"));
                     if (spg) {
-                        let sp = spg.children[0]
-
-                        util.setParent(g, sp)
+                        let sp = spg.children[0];
+                        util.setParent(g, sp);
                         g.addTo(spg);
                     }
                 }
@@ -135,21 +128,21 @@ BBPlugin.register('vs_plugin', {
         function resetStepparentTransforms() {
             for (var g of Group.all) {
                 let p = {} as any;
-                props.stepParentProp.copy(g as any, p)
+                props.stepParentProp.copy(g as any, p);
                 if (!g.hologram) {
-                    let spg = Group.all.find(g => g.name === (p.stepParentName + "_group"))
+                    let spg = Group.all.find(group => group.name === (p.stepParentName + "_group"));
                     if (spg) {
-                        let sp = spg.children[0]
+                        let sp = spg.children[0];
 
-                        util.removeParent(g, sp)
+                        util.removeParent(g, sp);
                         g.addTo("root");
                     }
                 }
             }
         }
 
-        let formatVS = get_format(codecVS)
-        codecVS.format = formatVS
+        let formatVS = get_format(codecVS);
+        codecVS.format = formatVS;
 
 
         exportAction = new Action('exportVS', {
@@ -166,11 +159,8 @@ BBPlugin.register('vs_plugin', {
                     content: codecVS.compile(),
                 });
             }
-
-        })
+        });
         MenuBar.addAction(exportAction, 'file.export');
-
-
 
         importAction = new Action('importVS', {
             name: 'Import from VS Format',
@@ -183,8 +173,7 @@ BBPlugin.register('vs_plugin', {
                     codecVS.parse!(files[0].content, files[0].path);
                 });
             }
-
-        })
+        });
         MenuBar.addAction(importAction, 'file.import');
 
         reExportAction = new Action("reExport", {
@@ -208,7 +197,7 @@ BBPlugin.register('vs_plugin', {
                             if (!test_file.includes("reexport_")) {
 
                                 const test_file_rel_path = test_folder + path.sep + path.dirname(test_file);
-                                const test_file_name = path.basename(test_file)
+                                const test_file_name = path.basename(test_file);
 
                                 const input_path = path.resolve(test_folder, test_file_rel_path, test_file_name);
                                 const output_path = path.resolve(test_folder, test_file_rel_path, `reexport_${test_file_name}`);
@@ -218,27 +207,26 @@ BBPlugin.register('vs_plugin', {
 
 
                                     Blockbench.readFile([input_path], {}, (files) => {
-                                        loadModelFile(files[0],[])
+                                        loadModelFile(files[0],[]);
 
-                                        let reexport_content = codecVS.compile()
+                                        let reexport_content = codecVS.compile();
 
                                         Blockbench.writeFile(output_path, {
                                             content: reexport_content,
                                             savetype: "text"
-                                        })
-                                    })
+                                        });
+                                    });
 
                                     
 
                                 } catch (e) {
                                     console.error(e);
                                 }
-                                // project.close(true)
+                                // project.close(true);
                             }
                         }
                     }
                 }).show();
-
             }
         });
         MenuBar.addAction(reExportAction, "file");
@@ -247,7 +235,7 @@ BBPlugin.register('vs_plugin', {
             name: 'Print Debug Info',
             icon: 'icon',
             click: function () {
-                console.log(Outliner.selected)
+                console.log(Outliner.selected);
             }
         });
         MenuBar.addAction(debugAction, "edit");
@@ -257,15 +245,15 @@ BBPlugin.register('vs_plugin', {
         exportAction.delete();
         importAction.delete();
         reExportAction.delete();
-        debugAction.delete()
-        Blockbench.removeListener('add_group', onGroupAdd)
+        debugAction.delete();
+        Blockbench.removeListener('add_group', onGroupAdd);
     }
 });
 
 function validate_json(content) {
-    const ajv = new Ajv()
-    const validate = ajv.compile(vs_schema)
-    const valid = validate(content)
-    if (!valid) console.log(validate.errors)
+    const ajv = new Ajv();
+    const validate = ajv.compile(vs_schema);
+    const valid = validate(content);
+    if (!valid) console.log(validate.errors);
     return valid;
 }
