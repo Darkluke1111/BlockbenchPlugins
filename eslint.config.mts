@@ -1,7 +1,7 @@
 import globals from "globals";
 import tseslint from "typescript-eslint";
 import pluginVue from "eslint-plugin-vue";
-import { defineConfig } from "eslint/config";
+import { defineConfig, globalIgnores } from "eslint/config";
 import "eslint-plugin-only-warn";
 
 export default defineConfig([
@@ -19,4 +19,5 @@ export default defineConfig([
     languageOptions: { 
       parserOptions: { parser: tseslint.parser } } 
   },
+  [globalIgnores(["dist/**", "src/generated/**"])]
 ]);
