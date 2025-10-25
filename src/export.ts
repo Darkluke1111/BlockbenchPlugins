@@ -2,7 +2,6 @@ import * as props from "./property";
 import {export_model} from "./export_model";
 import {export_animations} from "./export_animation";
 import { VS_EditorSettings, VS_Shape } from "./vs_shape_def";
-import { text } from "stream/consumers";
 
 export function ex(options) {
 

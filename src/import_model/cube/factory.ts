@@ -1,4 +1,4 @@
-import { VS_Direction, VS_Element, VS_Face } from "../../vs_shape_def";
+import { VS_Element } from "../../vs_shape_def";
 import * as util from "../../util";
 import { CubeExt } from "../../property";
 

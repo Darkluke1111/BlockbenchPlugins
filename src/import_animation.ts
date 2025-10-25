@@ -14,7 +14,7 @@ export function import_animations(animations: Array<VS_Animation>) {
         const isLooping = vsAnimation.onAnimationEnd === 'Repeat';
 
         const animation = ((new Animation({
-            //@ts-expect-error
+            //@ts-expect-error: Blockbench overwrites libdom's Animation type with its own Animation Class, but TypeScript doesn't include a way to overwrite UMD global types.
             name: vsAnimation.name,
             loop: isLooping ? 'loop' : 'once',
             length: animationLength,

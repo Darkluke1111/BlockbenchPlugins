@@ -1,4 +1,4 @@
-import { VS_Animation, VS_AnimationKey, VS_Keyframe } from "./vs_shape_def";
+import { VS_Animation, VS_Keyframe } from "./vs_shape_def";
 import * as util from "./util";
 
 /**

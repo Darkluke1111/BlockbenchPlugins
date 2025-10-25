@@ -43,7 +43,7 @@ let visit_tree = function (tree, visitor) {
             if (visitor.visit_group) {
                 visitor.visit_group(tree, parent);
             }
-            for (var child of tree.children) {
+            for (let child of tree.children) {
                 visit_tree_rec(tree, child, visitor);
             }
         } else {
