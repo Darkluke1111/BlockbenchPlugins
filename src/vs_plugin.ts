@@ -36,7 +36,7 @@ BBPlugin.register('vs_plugin', {
         patchBoneAnimator();
 
         //Init additional Attribute Properties
-        let game_path_setting = new Setting("game_path", {
+        const game_path_setting = new Setting("game_path", {
             name: "Game Path",
             description: "The path to your Vintage Story game folder. This is the folder that contains the assets, mods and lib folders.",
             type: "click",
@@ -62,9 +62,9 @@ BBPlugin.register('vs_plugin', {
 
         onGroupAdd = function () {
 
-            let group = Group.first_selected;
+            const group = Group.first_selected;
             if (!group) return;
-            let parent = group.parent;
+            const parent = group.parent;
             if (parent && parent != "root" && (parent as GroupExt).hologram) {
                 group.stepParentName = parent.name.substring(0, parent.name.length - 6);
             }
@@ -72,7 +72,7 @@ BBPlugin.register('vs_plugin', {
 
         Blockbench.on('add_group', onGroupAdd);
 
-        let codecVS = new Codec("codecVS", {
+        const codecVS = new Codec("codecVS", {
             name: "Vintage Story Codec",
             extension: "json",
             remember: true,
@@ -114,17 +114,17 @@ BBPlugin.register('vs_plugin', {
         }
 
         function resolveStepparentTransforms() {
-            for (let g of Group.all) {
-                let p = {};
+            for (const g of Group.all) {
+                const p = {};
 
                 // @ts-expect-error: copy has wrong type
                 props.stepParentProp.copy(g, p);
                 // @ts-expect-error: stepParentName is added by copy above
                 const stepParentName = p.stepParentName;
                 if (stepParentName) {
-                    let spg = Group.all.find(group => group.name === (stepParentName + "_group"));
+                    const spg = Group.all.find(group => group.name === (stepParentName + "_group"));
                     if (spg) {
-                        let sp = spg.children[0];
+                        const sp = spg.children[0];
                         util.setParent(g, sp);
                         g.addTo(spg);
                     }
@@ -133,16 +133,16 @@ BBPlugin.register('vs_plugin', {
         }
 
         function resetStepparentTransforms() {
-            for (var g of Group.all) {
-                let p = {};
+            for (const g of Group.all) {
+                const p = {};
                 // @ts-expect-error: copy has wrong type
                 props.stepParentProp.copy(g, p);
                 // @ts-expect-error: stepParentName is added by copy above
                 const stepParentName = p.stepParentName;
                 if (!g.hologram) {
-                    let spg = Group.all.find(group => group.name === (stepParentName + "_group"));
+                    const spg = Group.all.find(group => group.name === (stepParentName + "_group"));
                     if (spg) {
-                        let sp = spg.children[0];
+                        const sp = spg.children[0];
 
                         util.removeParent(g, sp);
                         g.addTo("root");
@@ -151,7 +151,7 @@ BBPlugin.register('vs_plugin', {
             }
         }
 
-        let formatVS = get_format(codecVS);
+        const formatVS = get_format(codecVS);
         codecVS.format = formatVS;
 
 
@@ -200,10 +200,10 @@ BBPlugin.register('vs_plugin', {
                         }
                     },
                     onConfirm(form_result) {
-                        let test_folder = form_result.select_folder;
+                        const test_folder = form_result.select_folder;
                         console.log(test_folder);
-                        let test_files = fs!.readdirSync(test_folder, { recursive: true, encoding: "utf-8" });
-                        for (var test_file of test_files) {
+                        const test_files = fs!.readdirSync(test_folder, { recursive: true, encoding: "utf-8" });
+                        for (const test_file of test_files) {
                             if (!test_file.includes("reexport_")) {
 
                                 const test_file_rel_path = test_folder + path.sep + path.dirname(test_file);
@@ -219,7 +219,7 @@ BBPlugin.register('vs_plugin', {
                                     Blockbench.readFile([input_path], {}, (files) => {
                                         loadModelFile(files[0],[]);
 
-                                        let reexport_content = codecVS.compile();
+                                        const reexport_content = codecVS.compile();
 
                                         Blockbench.writeFile(output_path, {
                                             content: reexport_content,

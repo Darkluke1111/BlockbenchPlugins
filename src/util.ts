@@ -1,17 +1,17 @@
 import * as fs from "fs";
 import * as path from "path";
 
-let fps = 30;
+const fps = 30;
 
-let get_texture_location = function (domain, rel_path) {
+const get_texture_location = function (domain, rel_path) {
 
-    for (let base_mod_path of ["creative", "game", "survival"]) {
-        let f = path.posix.format({
+    for (const base_mod_path of ["creative", "game", "survival"]) {
+        const f = path.posix.format({
             root: Settings.get("game_path") + path.sep + "assets" + path.sep + base_mod_path + path.sep + "textures" + path.sep,
             name: rel_path,
             ext: '.png',
         });
-        let exists = fs.existsSync(f);
+        const exists = fs.existsSync(f);
         if (exists) {
 
             return f;
@@ -20,15 +20,15 @@ let get_texture_location = function (domain, rel_path) {
     return "";
 };
 
-let get_shape_location = function (domain, rel_path) {
+const get_shape_location = function (domain, rel_path) {
 
-    for (let base_mod_path of ["creative", "game", "survival"]) {
-        let f = path.posix.format({
+    for (const base_mod_path of ["creative", "game", "survival"]) {
+        const f = path.posix.format({
             root: Settings.get("game_path") + path.sep + "assets" + path.sep + base_mod_path + path.sep + "shapes" + path.sep,
             name: rel_path,
             ext: '.json',
         });
-        let exists = fs.existsSync(f);
+        const exists = fs.existsSync(f);
         if (exists) {
 
             return f;
@@ -37,13 +37,13 @@ let get_shape_location = function (domain, rel_path) {
     return "";
 };
 
-let visit_tree = function (tree, visitor) {
-    let visit_tree_rec = (parent, tree, visitor) => {
+const visit_tree = function (tree, visitor) {
+    const visit_tree_rec = (parent, tree, visitor) => {
         if (is_group(tree)) {
             if (visitor.visit_group) {
                 visitor.visit_group(tree, parent);
             }
-            for (let child of tree.children) {
+            for (const child of tree.children) {
                 visit_tree_rec(tree, child, visitor);
             }
         } else {
@@ -56,11 +56,11 @@ let visit_tree = function (tree, visitor) {
     visit_tree_rec(null, tree, visitor);
 };
 
-let is_group = (x) => x.children;
+const is_group = (x) => x.children;
 
 
 function copyOrigin(source, target) {
-    let target_tmp = {};
+    const target_tmp = {};
     Group.properties["origin"].copy(source, target_tmp);
     Group.properties["origin"].merge(target, target_tmp);
 }
@@ -113,7 +113,7 @@ function update_children(node) {
 }
 
 function vector_add(a: [number,number,number], b: [number,number,number]): [number,number,number] {
-    let c: [number,number,number] = [0,0,0];
+    const c: [number,number,number] = [0,0,0];
     for(let i = 0 ; i < a.length ; i++) {
         c[i] = a[i] + b[i];
     }
@@ -121,7 +121,7 @@ function vector_add(a: [number,number,number], b: [number,number,number]): [numb
 }
 
 function vector_inv(a: [number,number,number]): [number,number,number] {
-    let c: [number,number,number] = [0,0,0];
+    const c: [number,number,number] = [0,0,0];
     for(let i = 0 ; i < a.length ; i++) {
         c[i] = - a[i];
     }
@@ -130,7 +130,7 @@ function vector_inv(a: [number,number,number]): [number,number,number] {
 }
 
 function vector_sub(a: [number,number,number], b: [number,number,number]): [number,number,number] {
-    let c: [number,number,number] = [0,0,0];
+    const c: [number,number,number] = [0,0,0];
     for(let i = 0 ; i < a.length ; i++) {
         c[i] = a[i] - b[i];
     }
