@@ -27,7 +27,11 @@ export function process_faces(faces: Partial<Record<VS_Direction, VS_Face>> | un
                 });
                 texture.fromDataURL(texture.getBase64()).add();
             }
-            processed_faces[direction] = { texture, uv: faceData.uv, rotation: faceData.rotation, windMode: faceData.windMode };
+            processed_faces[direction] = { 
+                texture: texture, 
+                uv: faceData.uv, 
+                rotation: faceData.rotation
+            };
         }
     }
     return processed_faces;

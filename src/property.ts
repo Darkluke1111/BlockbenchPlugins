@@ -21,7 +21,7 @@ export const hologramCubeProp= new Property(Cube, "string", "hologram");
  */
 declare global {
     interface Face {
-        windMode: [number, number, number, number];
+        windMode?: [number, number, number, number];
     }
 
     interface Texture {
