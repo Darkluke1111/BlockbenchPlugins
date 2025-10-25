@@ -1,6 +1,5 @@
 import { VS_Element } from "../vs_shape_def";
 import * as util from "../util";
-import { GroupExt, stepParentProp } from "../property";
 
 
 /**
@@ -12,7 +11,7 @@ import { GroupExt, stepParentProp } from "../property";
  * @param asHologram Whether to import as a hologram.
  * @returns The created Blockbench Group.
  */
-export function process_group(parent: GroupExt | null, object_space_pos: [number,number,number], vsElement: VS_Element, path: string, asHologram: boolean): GroupExt {
+export function process_group(parent: Group | null, object_space_pos: [number,number,number], vsElement: VS_Element, path: string, asHologram: boolean): Group {
     const group = new Group({
         name: vsElement.name + '_group',
         origin: vsElement.rotationOrigin ? util.vector_add(vsElement.rotationOrigin, object_space_pos) : object_space_pos,
@@ -23,10 +22,9 @@ export function process_group(parent: GroupExt | null, object_space_pos: [number
         group.hologram = path;
     }
     if (vsElement.stepParentName) {
-        // @ts-expect-error: merge has wrong type
-        stepParentProp.merge(group, { stepParentName: vsElement.stepParentName });
+        group.stepParentName = vsElement.stepParentName;
     }
 
-    group.addTo(parent ? parent : "root").init();
+    group.addTo(parent ? parent : undefined).init();
     return group;
 }

@@ -1,4 +1,3 @@
-import * as props from "./property";
 import {export_model} from "./export_model";
 import {export_animations} from "./export_animation";
 import { VS_EditorSettings, VS_Shape } from "./vs_shape_def";
@@ -20,11 +19,7 @@ export function ex(options) {
     // Populate Textures
     const textures: Record<string, string> = {};
     for (const texture of Texture.all) {
-        const tmp = {};
-        // @ts-expect-error: copy has wrong type
-        props.textureLocationProp.copy(texture, tmp);
-        // @ts-expect-error: textureLocation is added by copy above
-        textures[texture.name] = tmp.textureLocation;
+        textures[texture.name] = texture.textureLocation || "";
     }
     
     // Populate Editor Info

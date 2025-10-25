@@ -1,7 +1,6 @@
 import { im } from "./import";
 import { ex } from "./export";
 import { get_format } from "./format_definition";
-import { editor_backDropShapeProp, GroupExt } from './property';
 import * as util from './util';
 import * as props from './property';
 import * as vs_schema from "./generated/vs_shape_schema";
@@ -9,8 +8,9 @@ import patchBoneAnimator from "./patches/boneAnimatorPatch";
 
 import Ajv from "ajv";
 
-
+// @ts-expect-error: requireNativeModule is missing in blockbench types --- IGNORE ---
 const fs = requireNativeModule('fs');
+// @ts-expect-error: requireNativeModule is missing in blockbench types --- IGNORE ---
 const path = requireNativeModule('path');
 
 import * as process from "process";
@@ -39,6 +39,7 @@ BBPlugin.register('vs_plugin', {
         const game_path_setting = new Setting("game_path", {
             name: "Game Path",
             description: "The path to your Vintage Story game folder. This is the folder that contains the assets, mods and lib folders.",
+            category: "Vintage Story",
             type: "click",
             icon: "fa-folder-plus",
             value: Settings.get("asset_path") || process.env.VINTAGE_STORY || "",
@@ -65,7 +66,7 @@ BBPlugin.register('vs_plugin', {
             const group = Group.first_selected;
             if (!group) return;
             const parent = group.parent;
-            if (parent && parent != "root" && (parent as GroupExt).hologram) {
+            if (parent && parent != "root" && parent.hologram) {
                 group.stepParentName = parent.name.substring(0, parent.name.length - 6);
             }
         };
@@ -105,7 +106,7 @@ BBPlugin.register('vs_plugin', {
             // @ts-expect-error: backDropShape is added by copy above
             const backDropShape = backdrop.backDropShape;
             if (backDropShape) {
-                Blockbench.read(util.get_shape_location(null, backDropShape), {
+                Blockbench.read([util.get_shape_location(null, backDropShape)], {
                     readtype: "text", errorbox: false
                 }, (files) => {
                     im(files[0].content, files[0].path, true);
@@ -145,7 +146,7 @@ BBPlugin.register('vs_plugin', {
                         const sp = spg.children[0];
 
                         util.removeParent(g, sp);
-                        g.addTo("root");
+                        g.addTo(undefined);
                     }
                 }
             }
@@ -217,6 +218,7 @@ BBPlugin.register('vs_plugin', {
 
 
                                     Blockbench.readFile([input_path], {}, (files) => {
+                                        //@ts-expect-error: Missing in type --- IGNORE ---
                                         loadModelFile(files[0],[]);
 
                                         const reexport_content = codecVS.compile();
