@@ -28,7 +28,6 @@ let get_shape_location = function (domain, rel_path) {
             name: rel_path,
             ext: '.json',
         })
-        console.log(f)
         let exists = fs.existsSync(f)
         if (exists) {
 
