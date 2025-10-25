@@ -1,15 +1,20 @@
+/**
+ * Interfaces that define the structure of Vintage Story shape files.
+ * Remember to run 'npm run gen_schema' after modifying this file to generate the updated JSON schema for validation.
+ */
 
 export interface VS_Shape {
-    editor: VS_EditorSettings | undefined,
-    textureWidth: number,
-    textureHeight: number,
-    textureSizes: Record<string, [number,number]>,
+    editor?: VS_EditorSettings | undefined,
+    textureWidth?: number,
+    textureHeight?: number,
+    textureSizes?: Record<string, [number,number]>,
     textures: Record<string, string>,
     elements: Array<VS_Element>,
     animations?: Array<VS_Animation>,
 }
 
 export interface VS_EditorSettings {
+    backDropShape?: string,
     collapsedPaths?: string,
     allAngles?: boolean,
     entityTextureMode?: boolean,
@@ -20,17 +25,17 @@ export interface VS_Element {
     from: [number, number, number],
     to: [number, number, number],
     autoUnwrap?: boolean,
-    uv: [number,number],
+    uv?: [number,number],
     rotationOrigin?: [number,number,number]
     rotationX?: number,
     rotationY?: number,
     rotationZ?: number,
-    faces: Partial<Record<VS_Direction,VS_Face>>,
+    faces?: Partial<Record<VS_Direction,VS_Face>>,
     stepParentName?: string,
     children?: Array<VS_Element>,
 }
 
-export type VS_Direction = "north" | "east" | "south" | "west" | "up" | "down"
+export enum VS_Direction{ NORTH ="north", EAST = "east", SOUTH =  "south", WEST = "west", UP = "up", DOWN = "down"}
 
 export interface VS_Face {
     texture: string,

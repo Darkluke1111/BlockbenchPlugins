@@ -30,11 +30,7 @@ module.exports = {
     }
   },
   "required": [
-    "editor",
     "elements",
-    "textureHeight",
-    "textureSizes",
-    "textureWidth",
     "textures"
   ],
   "definitions": {
@@ -154,8 +150,7 @@ module.exports = {
         "faces",
         "from",
         "name",
-        "to",
-        "uv"
+        "to"
       ]
     },
     "Partial<Record<VS_Direction,VS_Face>>": {

@@ -1,14 +1,22 @@
-const util = require("../util.js");
+import { GroupExt } from "../property";
+import { VS_Element } from "../vs_shape_def";
+import { traverse } from "./traverse";
+
+const util = require("../util");
 
 /**
  * Processes a Blockbench Group and converts it to a VS element.
- * @param {object} parent The parent node in the hierarchy.
- * @param {object} node The Group node to process.
- * @param {Array<object>} accu The accumulator for the VS elements.
- * @param {function} traverse The traverse function to process child nodes.
- * @param {Array<number>} offset The position offset to apply.
+ * @param parent The parent node in the hierarchy.
+ * @param node The Group node to process.
+ * @param accu The accumulator for the VS elements.
+ * @param offset The position offset to apply.
  */
-function processGroup(parent, node, accu, traverse, offset) {
+export function process_group(
+    parent: GroupExt | null , 
+    node: GroupExt, 
+    accu: Array<VS_Element>,
+    offset: [number,number,number]
+) {
     const parent_pos = parent ? parent.origin : [0, 0, 0];
     const converted_rotation = node.rotation;
 
@@ -22,7 +30,7 @@ function processGroup(parent, node, accu, traverse, offset) {
         rotationOrigin = util.vector_add(rotationOrigin, offset);
     }
 
-    const vsElement = {
+    const vsElement: VS_Element = {
         name: node.name.replace('_group', ''),
         from: from,
         to: to,
@@ -39,10 +47,8 @@ function processGroup(parent, node, accu, traverse, offset) {
 
     if (!node.hologram) {
         accu.push(vsElement);
-        traverse(node, node.children, vsElement.children, offset);
+        traverse(node, node.children, vsElement.children!, offset);
     } else {
         traverse(node, node.children, accu, offset);
     }
 }
-
-module.exports = processGroup;

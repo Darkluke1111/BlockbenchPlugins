@@ -1,6 +1,15 @@
 {
-  "dependencies": {
-    "typescript": "^5.7.2",
-    "module": "commonjs"
-  }
+  "compilerOptions": {
+    "outDir": "/dist",
+    "types": ["blockbench-types", "node"],
+    "module": "node16",
+    "target": "es2022",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node16",
+    "allowJs": true,
+    "strictNullChecks": true,
+  },
+  "exclude": [
+    "node_modules"
+  ]
 }

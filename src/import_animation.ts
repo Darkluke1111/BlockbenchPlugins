@@ -1,10 +1,11 @@
-const util = require("./util.js");
+import * as util from "./util";
+import { VS_Animation } from "./vs_shape_def";
 
 /**
  * Imports animations from the Vintage Story format into Blockbench.
  * @param {Array<object>} animations The array of animation data from the VS model file.
  */
-module.exports = function importAnimations(animations) {
+export function import_animations(animations: Array<VS_Animation>) {
     const FPS = util.fps;
     const interpolationMode = "linear";
 
@@ -12,12 +13,13 @@ module.exports = function importAnimations(animations) {
         const animationLength = vsAnimation.quantityframes / FPS;
         const isLooping = vsAnimation.onAnimationEnd === 'Repeat';
 
-        const animation = new Animation({
+        const animation = ((new Animation({
+            //@ts-expect-error
             name: vsAnimation.name,
             loop: isLooping ? 'loop' : 'once',
             length: animationLength,
             snapping: FPS
-        }).add();
+        }) as unknown) as _Animation).add();
 
         vsAnimation.keyframes.forEach(vsKeyframe => {
             const time = vsKeyframe.frame / FPS;
