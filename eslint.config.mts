@@ -8,7 +8,16 @@ export default defineConfig([
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"],
     rules: {
-      "semi": [1,"always"],
+      "semi": ["warn","always"],
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_"
+        }
+      ]
     },
     languageOptions: { globals: globals.browser }
   },
@@ -19,5 +28,5 @@ export default defineConfig([
     languageOptions: { 
       parserOptions: { parser: tseslint.parser } } 
   },
-  [globalIgnores(["dist/**", "src/generated/**"])]
+  [globalIgnores(["dist/**", "src/generated/**", "webpack.config.js"])]
 ]);
