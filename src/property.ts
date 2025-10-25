@@ -1,5 +1,3 @@
-import { ex } from "./export";
-
 // @ts-expect-error: vector4 is missing in blockbench types here for some reason
 export const windProp = new Property(Face, "vector4", "windMode");
 

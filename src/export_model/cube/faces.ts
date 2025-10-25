@@ -1,4 +1,3 @@
-import * as props from "../../property";
 import { VS_Direction, VS_Face } from "../../vs_shape_def";
 
 /**

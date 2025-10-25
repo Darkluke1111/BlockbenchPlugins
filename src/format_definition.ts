@@ -1,5 +1,3 @@
-import { ex } from "./export";
-
 export function get_format(codec: Codec): ModelFormat { 
     return new ModelFormat("formatVS", {
         name: "Vintage Story Base Format",
