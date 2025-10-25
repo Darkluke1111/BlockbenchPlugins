@@ -58,7 +58,7 @@ BBPlugin.register('vs_plugin', {
                     }
                 }).show();
             }
-        })
+        });
 
         onGroupAdd = function (_group) {
 
@@ -68,7 +68,7 @@ BBPlugin.register('vs_plugin', {
             if (parent != "root" && parent.hologram) {
                 group.stepParentName = parent.name.substring(0, parent.name.length - 6);
             }
-        }
+        };
 
         Blockbench.on('add_group', onGroupAdd);
 
@@ -95,7 +95,7 @@ BBPlugin.register('vs_plugin', {
                 // loadBackDropShape();
                 // resolveStepparentTransforms();
             },
-        })
+        });
 
         function loadBackDropShape() {
             let backdrop = {} as any;
