@@ -4,7 +4,6 @@ export const windProp = new Property(Face, "vector4", "windMode");
 
 export const textureLocationProp = new Property(Texture, "string", "textureLocation");
 
-
 export const editor_backDropShapeProp= new Property(ModelProject, "string", "backDropShape", {exposed: false,});
 export const editor_allAnglesProp= new Property(ModelProject, "boolean", "allAngles", {exposed: false,});
 export const editor_entityTextureModeProp= new Property(ModelProject, "boolean", "entityTextureMode", {exposed: false,});
@@ -16,6 +15,10 @@ export const hologramGroupProp= new Property(Group, "string", "hologram");
 
 export const hologramCubeProp= new Property(Cube, "string", "hologram");
 
+
+/**
+ * Extend Blockbench types with our custom properties
+ */
 declare global {
     interface Face {
         windMode: [number, number, number, number];
