@@ -43,6 +43,7 @@ export interface VS_Face {
     uv: [number,number,number,number],
     rotation?: number,
     windMode?: [number,number,number,number],
+    windData?: [number,number,number,number],
 }
 
 export interface VS_Animation {
