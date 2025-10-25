@@ -21,8 +21,10 @@ export function ex(options) {
     // Populate Textures
     const textures: Record<string, string> = {};
     for (const texture of Texture.all) {
-        let tmp = {} as any;
-        props.textureLocationProp.copy(texture as any, tmp as any);
+        const tmp = {};
+        // @ts-expect-error: copy has wrong type
+        props.textureLocationProp.copy(texture, tmp);
+        // @ts-expect-error: textureLocation is added by copy above
         textures[texture.name] = tmp.textureLocation;
     }
     

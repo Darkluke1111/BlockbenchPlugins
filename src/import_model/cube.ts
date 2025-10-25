@@ -23,7 +23,8 @@ export function process_cube(parent: GroupExt | null, object_space_pos: [number,
 
     for (const direction in cube.faces) {
         if (vsElement.faces && vsElement.faces[direction]?.windMode) {
-            windProp.merge(cube.faces[direction] as any, { windMode: vsElement.faces[direction].windMode } as any);
+            // @ts-expect-error: merge has wrong type
+            windProp.merge(cube.faces[direction], { windMode: vsElement.faces[direction].windMode });
         }
     }
 }

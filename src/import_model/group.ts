@@ -23,7 +23,8 @@ export function process_group(parent: GroupExt | null, object_space_pos: [number
         group.hologram = path;
     }
     if (vsElement.stepParentName) {
-        stepParentProp.merge(group as any, { stepParentName: vsElement.stepParentName } as any);
+        // @ts-expect-error: merge has wrong type
+        stepParentProp.merge(group, { stepParentName: vsElement.stepParentName });
     }
 
     group.addTo(parent ? parent : "root").init();

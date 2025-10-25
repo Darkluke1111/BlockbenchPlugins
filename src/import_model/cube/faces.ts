@@ -25,7 +25,7 @@ export function process_faces(faces: Partial<Record<VS_Direction, VS_Face>> | un
                 texture = new Texture({
                     name: texture_name
                 });
-                texture.fromDataURL(texture.getBase64()).add()
+                texture.fromDataURL(texture.getBase64()).add();
             }
             processed_faces[direction] = { texture, uv: faceData.uv, rotation: faceData.rotation };
         }

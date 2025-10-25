@@ -23,15 +23,20 @@ export function im(data, path, asHologram) {
             texture.uv_width = content.textureSizes[name][0];
             texture.uv_height = content.textureSizes[name][1];
         }
-        props.textureLocationProp.merge(texture as any, { textureLocation: content.textures[name] } as any);
+        // @ts-expect-error: merge has wrong type
+        props.textureLocationProp.merge(texture, { textureLocation: content.textures[name] });
     }
 
     // Load editor properties
     if (content.editor) {
-        props.editor_backDropShapeProp.merge(Project as any, content.editor as any);
-        props.editor_allAnglesProp.merge(Project as any, content.editor as any);
-        props.editor_entityTextureModeProp.merge(Project as any, content.editor as any);
-        props.editor_collapsedPathsProp.merge(Project as any, content.editor as any);
+        // @ts-expect-error: merge has wrong type
+        props.editor_backDropShapeProp.merge(Project, content.editor);
+        // @ts-expect-error: merge has wrong type
+        props.editor_allAnglesProp.merge(Project, content.editor);
+        // @ts-expect-error: merge has wrong type
+        props.editor_entityTextureModeProp.merge(Project, content.editor);
+        // @ts-expect-error: merge has wrong type
+        props.editor_collapsedPathsProp.merge(Project, content.editor);
     }
 
     // Build the model structure using the dedicated module

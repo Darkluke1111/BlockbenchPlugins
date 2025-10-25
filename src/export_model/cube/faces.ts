@@ -81,7 +81,8 @@ export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>
             autoUv: false,
             snapUv: false
         });
-        props.windProp.copy(face as any, reduced_faces[direction] as any);
+        // @ts-expect-error: merge has wrong type
+        props.windProp.copy(face, reduced_faces[direction]);
     }
     return reduced_faces;
 }

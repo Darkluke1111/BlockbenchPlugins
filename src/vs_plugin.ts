@@ -1,7 +1,7 @@
 import { im } from "./import";
 import { ex } from "./export";
 import { get_format } from "./format_definition";
-import { editor_backDropShapeProp } from './property';
+import { editor_backDropShapeProp, GroupExt } from './property';
 import * as util from './util';
 import * as props from './property';
 import * as vs_schema from "./generated/vs_shape_schema";
@@ -60,12 +60,12 @@ BBPlugin.register('vs_plugin', {
             }
         });
 
-        onGroupAdd = function (_group) {
+        onGroupAdd = function () {
 
             let group = Group.first_selected;
             if (!group) return;
-            let parent = group.parent as any;
-            if (parent != "root" && parent.hologram) {
+            let parent = group.parent;
+            if (parent && parent != "root" && (parent as GroupExt).hologram) {
                 group.stepParentName = parent.name.substring(0, parent.name.length - 6);
             }
         };
@@ -98,11 +98,14 @@ BBPlugin.register('vs_plugin', {
         });
 
         function loadBackDropShape() {
-            let backdrop = {} as any;
-            editor_backDropShapeProp.copy(Project as any, backdrop);
+            const backdrop = {};
+            // @ts-expect-error: copy has wrong type
+            editor_backDropShapeProp.copy(Project, backdrop);
 
-            if (backdrop.backDropShape) {
-                Blockbench.read(util.get_shape_location(null, backdrop.backDropShape), {
+            // @ts-expect-error: backDropShape is added by copy above
+            const backDropShape = backdrop.backDropShape;
+            if (backDropShape) {
+                Blockbench.read(util.get_shape_location(null, backDropShape), {
                     readtype: "text", errorbox: false
                 }, (files) => {
                     im(files[0].content, files[0].path, true);
@@ -111,11 +114,15 @@ BBPlugin.register('vs_plugin', {
         }
 
         function resolveStepparentTransforms() {
-            for (var g of Group.all) {
-                let p = {} as any;
-                props.stepParentProp.copy(g as any, p);
-                if (p.stepParentName) {
-                    let spg = Group.all.find(group => group.name === (p.stepParentName + "_group"));
+            for (let g of Group.all) {
+                let p = {};
+
+                // @ts-expect-error: copy has wrong type
+                props.stepParentProp.copy(g, p);
+                // @ts-expect-error: stepParentName is added by copy above
+                const stepParentName = p.stepParentName;
+                if (stepParentName) {
+                    let spg = Group.all.find(group => group.name === (stepParentName + "_group"));
                     if (spg) {
                         let sp = spg.children[0];
                         util.setParent(g, sp);
@@ -127,10 +134,13 @@ BBPlugin.register('vs_plugin', {
 
         function resetStepparentTransforms() {
             for (var g of Group.all) {
-                let p = {} as any;
-                props.stepParentProp.copy(g as any, p);
+                let p = {};
+                // @ts-expect-error: copy has wrong type
+                props.stepParentProp.copy(g, p);
+                // @ts-expect-error: stepParentName is added by copy above
+                const stepParentName = p.stepParentName;
                 if (!g.hologram) {
-                    let spg = Group.all.find(group => group.name === (p.stepParentName + "_group"));
+                    let spg = Group.all.find(group => group.name === (stepParentName + "_group"));
                     if (spg) {
                         let sp = spg.children[0];
 
