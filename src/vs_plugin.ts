@@ -224,6 +224,7 @@ BBPlugin.register('vs_plugin', {
             }
 
             const old_format = Project.format?.id || 'unknown';
+            // @ts-expect-error: euler_order is missing in blockbench types --- IGNORE ---
             const old_euler_order = Project.format?.euler_order || 'ZYX';
 
             // Convert rotation values for VS export
