@@ -8,7 +8,9 @@ import patchBoneAnimator from "./patches/boneAnimatorPatch";
 
 import Ajv from "ajv";
 
+// @ts-expect-error: requireNativeModule is missing in blockbench types --- IGNORE ---
 const fs = requireNativeModule('fs');
+// @ts-expect-error: requireNativeModule is missing in blockbench types --- IGNORE ---
 const path = requireNativeModule('path');
 
 import * as process from "process";
@@ -75,7 +77,7 @@ BBPlugin.register('vs_plugin', {
             const group = Group.first_selected;
             if (!group) return;
             const parent = group.parent;
-            if (parent && parent != "root" && (parent as Group).hologram) {
+            if (parent && parent != "root" && parent.hologram) {
                 group.stepParentName = parent.name.substring(0, parent.name.length - 6);
             }
         };
@@ -306,6 +308,7 @@ BBPlugin.register('vs_plugin', {
 
 
                                     Blockbench.readFile([input_path], {}, (files) => {
+                                        //@ts-expect-error: Missing in type --- IGNORE ---
                                         loadModelFile(files[0],[]);
 
                                         const reexport_content = codecVS.compile();
