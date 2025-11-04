@@ -1,5 +1,4 @@
 import * as util from "./util";
-import * as props from "./property";
 import {import_model} from "./import_model";
 import {import_animations} from "./import_animation";
 import { VS_Shape } from "./vs_shape_def";
@@ -23,22 +22,18 @@ export function im(data, path, asHologram) {
             texture.uv_width = content.textureSizes[name][0];
             texture.uv_height = content.textureSizes[name][1];
         }
-        // @ts-expect-error: merge has wrong type
-        props.textureLocationProp.merge(texture, { textureLocation: content.textures[name] });
+
+        texture.textureLocation = content.textures[name];
     }
 
     // Load editor properties
     if (content.editor) {
-        // @ts-expect-error: merge has wrong type
-        props.editor_backDropShapeProp.merge(Project, content.editor);
-        // @ts-expect-error: merge has wrong type
-        props.editor_allAnglesProp.merge(Project, content.editor);
-        // @ts-expect-error: merge has wrong type
-        props.editor_entityTextureModeProp.merge(Project, content.editor);
-        // @ts-expect-error: merge has wrong type
-        props.editor_collapsedPathsProp.merge(Project, content.editor);
-        // @ts-expect-error: merge has wrong type
-        props.editor_vsFormatConvertedProp.merge(Project, content.editor);
+        Project.backDropShape = content.editor.backDropShape;
+        Project.allAngles = content.editor.allAngles;
+        Project.entityTextureMode = content.editor.entityTextureMode;
+        Project.collapsedPaths = content.editor.collapsedPaths;
+        Project.vsFormatConverted = content.editor.vsFormatConverted;
+        Project.singleTexture = content.editor.singleTexture;
     }
 
     // Build the model structure using the dedicated module

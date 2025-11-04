@@ -1,4 +1,3 @@
-import * as props from "./property";
 import {export_model} from "./export_model";
 import {export_animations} from "./export_animation";
 import { VS_EditorSettings, VS_Shape } from "./vs_shape_def";
@@ -20,20 +19,17 @@ export function ex(options) {
     // Populate Textures
     const textures: Record<string, string> = {};
     for (const texture of Texture.all) {
-        const tmp = {};
-        // @ts-expect-error: copy has wrong type
-        props.textureLocationProp.copy(texture, tmp);
-        // @ts-expect-error: textureLocation is added by copy above
-        textures[texture.name] = tmp.textureLocation;
+        textures[texture.name] = texture.textureLocation || "";
     }
     
     // Populate Editor Info
     const editor: VS_EditorSettings = {};
-    if (Project.backDropShape) editor.backDropShape = Project.backDropShape;
-    if (Project.allAngles) editor.allAngles = Project.allAngles;
-    if (Project.entityTextureMode) editor.entityTextureMode = Project.entityTextureMode;
-    if (Project.collapsedPaths) editor.collapsedPaths = Project.collapsedPaths;
-    if (Project.vsFormatConverted) editor.vsFormatConverted = Project.vsFormatConverted;
+    if (Project.backDropShape != undefined) editor.backDropShape = Project.backDropShape;
+    if (Project.allAngles != undefined) editor.allAngles = Project.allAngles;
+    if (Project.entityTextureMode != undefined) editor.entityTextureMode = Project.entityTextureMode;
+    if (Project.collapsedPaths != undefined) editor.collapsedPaths = Project.collapsedPaths;
+    if (Project.vsFormatConverted != undefined) editor.vsFormatConverted = Project.vsFormatConverted;
+    if (Project.singleTexture != undefined) editor.singleTexture = Project.singleTexture;
 
     const data: VS_Shape = {
         editor: editor,

@@ -19,6 +19,7 @@ export interface VS_EditorSettings {
     allAngles?: boolean,
     entityTextureMode?: boolean,
     vsFormatConverted?: boolean,
+    singleTexture?: boolean,
 }
 
 export interface VS_Element {

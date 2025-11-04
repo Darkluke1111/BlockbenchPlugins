@@ -1,4 +1,3 @@
-import { GroupExt } from "../property";
 import { VS_Element } from "../vs_shape_def";
 import { traverse } from "./traverse";
 import * as util from "../util";
@@ -10,8 +9,8 @@ import * as util from "../util";
  * @param offset The position offset to apply.
  */
 export function process_group(
-    parent: GroupExt | null ,
-    node: GroupExt,
+    parent: Group | null,
+    node: Group,
     accu: Array<VS_Element>,
     offset: [number,number,number]
 ) {

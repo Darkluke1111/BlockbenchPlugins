@@ -21,7 +21,7 @@ const get_texture_location = function (domain, rel_path) {
     return "";
 };
 
-const get_shape_location = function (domain, rel_path) {
+const get_shape_location = function (domain, rel_path): string {
 
     for (const base_mod_path of ["creative", "game", "survival"]) {
         const f = path.posix.format({
@@ -59,12 +59,6 @@ const visit_tree = function (tree, visitor) {
 
 const is_group = (x) => x.children;
 
-
-function copyOrigin(source, target) {
-    const target_tmp = {};
-    Group.properties["origin"].copy(source, target_tmp);
-    Group.properties["origin"].merge(target, target_tmp);
-}
 
 function setParent(child, parent) {
     visit_tree(child, {

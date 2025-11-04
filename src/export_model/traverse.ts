@@ -1,4 +1,3 @@
-import { GroupExt } from "../property";
 import { VS_Element } from "../vs_shape_def";
 import {process_cube} from "./cube";
 import {process_group} from "./group";
@@ -10,7 +9,7 @@ import {process_group} from "./group";
  * @param accu The accumulator for the VS elements.
  * @param offset The position offset to apply.
  */
-export function traverse(parent: GroupExt | null, nodes: Array<OutlinerNode>, accu: Array<VS_Element>, offset: [number,number,number]) {
+export function traverse(parent: Group | null, nodes: Array<OutlinerNode>, accu: Array<VS_Element>, offset: [number,number,number]) {
     for (const node of nodes) {
         if (node instanceof Group) {
             process_group(parent, node, accu, offset);
