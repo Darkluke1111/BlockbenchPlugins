@@ -1,13 +1,14 @@
 {
   "devDependencies": {
     "@types/node": "^24.9.1",
-    "blockbench-types": "^5.0.0-beta.3",
+    "blockbench-types": "https://github.com/SnaveSutit/blockbench-types.git",
     "eslint": "^9.38.0",
     "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-vue": "^10.5.1",
     "globals": "^16.4.0",
     "jiti": "^2.6.1",
     "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
     "typescript-json-schema": "^0.65.1",
     "webpack-cli": "^6.0.1",

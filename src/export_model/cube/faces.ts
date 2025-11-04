@@ -1,4 +1,3 @@
-import * as props from "../../property";
 import { VS_Direction, VS_Face } from "../../vs_shape_def";
 
 /**
@@ -79,10 +78,9 @@ export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>
             ...(!isUvDefault && { uv: transformedUV }),
             ...(transformedRotation !== 0 && { rotation: transformedRotation }),
             autoUv: false,
-            snapUv: false
+            snapUv: false,
+            windMode: face.windMode,
         });
-        // @ts-expect-error: merge has wrong type
-        props.windProp.copy(face, reduced_faces[direction]);
     }
     return reduced_faces;
 }
