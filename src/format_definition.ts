@@ -42,7 +42,6 @@ export function get_format(codec: Codec): ModelFormat {
         java_cube_shading_properties: false,
         cullfaces: false, // Not sure if Vintage Story supports this
         render_sides: "front", //Seems right to me but I havent tested how VS does it
-        //@ts-expect-error: Missing in type --- IGNORE ---
         euler_order: "XYZ",
         animation_loop_wrapping: true,
         quaternion_interpolation: false,
