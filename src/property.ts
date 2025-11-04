@@ -12,7 +12,8 @@ export const editor_backDropShapeProp= new Property(ModelProject, "string", "bac
 export const editor_allAnglesProp= new Property(ModelProject, "boolean", "allAngles", {exposed: false,});
 export const editor_entityTextureModeProp= new Property(ModelProject, "boolean", "entityTextureMode", {exposed: false,});
 export const editor_collapsedPathsProp= new Property(ModelProject, "string", "collapsedPaths", {exposed: false,});
-export type ModelProjectExt = ModelProject & { backDropShape?: string, allAngles?: boolean, entityTextureMode?: boolean, collapsedPaths?: string };
+export const editor_vsFormatConvertedProp= new Property(ModelProject, "boolean", "vsFormatConverted", {exposed: false,});
+export type ModelProjectExt = ModelProject & { backDropShape?: string, allAngles?: boolean, entityTextureMode?: boolean, collapsedPaths?: string, vsFormatConverted?: boolean };
 
 export const stepParentProp= new Property(Group, "string", "stepParentName");
 export const hologramGroupProp= new Property(Group, "string", "hologram");

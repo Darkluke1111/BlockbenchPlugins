@@ -18,6 +18,7 @@ export interface VS_EditorSettings {
     collapsedPaths?: string,
     allAngles?: boolean,
     entityTextureMode?: boolean,
+    vsFormatConverted?: boolean,
 }
 
 export interface VS_Element {

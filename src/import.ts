@@ -37,6 +37,8 @@ export function im(data, path, asHologram) {
         props.editor_entityTextureModeProp.merge(Project, content.editor);
         // @ts-expect-error: merge has wrong type
         props.editor_collapsedPathsProp.merge(Project, content.editor);
+        // @ts-expect-error: merge has wrong type
+        props.editor_vsFormatConvertedProp.merge(Project, content.editor);
     }
 
     // Build the model structure using the dedicated module

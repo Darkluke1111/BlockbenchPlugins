@@ -23,6 +23,7 @@ let importAction;
 let reExportAction;
 let debugAction;
 let onGroupAdd;
+let onProjectLoad;
 
 BBPlugin.register('vs_plugin', {
     title: 'Vintage Story Format Support',
@@ -57,6 +58,16 @@ BBPlugin.register('vs_plugin', {
                         Settings.save();
                     }
                 }).show();
+            }
+        });
+
+        const auto_convert_vs_format_setting = new Setting("auto_convert_vs_format", {
+            name: "Auto-Convert to VS Format",
+            description: "Automatically convert projects to Vintage Story format when loading .bbmodel files",
+            type: "toggle",
+            value: true,
+            onChange(_value: boolean) {
+                Settings.save();
             }
         });
 
@@ -186,6 +197,85 @@ BBPlugin.register('vs_plugin', {
         });
         MenuBar.addAction(importAction, 'file.import');
 
+        const convertProjectToVSFormat = (): void => {
+            if (!Project) return;
+            if (Project.format && Project.format.id === 'formatVS') return;
+            if (Project.vsFormatConverted) {
+                // File already converted, just set format and display order
+                Project.format = formatVS;
+
+                for (const group of Group.all) {
+                    if (group.mesh && group.mesh.rotation) {
+                        group.mesh.rotation.order = 'XYZ';
+                    }
+                }
+                for (const cube of Cube.all) {
+                    if (cube.preview_controller && cube.preview_controller.mesh && cube.preview_controller.mesh.rotation) {
+                        cube.preview_controller.mesh.rotation.order = 'XYZ';
+                    }
+                }
+
+                Canvas.updateAllBones();
+                Canvas.updateAllPositions();
+                Canvas.updateAll();
+                return;
+            }
+
+            const old_format = Project.format?.id || 'unknown';
+            const old_euler_order = Project.format?.euler_order || 'ZYX';
+
+            // Convert rotation values for VS export
+            if (old_euler_order !== 'XYZ') {
+                for (const group of Group.all) {
+                    if (group.rotation && (group.rotation[0] !== 0 || group.rotation[1] !== 0 || group.rotation[2] !== 0)) {
+                        const old_rotation = [group.rotation[0], group.rotation[1], group.rotation[2]] as [number, number, number];
+                        const new_rotation = util.zyx_to_xyz(old_rotation);
+                        group.rotation = new_rotation;
+                    }
+                }
+
+                for (const cube of Cube.all) {
+                    if (cube.rotation && (cube.rotation[0] !== 0 || cube.rotation[1] !== 0 || cube.rotation[2] !== 0)) {
+                        const old_rotation = [cube.rotation[0], cube.rotation[1], cube.rotation[2]] as [number, number, number];
+                        const new_rotation = util.zyx_to_xyz(old_rotation);
+                        cube.rotation = new_rotation;
+                    }
+                }
+            }
+
+            // Switch to VS format
+            Project.format = formatVS;
+            Project.vsFormatConverted = true;
+
+            // Update mesh display order
+            for (const group of Group.all) {
+                if (group.mesh && group.mesh.rotation) {
+                    group.mesh.rotation.order = 'XYZ';
+                }
+            }
+
+            for (const cube of Cube.all) {
+                if (cube.preview_controller && cube.preview_controller.mesh && cube.preview_controller.mesh.rotation) {
+                    cube.preview_controller.mesh.rotation.order = 'XYZ';
+                }
+            }
+
+            Canvas.updateAllBones();
+            Canvas.updateAllPositions();
+            Canvas.updateAll();
+
+            Blockbench.showQuickMessage('Converted to VS format', 3000);
+        };
+
+        // Do everything together with delay for elements to load
+        onProjectLoad = () => {
+            if (auto_convert_vs_format_setting.value) {
+                setTimeout(convertProjectToVSFormat, 1000);
+            }
+        };
+
+        Blockbench.on('load_project', onProjectLoad);
+
         reExportAction = new Action("reExport", {
             name: 'Reexport Test',
             icon: 'fa-flask-vial',
@@ -257,6 +347,7 @@ BBPlugin.register('vs_plugin', {
         reExportAction.delete();
         debugAction.delete();
         Blockbench.removeListener('add_group', onGroupAdd);
+        Blockbench.removeListener('load_project', onProjectLoad);
     }
 });
 

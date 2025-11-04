@@ -10,8 +10,8 @@ import * as util from "../util";
  * @param offset The position offset to apply.
  */
 export function process_group(
-    parent: GroupExt | null , 
-    node: GroupExt, 
+    parent: GroupExt | null ,
+    node: GroupExt,
     accu: Array<VS_Element>,
     offset: [number,number,number]
 ) {
