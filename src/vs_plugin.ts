@@ -1,10 +1,10 @@
 import { im } from "./import";
 import { ex } from "./export";
 import { get_format } from "./format_definition";
-import * as util from './util';
-import * as props from './property';
 import * as vs_schema from "./generated/vs_shape_schema";
-import patchBoneAnimator from "./patches/boneAnimatorPatch";
+
+import PACKAGE from "../package.json";
+
 
 import Ajv from "ajv";
 
@@ -14,18 +14,25 @@ const fs = requireNativeModule('fs');
 const path = requireNativeModule('path');
 
 import * as process from "process";
+import { events } from "./util/events";
 
 
+// Actions
+import "./debug_actions";
+import "./actions";
+
+// Mods
+import "./mods/boneAnimatorMod";
 
 
-let exportAction;
-let importAction;
-let reExportAction;
-let debugAction;
+export let codecVS: Codec;
+
 let onGroupAdd;
 
-BBPlugin.register('vs_plugin', {
-    title: 'Vintage Story Format Support',
+
+
+BBPlugin.register(PACKAGE.name, {
+    title: PACKAGE.title,
     icon: 'icon',
     author: 'Darkluke1111, codename_B',
     description: 'Adds the Vintage Story format export/import options.',
@@ -33,7 +40,6 @@ BBPlugin.register('vs_plugin', {
     variant: 'desktop',
 
     onload() {
-        patchBoneAnimator();
 
         //Init additional Attribute Properties
         const game_path_setting = new Setting("game_path", {
@@ -73,7 +79,7 @@ BBPlugin.register('vs_plugin', {
 
         Blockbench.on('add_group', onGroupAdd);
 
-        const codecVS = new Codec("codecVS", {
+        codecVS = new Codec("codecVS", {
             name: "Vintage Story Codec",
             extension: "json",
             remember: true,
@@ -155,111 +161,18 @@ BBPlugin.register('vs_plugin', {
         const formatVS = get_format(codecVS);
         codecVS.format = formatVS;
 
-
-        exportAction = new Action('exportVS', {
-            name: 'Export into VS Format',
-            icon: 'fa-cookie-bite',
-            click: function () {
-                if (!Project) {
-                    throw new Error("No project loaded during export");
-                }
-                Blockbench.export({
-                    name: Project.name,
-                    type: 'json',
-                    extensions: ['json'],
-                    content: codecVS.compile(),
-                });
-            }
-        });
-        MenuBar.addAction(exportAction, 'file.export');
-
-        importAction = new Action('importVS', {
-            name: 'Import from VS Format',
-            icon: 'fa-cookie-bite',
-            click: function () {
-                Blockbench.import({
-                    type: 'json',
-                    extensions: ['json'],
-                }, function (files) {
-                    codecVS.parse!(files[0].content, files[0].path);
-                });
-            }
-        });
-        MenuBar.addAction(importAction, 'file.import');
-
-        reExportAction = new Action("reExport", {
-            name: 'Reexport Test',
-            icon: 'fa-flask-vial',
-            click: function () {
-                new Dialog("folder_select", {
-                    title: "Select Folder",
-                    form: {
-                        select_folder: {
-                            label: "Select Folder to test",
-                            description: "This Action is made for testing. If you don't know what it does, you probably should not use it.",
-                            type: "folder",
-                        }
-                    },
-                    onConfirm(form_result) {
-                        const test_folder = form_result.select_folder;
-                        console.log(test_folder);
-                        const test_files = fs!.readdirSync(test_folder, { recursive: true, encoding: "utf-8" });
-                        for (const test_file of test_files) {
-                            if (!test_file.includes("reexport_")) {
-
-                                const test_file_rel_path = test_folder + path.sep + path.dirname(test_file);
-                                const test_file_name = path.basename(test_file);
-
-                                const input_path = path.resolve(test_folder, test_file_rel_path, test_file_name);
-                                const output_path = path.resolve(test_folder, test_file_rel_path, `reexport_${test_file_name}`);
-
-                                if (!fs?.statSync(input_path).isFile()) continue;
-                                try {
-
-
-                                    Blockbench.readFile([input_path], {}, (files) => {
-                                        //@ts-expect-error: Missing in type --- IGNORE ---
-                                        loadModelFile(files[0],[]);
-
-                                        const reexport_content = codecVS.compile();
-
-                                        Blockbench.writeFile(output_path, {
-                                            content: reexport_content,
-                                            savetype: "text"
-                                        });
-                                    });
-
-                                    
-
-                                } catch (e) {
-                                    console.error(e);
-                                }
-                                // project.close(true);
-                            }
-                        }
-                    }
-                }).show();
-            }
-        });
-        MenuBar.addAction(reExportAction, "file");
-
-        debugAction = new Action("printDebug", {
-            name: 'Print Debug Info',
-            icon: 'icon',
-            click: function () {
-                console.log(Outliner.selected);
-            }
-        });
-        MenuBar.addAction(debugAction, "edit");
-        Outliner.control_menu_group.push(debugAction.id);
+        events.LOAD.dispatch();
     },
     onunload() {
-        exportAction.delete();
-        importAction.delete();
-        reExportAction.delete();
-        debugAction.delete();
         Blockbench.removeListener('add_group', onGroupAdd);
-    }
+        events.UNLOAD.dispatch();
+    },
+    oninstall() {
+		events.INSTALL.dispatch();
+	},
+	onuninstall() {
+		events.UNINSTALL.dispatch();
+	},
 });
 
 function validate_json(content) {
