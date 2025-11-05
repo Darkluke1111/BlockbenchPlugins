@@ -1,21 +1,12 @@
-import { im } from "./import";
-import { ex } from "./export";
-import { get_format } from "./format_definition";
-import * as vs_schema from "./generated/vs_shape_schema";
-
-import PACKAGE from "../package.json";
-
-
-import Ajv from "ajv";
-
 // @ts-expect-error: requireNativeModule is missing in blockbench types --- IGNORE ---
 const fs = requireNativeModule('fs');
 // @ts-expect-error: requireNativeModule is missing in blockbench types --- IGNORE ---
 const path = requireNativeModule('path');
-
 import * as process from "process";
-import { events } from "./util/events";
 
+import { create_format } from "./format_definition";
+import { events } from "./util/events";
+import PACKAGE from "../package.json";
 
 // Actions
 import "./debug_actions";
@@ -23,13 +14,10 @@ import "./actions";
 
 // Mods
 import "./mods/boneAnimatorMod";
+import "./mods/formatMod";
 
-
-export let codecVS: Codec;
 
 let onGroupAdd;
-
-
 
 BBPlugin.register(PACKAGE.name, {
     title: PACKAGE.title,
@@ -40,6 +28,8 @@ BBPlugin.register(PACKAGE.name, {
     variant: 'desktop',
 
     onload() {
+
+        //create_format();
 
         //Init additional Attribute Properties
         const game_path_setting = new Setting("game_path", {
@@ -79,33 +69,9 @@ BBPlugin.register(PACKAGE.name, {
 
         Blockbench.on('add_group', onGroupAdd);
 
-        codecVS = new Codec("codecVS", {
-            name: "Vintage Story Codec",
-            extension: "json",
-            remember: true,
-            load_filter: {
-                extensions: ["json"],
-                type: 'text',
-                condition(model) {
-                    const content = autoParseJSON(model);
-                    return validate_json(content);
-                }
-            },
-            compile(options) {
-                // Removed for now since it doesn't work
-                // resetStepparentTransforms();
-                return ex(options);
-            },
-            parse(data, file_path, add) {
-                im(data, file_path, false);
-                // Removed for now since it doesn't work
-                // loadBackDropShape();
-                // resolveStepparentTransforms();
-            },
-        });
+        
 
-        const formatVS = get_format(codecVS);
-        codecVS.format = formatVS;
+
 
         events.LOAD.dispatch();
     },
@@ -120,11 +86,3 @@ BBPlugin.register(PACKAGE.name, {
 		events.UNINSTALL.dispatch();
 	},
 });
-
-function validate_json(content) {
-    const ajv = new Ajv();
-    const validate = ajv.compile(vs_schema);
-    const valid = validate(content);
-    if (!valid) console.log(validate.errors);
-    return valid;
-}

@@ -1,7 +1,9 @@
-export function get_format(codec: Codec): ModelFormat { 
-    return new ModelFormat("formatVS", {
+import { codecVS } from "./codec";
+
+export function create_format(): ModelFormat { 
+    const format =  new ModelFormat("formatVS", {
         name: "Vintage Story Base Format",
-        codec: codec,
+        codec: codecVS,
         icon: "fa-cookie-bite",
         box_uv: false,
         optional_box_uv: false,
@@ -48,4 +50,6 @@ export function get_format(codec: Codec): ModelFormat {
         quaternion_interpolation: false,
         per_animator_rotation_interpolation: false,
     });
+    codecVS.format = format;
+    return format;
 };

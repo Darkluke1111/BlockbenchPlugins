@@ -1,5 +1,4 @@
 import { createAction } from "./util/moddingTools";
-import { codecVS } from "./vs_plugin";
 import * as PACKAGE from "../package.json";
 import { is_vs_project } from "./util";
 
@@ -18,7 +17,8 @@ const export_action = createAction(`${PACKAGE.name}:export_vs`, {
             name: Project.name,
             type: 'json',
             extensions: ['json'],
-            content: codecVS.compile(),
+            // codec should be valid if action condition is met
+            content: Format.codec!.compile()
         });
     }
 });
@@ -35,7 +35,8 @@ const import_action = createAction(`${PACKAGE.name}:import_vs`, {
             type: 'json',
             extensions: ['json'],
         }, function (files) {
-            codecVS.parse!(files[0].content, files[0].path);
+            // codec and parse should be valid if action condition is met
+            Format.codec!.parse!(files[0].content, files[0].path);
         });
     }
 });

@@ -1,5 +1,4 @@
 import { createAction } from "./util/moddingTools";
-import { codecVS } from "./vs_plugin";
 import * as PACKAGE from "../package.json";
 import { is_vs_project } from "./util";
 
@@ -44,7 +43,8 @@ const reExportAction = createAction(`${PACKAGE.name}:reExport`, {
                                 //@ts-expect-error: Missing in type --- IGNORE ---
                                 loadModelFile(files[0], []);
 
-                                const reexport_content = codecVS.compile();
+                                // codec should be valid if condition is met
+                                const reexport_content = Format.codec!.compile();
 
                                 Blockbench.writeFile(output_path, {
                                     content: reexport_content,
