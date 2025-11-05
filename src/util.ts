@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+declare const THREE: typeof import('three');
 
 const fps = 30;
 
@@ -20,26 +21,26 @@ const get_texture_location = function (domain, rel_path) {
     return "";
 };
 
-function vector_add(a: [number,number,number], b: [number,number,number]): [number,number,number] {
-    const c: [number,number,number] = [0,0,0];
-    for(let i = 0 ; i < a.length ; i++) {
+function vector_add(a: [number, number, number], b: [number, number, number]): [number, number, number] {
+    const c: [number, number, number] = [0, 0, 0];
+    for (let i = 0; i < a.length; i++) {
         c[i] = a[i] + b[i];
     }
     return c;
 }
 
-function vector_inv(a: [number,number,number]): [number,number,number] {
-    const c: [number,number,number] = [0,0,0];
-    for(let i = 0 ; i < a.length ; i++) {
+function vector_inv(a: [number, number, number]): [number, number, number] {
+    const c: [number, number, number] = [0, 0, 0];
+    for (let i = 0; i < a.length; i++) {
         c[i] = - a[i];
     }
-   
+
     return c;
 }
 
-function vector_sub(a: [number,number,number], b: [number,number,number]): [number,number,number] {
-    const c: [number,number,number] = [0,0,0];
-    for(let i = 0 ; i < a.length ; i++) {
+function vector_sub(a: [number, number, number], b: [number, number, number]): [number, number, number] {
+    const c: [number, number, number] = [0, 0, 0];
+    for (let i = 0; i < a.length; i++) {
         c[i] = a[i] - b[i];
     }
     return c;
@@ -50,6 +51,25 @@ function is_vs_project(): boolean {
     else return false;
 }
 
+// Convert ZYX to XYZ euler angles
+function zyx_to_xyz(rotation: readonly [number, number, number]): [number, number, number] {
+    const euler = new THREE.Euler(
+        THREE.MathUtils.degToRad(rotation[0]),
+        THREE.MathUtils.degToRad(rotation[1]),
+        THREE.MathUtils.degToRad(rotation[2]),
+        'ZYX'
+    );
+
+    euler.reorder('XYZ');
+
+    // Use properties instead of toArray() (which includes order as 4th element)
+    return [
+        THREE.MathUtils.radToDeg(euler.x),
+        THREE.MathUtils.radToDeg(euler.y),
+        THREE.MathUtils.radToDeg(euler.z)
+    ];
+}
+
 export {
     fps,
     is_vs_project,
@@ -57,4 +77,5 @@ export {
     vector_add,
     vector_sub,
     vector_inv,
+    zyx_to_xyz,
 };

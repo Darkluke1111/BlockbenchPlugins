@@ -10,6 +10,7 @@ export const editor_backDropShapeProp= new Property(ModelProject, "string", "bac
 export const editor_allAnglesProp= new Property(ModelProject, "boolean", "allAngles", {exposed: false,});
 export const editor_entityTextureModeProp= new Property(ModelProject, "boolean", "entityTextureMode", {exposed: false,});
 export const editor_collapsedPathsProp= new Property(ModelProject, "string", "collapsedPaths", {exposed: false,});
+export const editor_vsFormatConvertedProp= new Property(ModelProject, "boolean", "vsFormatConverted", {exposed: false,});
 export const editor_singleTextureProp= new Property(ModelProject, "boolean", "singleTexture", {exposed: false,});
 
 export const stepParentProp= new Property(Group, "string", "stepParentName");
@@ -36,6 +37,7 @@ declare global {
         allAngles?: boolean;
         entityTextureMode?: boolean;
         collapsedPaths?: string;
+        vsFormatConverted?: boolean;
         singleTexture?: boolean;
     }
 

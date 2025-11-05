@@ -43,7 +43,7 @@ export function create_format(): ModelFormat {
         box_uv_float_size: false,
         java_cube_shading_properties: false,
         cullfaces: false, // Not sure if Vintage Story supports this
-        render_sides: "front", //Seems right to me but I havent tested how VS does it
+        render_sides: "double",
         //@ts-expect-error: Missing in type --- IGNORE ---
         euler_order: "XYZ",
         animation_loop_wrapping: true,
