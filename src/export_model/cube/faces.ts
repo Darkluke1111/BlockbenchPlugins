@@ -80,6 +80,7 @@ export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>
             autoUv: false,
             snapUv: false,
             windMode: face.windMode,
+            windData: face.windData,
         });
     }
     return reduced_faces;

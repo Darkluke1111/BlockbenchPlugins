@@ -24,6 +24,7 @@ export function process_cube(parent: Group | null, object_space_pos: [number,num
     for (const direction in cube.faces) {
         if (vsElement.faces && vsElement.faces[direction]?.windMode) {
             cube.faces[direction].windMode = vsElement.faces[direction].windMode;
+            cube.faces[direction].windData = vsElement.faces[direction].windData;
         }
     }
 }

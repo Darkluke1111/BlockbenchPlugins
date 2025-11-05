@@ -24,7 +24,7 @@ const program = TJS.getProgramFromFiles(
 // We can either get the schema for one file and one type...
 const schema = TJS.generateSchema(program, "VS_Shape", settings);
 
-fs.mkdir('src/generated/', {recursive: true}, (err) => {
+fs.mkdir(path.resolve('src/generated/'), {recursive: true}, (err) => {
   if (err) throw err;
 });
 
