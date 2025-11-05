@@ -2,9 +2,7 @@
 const fs = requireNativeModule('fs');
 // @ts-expect-error: requireNativeModule is missing in blockbench types --- IGNORE ---
 const path = requireNativeModule('path');
-import * as process from "process";
 
-import { create_format } from "./format_definition";
 import { events } from "./util/events";
 import PACKAGE from "../package.json";
 
@@ -15,6 +13,7 @@ import "./actions";
 // Mods
 import "./mods/boneAnimatorMod";
 import "./mods/formatMod";
+import "./mods/settingsMod";
 
 
 let onGroupAdd;
@@ -28,35 +27,6 @@ BBPlugin.register(PACKAGE.name, {
     variant: 'desktop',
 
     onload() {
-
-        //create_format();
-
-        //Init additional Attribute Properties
-        const game_path_setting = new Setting("game_path", {
-            name: "Game Path",
-            description: "The path to your Vintage Story game folder. This is the folder that contains the assets, mods and lib folders.",
-            category: "Vintage Story",
-            type: "click",
-            icon: "fa-folder-plus",
-            value: Settings.get("asset_path") || process.env.VINTAGE_STORY || "",
-            click() {
-                new Dialog("gamePathSelect", {
-                    title: "Select Game Path",
-                    form: {
-                        path: {
-                            label: "Path to your game folder",
-                            type: "folder",
-                            value: Settings.get("game_path") || process.env.VINTAGE_STORY || "",
-                        }
-                    },
-                    onConfirm(formResult) {
-                        game_path_setting.set(formResult.path);
-                        Settings.save();
-                    }
-                }).show();
-            }
-        });
-
         onGroupAdd = function () {
 
             const group = Group.first_selected;
@@ -68,10 +38,6 @@ BBPlugin.register(PACKAGE.name, {
         };
 
         Blockbench.on('add_group', onGroupAdd);
-
-        
-
-
 
         events.LOAD.dispatch();
     },

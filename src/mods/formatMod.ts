@@ -6,14 +6,14 @@ import * as PACKAGE from "../../package.json";
 createBlockbenchMod(
     `${PACKAGE.name}:vs_format_mod`,
     {
-        vs_format: Format
+        vs_format: undefined as any
     },
     context => {
         context.vs_format = create_format();
         return context;
         },
     context => {
-        context.vs_format.delete();
+        context.vs_format?.delete();
     }
 
 );
