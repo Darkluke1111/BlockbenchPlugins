@@ -104,60 +104,6 @@ BBPlugin.register(PACKAGE.name, {
             },
         });
 
-        function loadBackDropShape() {
-            const backdrop = {};
-            // @ts-expect-error: copy has wrong type
-            editor_backDropShapeProp.copy(Project, backdrop);
-
-            // @ts-expect-error: backDropShape is added by copy above
-            const backDropShape = backdrop.backDropShape;
-            if (backDropShape) {
-                Blockbench.read([util.get_shape_location(null, backDropShape)], {
-                    readtype: "text", errorbox: false
-                }, (files) => {
-                    im(files[0].content, files[0].path, true);
-                });
-            }
-        }
-
-        function resolveStepparentTransforms() {
-            for (const g of Group.all) {
-                const p = {};
-
-                // @ts-expect-error: copy has wrong type
-                props.stepParentProp.copy(g, p);
-                // @ts-expect-error: stepParentName is added by copy above
-                const stepParentName = p.stepParentName;
-                if (stepParentName) {
-                    const spg = Group.all.find(group => group.name === (stepParentName + "_group"));
-                    if (spg) {
-                        const sp = spg.children[0];
-                        util.setParent(g, sp);
-                        g.addTo(spg);
-                    }
-                }
-            }
-        }
-
-        function resetStepparentTransforms() {
-            for (const g of Group.all) {
-                const p = {};
-                // @ts-expect-error: copy has wrong type
-                props.stepParentProp.copy(g, p);
-                // @ts-expect-error: stepParentName is added by copy above
-                const stepParentName = p.stepParentName;
-                if (!g.hologram) {
-                    const spg = Group.all.find(group => group.name === (stepParentName + "_group"));
-                    if (spg) {
-                        const sp = spg.children[0];
-
-                        util.removeParent(g, sp);
-                        g.addTo(undefined);
-                    }
-                }
-            }
-        }
-
         const formatVS = get_format(codecVS);
         codecVS.format = formatVS;
 
