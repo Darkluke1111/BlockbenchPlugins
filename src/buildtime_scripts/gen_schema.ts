@@ -24,10 +24,10 @@ const program = TJS.getProgramFromFiles(
 // We can either get the schema for one file and one type...
 const schema = TJS.generateSchema(program, "VS_Shape", settings);
 
-fs.mkdir('src/generated/', {recursive: true}, (err) => {
+fs.mkdir(path.resolve('src/generated/'), {recursive: true}, (err) => {
   if (err) throw err;
 });
 
 const schema_str = JSON.stringify(schema, null, 2);
 
-fs.writeFileSync("src/generated/vs_shape_schema.js", `module.exports = ${schema_str}`);
+fs.writeFileSync(path.resolve("src/generated/vs_shape_schema.js"), `module.exports = ${schema_str}`);
