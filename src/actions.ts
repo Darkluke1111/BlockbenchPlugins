@@ -1,11 +1,15 @@
 import { createAction } from "./util/moddingTools";
 import { codecVS } from "./vs_plugin";
 import * as PACKAGE from "../package.json";
+import { is_vs_project } from "./util";
 
 
 const export_action = createAction(`${PACKAGE.name}:export_vs`, {
     name: 'Export into VS Format',
     icon: 'fa-cookie-bite',
+    condition() {
+        return is_vs_project();
+    },
     click: function () {
         if (!Project) {
             throw new Error("No project loaded during export");
@@ -23,6 +27,9 @@ MenuBar.addAction(export_action, 'file.export');
 const import_action = createAction(`${PACKAGE.name}:import_vs`, {
     name: 'Import from VS Format',
     icon: 'fa-cookie-bite',
+    condition() {
+        return is_vs_project();
+    },
     click: function () {
         Blockbench.import({
             type: 'json',

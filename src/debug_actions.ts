@@ -1,6 +1,7 @@
 import { createAction } from "./util/moddingTools";
 import { codecVS } from "./vs_plugin";
 import * as PACKAGE from "../package.json";
+import { is_vs_project } from "./util";
 
 // @ts-expect-error: requireNativeModule is missing in blockbench types --- IGNORE ---
 const path = requireNativeModule('path');
@@ -9,6 +10,9 @@ const path = requireNativeModule('path');
 const reExportAction = createAction(`${PACKAGE.name}:reExport`, {
     name: 'Reexport Test',
     icon: 'fa-flask-vial',
+    condition() {
+        return is_vs_project();
+    },
     click: function () {
         new Dialog("folder_select", {
             title: "Select Folder",
@@ -65,6 +69,9 @@ MenuBar.addAction(reExportAction, "file");
 const debugAction = createAction(`${PACKAGE.name}:printDebug`, {
     name: 'Print Debug Info',
     icon: 'icon',
+    condition() {
+        return is_vs_project();
+    },
     click: function () {
         console.log(Outliner.selected);
     }
