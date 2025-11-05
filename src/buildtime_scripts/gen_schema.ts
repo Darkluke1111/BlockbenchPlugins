@@ -30,4 +30,4 @@ fs.mkdir('src/generated/', {recursive: true}, (err) => {
 
 const schema_str = JSON.stringify(schema, null, 2);
 
-fs.writeFileSync(path.resolve("src/generated/vs_shape_schema.js"), `module.exports = ${schema_str}`);
+fs.writeFileSync("src/generated/vs_shape_schema.js", `module.exports = ${schema_str}`);
