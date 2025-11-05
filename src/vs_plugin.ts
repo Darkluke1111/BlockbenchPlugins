@@ -22,7 +22,6 @@ let exportAction;
 let importAction;
 let reExportAction;
 let debugAction;
-let toggleAutoConvertAction;
 let onGroupAdd;
 let onProjectLoad;
 
@@ -63,31 +62,6 @@ BBPlugin.register('vs_plugin', {
             }
         });
 
-        const auto_convert_vs_format_setting = new Setting("auto_convert_vs_format", {
-            name: "Auto-Convert to VS Format",
-            description: "Automatically convert projects to Vintage Story format when loading .bbmodel files",
-            category: "Vintage Story",
-            type: "toggle",
-            value: true,
-            onChange() {
-                Settings.save();
-            }
-        });
-
-        toggleAutoConvertAction = new Action('toggleAutoConvertVS', {
-            name: 'Toggle Auto-Convert to VS Format',
-            icon: 'fa-rotate',
-            keybind: new Keybind({key: 'k', ctrl: true, shift: true}),
-            click: function () {
-                auto_convert_vs_format_setting.value = !auto_convert_vs_format_setting.value;
-                Settings.save();
-                Blockbench.showQuickMessage(
-                    `Auto-convert ${auto_convert_vs_format_setting.value ? 'enabled' : 'disabled'}`,
-                    2000
-                );
-            }
-        });
-        MenuBar.addAction(toggleAutoConvertAction, 'tools');
 
         onGroupAdd = function () {
 
@@ -220,53 +194,51 @@ BBPlugin.register('vs_plugin', {
         });
         MenuBar.addAction(importAction, 'file.import');
 
-        const convertProjectToVSFormat = (): void => {
+        // Update mesh rotation orders when switching to VS format
+        const updateMeshRotationOrders = (): void => {
+            if (!Project || !Project.format || Project.format.id !== 'formatVS') return;
+
+            // Update canvas to ensure meshes exist
+            Canvas.updateAllBones();
+            Canvas.updateAllPositions();
+            Canvas.updateAll();
+
+            // Force cube geometry update
+            Canvas.updateView({
+                elements: Cube.all,
+                element_aspects: {
+                    geometry: true,
+                    transform: true
+                }
+            });
+
+            // Set XYZ rotation order on all meshes
+            for (const group of Group.all) {
+                if (group.mesh && group.mesh.rotation) {
+                    group.mesh.rotation.order = 'XYZ';
+                }
+            }
+
+            for (const cube of Cube.all) {
+                if (cube.mesh && cube.mesh.rotation) {
+                    cube.mesh.rotation.order = 'XYZ';
+                }
+            }
+
+            // Refresh canvas
+            Canvas.updateAllBones();
+            Canvas.updateAllPositions();
+            Canvas.updateAll();
+        };
+
+        // Convert rotation values when converting TO VS format
+        Blockbench.on('convert_format', (event) => {
+            if (event.format.id !== 'formatVS') return;
             if (!Project) return;
 
-            // If already VS format, just ensure mesh orders are correct
-            if (Project.format && Project.format.id === 'formatVS') {
-                for (const group of Group.all) {
-                    if (group.mesh && group.mesh.rotation) {
-                        group.mesh.rotation.order = 'XYZ';
-                    }
-                }
-                for (const cube of Cube.all) {
-                    if (cube.preview_controller && cube.preview_controller.mesh && cube.preview_controller.mesh.rotation) {
-                        cube.preview_controller.mesh.rotation.order = 'XYZ';
-                    }
-                }
-                Canvas.updateAllBones();
-                Canvas.updateAllPositions();
-                Canvas.updateAll();
-                return;
-            }
+            const old_euler_order = event.old_format?.euler_order || 'ZYX';
 
-            if (Project.vsFormatConverted) {
-                // File already converted, just set format and display order
-                Project.format = formatVS;
-
-                for (const group of Group.all) {
-                    if (group.mesh && group.mesh.rotation) {
-                        group.mesh.rotation.order = 'XYZ';
-                    }
-                }
-                for (const cube of Cube.all) {
-                    if (cube.preview_controller && cube.preview_controller.mesh && cube.preview_controller.mesh.rotation) {
-                        cube.preview_controller.mesh.rotation.order = 'XYZ';
-                    }
-                }
-
-                Canvas.updateAllBones();
-                Canvas.updateAllPositions();
-                Canvas.updateAll();
-                return;
-            }
-
-            const old_format = Project.format?.id || 'unknown';
-            // @ts-expect-error: euler_order is missing in blockbench types --- IGNORE ---
-            const old_euler_order = Project.format?.euler_order || 'ZYX';
-
-            // Convert rotation values for VS export
+            // Only convert if old format used different euler order
             if (old_euler_order !== 'XYZ') {
                 for (const group of Group.all) {
                     if (group.rotation && (group.rotation[0] !== 0 || group.rotation[1] !== 0 || group.rotation[2] !== 0)) {
@@ -285,51 +257,26 @@ BBPlugin.register('vs_plugin', {
                 }
             }
 
-            // Switch to VS format
-            Project.format = formatVS;
+            // Ensure root group is at VS standard origin (8,0,8)
+            const rootGroup = Outliner.root.filter(node => node instanceof Group).map(node => node as Group)[0];
+            if (rootGroup && !(rootGroup.origin[0] === 8 && rootGroup.origin[1] === 0 && rootGroup.origin[2] === 8)) {
+                rootGroup.origin = [8, 0, 8];
+            }
+
+            // Mark as converted
             Project.vsFormatConverted = true;
 
-            // Update canvas to create all meshes
-            Canvas.updateAllBones();
-            Canvas.updateAllPositions();
-            Canvas.updateAll();
+            // Update mesh rotation orders for display
+            updateMeshRotationOrders();
+        });
 
-            // Force cube geometry update
-            Canvas.updateView({
-                elements: Cube.all,
-                element_aspects: {
-                    geometry: true,
-                    transform: true
-                }
-            });
-
-            // Set XYZ rotation order on all group meshes
-            for (const group of Group.all) {
-                if (group.mesh && group.mesh.rotation) {
-                    group.mesh.rotation.order = 'XYZ';
-                }
-            }
-
-            // Set XYZ rotation order on all cube meshes
-            for (const cube of Cube.all) {
-                if (cube.mesh && cube.mesh.rotation) {
-                    cube.mesh.rotation.order = 'XYZ';
-                }
-            }
-
-            // Refresh canvas with correct rotation orders
-            Canvas.updateAllBones();
-            Canvas.updateAllPositions();
-            Canvas.updateAll();
-
-            Blockbench.showQuickMessage('Converted to VS format', 3000);
-        };
-
-        // Do everything together with delay for elements to load
+        // Update mesh orders when opening VS format projects
         onProjectLoad = () => {
-            if (auto_convert_vs_format_setting.value) {
-                setTimeout(convertProjectToVSFormat, 1000);
-            }
+            setTimeout(() => {
+                if (Project && Project.format && Project.format.id === 'formatVS') {
+                    updateMeshRotationOrders();
+                }
+            }, 100);
         };
 
         Blockbench.on('load_project', onProjectLoad);
@@ -405,7 +352,6 @@ BBPlugin.register('vs_plugin', {
         importAction.delete();
         reExportAction.delete();
         debugAction.delete();
-        toggleAutoConvertAction.delete();
         Blockbench.removeListener('add_group', onGroupAdd);
         Blockbench.removeListener('load_project', onProjectLoad);
     }
