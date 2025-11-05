@@ -14,11 +14,7 @@ import "./actions";
 import "./mods/boneAnimatorMod";
 import "./mods/formatMod";
 import "./mods/settingsMod";
-
-
-let toggleAutoConvertAction;
-let onGroupAdd;
-let onProjectLoad;
+import "./mods/legacyFormatConverterMod";
 
 BBPlugin.register(PACKAGE.name, {
     title: PACKAGE.title,
@@ -29,24 +25,9 @@ BBPlugin.register(PACKAGE.name, {
     variant: 'desktop',
 
     onload() {
-
-        onGroupAdd = function () {
-
-            const group = Group.first_selected;
-            if (!group) return;
-            const parent = group.parent;
-            if (parent && parent != "root" && parent.hologram) {
-                group.stepParentName = parent.name.substring(0, parent.name.length - 6);
-            }
-        };
-
-        Blockbench.on('add_group', onGroupAdd);
-
         events.LOAD.dispatch();
     },
     onunload() {
-        toggleAutoConvertAction.delete();
-        Blockbench.removeListener('add_group', onGroupAdd);
         events.UNLOAD.dispatch();
     },
     oninstall() {
