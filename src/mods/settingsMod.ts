@@ -41,5 +41,29 @@ createBlockbenchMod(
 
 );
 
+createBlockbenchMod(
+    `${PACKAGE.name}:auto_convert_vs_format_settings_mod`,
+    {
+        auto_convert_vs_format_setting: undefined as any
+    },
+    context => {
+        context.auto_convert_vs_format_setting = new Setting("auto_convert_vs_format", {
+            name: "Auto-Convert to VS Format",
+            description: "Automatically convert projects to Vintage Story format when loading .bbmodel files",
+            category: "Vintage Story",
+            type: "toggle",
+            value: true,
+            onChange() {
+                Settings.save();
+            }
+        }
+        );
+        return context;
+    },
+    context => {
+        context.auto_convert_vs_format_setting?.delete();
+    }
+
+);
 
 

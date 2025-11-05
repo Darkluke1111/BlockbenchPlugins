@@ -25,6 +25,8 @@ export const events = {
 
 	SELECT_PROJECT: new PluginEvent<ModelProject>('selectProject'),
 	UNSELECT_PROJECT: new PluginEvent<ModelProject>('deselectProject'),
+	
+	LOAD_PROJECT: new PluginEvent<ModelProject>('loadProject')
 };
 
 function injectionHandler() {
@@ -49,4 +51,9 @@ Blockbench.on<EventName>('select_project', ({ project }: { project: ModelProject
 });
 Blockbench.on<EventName>('unselect_project', ({ project }: { project: ModelProject }) => {
 	events.UNSELECT_PROJECT.dispatch(project);
+});
+
+
+Blockbench.on<EventName>('load_project', ({ project }: { project: ModelProject }) => {
+	events.LOAD_PROJECT.dispatch(project);
 });
