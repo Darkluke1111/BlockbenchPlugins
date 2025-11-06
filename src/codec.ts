@@ -12,6 +12,11 @@ export const codecVS = new Codec("codecVS", {
                 type: 'text',
                 condition(model) {
                     const content = autoParseJSON(model);
+                    // Quick check for VS-specific structure before full validation
+                    if (!content || typeof content !== 'object') return false;
+                    if (!content.elements || !Array.isArray(content.elements)) return false;
+                    if (!content.textures || typeof content.textures !== 'object') return false;
+                    // Full schema validation
                     return validate_json(content);
                 }
             },
