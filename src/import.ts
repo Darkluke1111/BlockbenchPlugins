@@ -32,7 +32,6 @@ export function im(data, path, asHologram) {
         Project.allAngles = content.editor.allAngles;
         Project.entityTextureMode = content.editor.entityTextureMode;
         Project.collapsedPaths = content.editor.collapsedPaths;
-        Project.vsFormatConverted = content.editor.vsFormatConverted;
         Project.singleTexture = content.editor.singleTexture;
     }
 

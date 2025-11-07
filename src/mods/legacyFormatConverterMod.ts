@@ -1,76 +1,82 @@
 import * as util from '../util';
-import { formatVS } from "../mods/formatMod";
 import { createBlockbenchMod } from '../util/moddingTools';
 import * as PACKAGE from "../../package.json";
 import { events } from '../util/events';
 
 createBlockbenchMod(
-    `${PACKAGE.name}:vs_format_mod`,
+    `${PACKAGE.name}:vs_legacy_format_converter_mod`,
     {
     },
     _context => {
         return events.LOAD_PROJECT.subscribe(onProjectLoad);
     },
     context => {
-        context();
+        context?.call(context);
     }
 
 );
 
-function onProjectLoad(_project) {
-    // Do everything together with delay for elements to load
-    if (Settings.get("auto_convert_vs_format").value) {
-        setTimeout(convertProjectToVSFormat, 1000);
+createBlockbenchMod(
+    `${PACKAGE.name}:vs_format_converter_mod`,
+    {},
+    _context => {
+        return events.CONVERT_FORMAT.subscribe(convert_format);
+    },
+    context => {
+        context?.call(context);
     }
+);
+
+
+// Update mesh rotation orders when switching to VS format
+const updateMeshRotationOrders = (): void => {
+    if (!Project || !Project.format || Project.format.id !== 'formatVS') return;
+
+    // Update canvas to ensure meshes exist
+    Canvas.updateAllBones();
+    Canvas.updateAllPositions();
+    Canvas.updateAll();
+
+    console.log("legacy converting!");
+
+    // Force cube geometry update
+    Canvas.updateView({
+        elements: Cube.all,
+        element_aspects: {
+            geometry: true,
+            transform: true
+        }
+    });
+
+    // Set XYZ rotation order on all meshes
+    for (const group of Group.all) {
+        if (group.mesh && group.mesh.rotation) {
+            group.mesh.rotation.order = 'XYZ';
+            console.log("legacy converting group!");
+        }
+    }
+
+    for (const cube of Cube.all) {
+        if (cube.mesh && cube.mesh.rotation) {
+            cube.mesh.rotation.order = 'XYZ';
+            console.log("legacy converting cube!");
+        }
+    }
+
+    // Refresh canvas
+    Canvas.updateAllBones();
+    Canvas.updateAllPositions();
+    Canvas.updateAll();
 };
 
-function convertProjectToVSFormat(): void {
+// Convert rotation values when converting TO VS format
+const convert_format = (event) => {
+    if (event.format.id !== 'formatVS') return;
     if (!Project) return;
 
-    // If already VS format, just ensure mesh orders are correct
-    if (Project.format && Project.format.id === 'formatVS') {
-        for (const group of Group.all) {
-            if (group.mesh && group.mesh.rotation) {
-                group.mesh.rotation.order = 'XYZ';
-            }
-        }
-        for (const cube of Cube.all) {
-            if (cube.preview_controller && cube.preview_controller.mesh && cube.preview_controller.mesh.rotation) {
-                cube.preview_controller.mesh.rotation.order = 'XYZ';
-            }
-        }
-        Canvas.updateAllBones();
-        Canvas.updateAllPositions();
-        Canvas.updateAll();
-        return;
-    }
+    const old_euler_order = event.old_format?.euler_order || 'ZYX';
 
-    if (Project.vsFormatConverted) {
-        // File already converted, just set format and display order
-        Project.format.id = "formatVS";
-
-        for (const group of Group.all) {
-            if (group.mesh && group.mesh.rotation) {
-                group.mesh.rotation.order = 'XYZ';
-            }
-        }
-        for (const cube of Cube.all) {
-            if (cube.preview_controller && cube.preview_controller.mesh && cube.preview_controller.mesh.rotation) {
-                cube.preview_controller.mesh.rotation.order = 'XYZ';
-            }
-        }
-
-        Canvas.updateAllBones();
-        Canvas.updateAllPositions();
-        Canvas.updateAll();
-        return;
-    }
-
-    const old_format = Project.format?.id || 'unknown';
-    // @ts-expect-error: euler_order is missing in blockbench types --- IGNORE ---
-    const old_euler_order = Project.format?.euler_order || 'ZYX';
-
-    // Convert rotation values for VS export
+    // Only convert if old format used different euler order
     if (old_euler_order !== 'XYZ') {
         for (const group of Group.all) {
             if (group.rotation && (group.rotation[0] !== 0 || group.rotation[1] !== 0 || group.rotation[2] !== 0)) {
@@ -89,44 +95,25 @@ function convertProjectToVSFormat(): void {
         }
     }
 
-    // Switch to VS format
-    Project.format = formatVS;
+    // Ensure root group is at VS standard origin (8,0,8)
+    const rootGroup = Outliner.root.filter(node => node instanceof Group).map(node => node as Group)[0];
+    if (rootGroup && !(rootGroup.origin[0] === 8 && rootGroup.origin[1] === 0 && rootGroup.origin[2] === 8)) {
+        rootGroup.origin = [8, 0, 8];
+    }
+
+    // Mark as converted
     Project.vsFormatConverted = true;
 
-    // Update canvas to create all meshes
-    Canvas.updateAllBones();
-    Canvas.updateAllPositions();
-    Canvas.updateAll();
-
-    // Force cube geometry update
-    Canvas.updateView({
-        elements: Cube.all,
-        element_aspects: {
-            geometry: true,
-            transform: true
-        }
-    });
-
-    // Set XYZ rotation order on all group meshes
-    for (const group of Group.all) {
-        if (group.mesh && group.mesh.rotation) {
-            group.mesh.rotation.order = 'XYZ';
-        }
-    }
-
-    // Set XYZ rotation order on all cube meshes
-    for (const cube of Cube.all) {
-        if (cube.mesh && cube.mesh.rotation) {
-            cube.mesh.rotation.order = 'XYZ';
-        }
-    }
-
-    // Refresh canvas with correct rotation orders
-    Canvas.updateAllBones();
-    Canvas.updateAllPositions();
-    Canvas.updateAll();
-
-    Blockbench.showQuickMessage('Converted to VS format', 3000);
+    // Update mesh rotation orders for display
+    updateMeshRotationOrders();
 };
 
+// Update mesh orders when opening VS format projects
+const onProjectLoad = () => {
+    setTimeout(() => {
+        if (Project && Project.format && Project.format.id === 'formatVS') {
+            updateMeshRotationOrders();
+        }
+    }, 100);
+};
 

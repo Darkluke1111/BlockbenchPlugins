@@ -16,11 +16,14 @@ createBlockbenchMod(
 );
 
 function removeSettingsCategory(id: string) {
-    delete Settings.structure[id];
-    //@ts-expect-error:  addCategory is not available in blockbench types
-    delete Settings.dialog.sidebar.pages[id];
-    //@ts-expect-error:  addCategory is not available in blockbench types
-    Settings.dialog.sidebar.build();
+    //@ts-expect-error:  dialog is not available in blockbench types
+    if(Settings.dialog[id]){
+        delete Settings.structure[id];
+        //@ts-expect-error:  dialog is not available in blockbench types
+        delete Settings.dialog.sidebar.pages[id];
+        //@ts-expect-error:  dialog is not available in blockbench types
+        Settings.dialog.sidebar.build();
+    }
 }
 
 
@@ -56,30 +59,7 @@ createBlockbenchMod(
         return setting;
     },
     context => {
-        context.delete();
-    }
-
-);
-
-createBlockbenchMod(
-    `${PACKAGE.name}:auto_convert_vs_format_settings_mod`,
-    {},
-    _context => {
-        return new Setting("auto_convert_vs_format", {
-            name: "Auto-Convert to VS Format",
-            description: "Automatically convert projects to Vintage Story format when loading .bbmodel files",
-            category: "vintage_story",
-            type: "toggle",
-            value: true,
-            onChange() {
-                Settings.save();
-            }
-        }
-        );
-
-    },
-    context => {
-        context.delete();
+        context?.delete();
     }
 
 );

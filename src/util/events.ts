@@ -5,6 +5,8 @@
 import * as PACKAGE from '../../package.json';
 import { Subscribable } from './subscribable';
 
+interface ConvertFormatEventData {format: ModelFormat, oldFormat: ModelFormat};
+
 export class PluginEvent<EventData = void> extends Subscribable<EventData> {
 	protected static events: Record<string, PluginEvent<any>> = {};
 	constructor(public name: string) {
@@ -26,7 +28,9 @@ export const events = {
 	SELECT_PROJECT: new PluginEvent<ModelProject>('selectProject'),
 	UNSELECT_PROJECT: new PluginEvent<ModelProject>('deselectProject'),
 	
-	LOAD_PROJECT: new PluginEvent<ModelProject>('loadProject')
+	LOAD_PROJECT: new PluginEvent<ModelProject>('loadProject'),
+
+	CONVERT_FORMAT: new PluginEvent<ConvertFormatEventData>('convert_format'),
 };
 
 function injectionHandler() {
@@ -56,4 +60,10 @@ Blockbench.on<EventName>('unselect_project', ({ project }: { project: ModelProje
 
 Blockbench.on<EventName>('load_project', ({ project }: { project: ModelProject }) => {
 	events.LOAD_PROJECT.dispatch(project);
+});
+
+
+
+Blockbench.on<EventName>('convert_format', (e: ConvertFormatEventData) => {
+	events.CONVERT_FORMAT.dispatch(e);
 });
