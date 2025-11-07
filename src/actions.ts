@@ -41,20 +41,3 @@ const import_action = createAction(`${PACKAGE.name}:import_vs`, {
     }
 });
 MenuBar.addAction(import_action, 'file.import');
-
-
-const toggle_auto_convert_vs = createAction(`${PACKAGE.name}:toggle_auto_convert_vs`, {
-            name: 'Toggle Auto-Convert to VS Format',
-            icon: 'fa-rotate',
-            keybind: new Keybind({key: 'k', ctrl: true, shift: true}),
-            click: function () {
-                const auto_convert_vs_format_setting = Settings.get("auto_convert_vs_format");
-                auto_convert_vs_format_setting.value = !auto_convert_vs_format_setting.value;
-                Settings.save();
-                Blockbench.showQuickMessage(
-                    `Auto-convert ${auto_convert_vs_format_setting.value ? 'enabled' : 'disabled'}`,
-                    2000
-                );
-            }
-        });
-        MenuBar.addAction(toggle_auto_convert_vs, 'tools');

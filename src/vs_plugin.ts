@@ -10,6 +10,9 @@ import PACKAGE from "../package.json";
 import "./debug_actions";
 import "./actions";
 
+// Properties
+import "./property";
+
 // Mods
 import "./mods/boneAnimatorMod";
 import "./mods/formatMod";
