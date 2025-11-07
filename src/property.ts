@@ -1,5 +1,7 @@
 // @ts-expect-error: vector4 is missing in blockbench types here for some reason
 export const windProp = new Property(Face, "vector4", "windMode");
+// @ts-expect-error: vector4 is missing in blockbench types here for some reason
+export const windDataProp = new Property(Face, "vector4", "windData");
 
 
 export const textureLocationProp = new Property(Texture, "string", "textureLocation");
@@ -23,6 +25,7 @@ export const hologramCubeProp= new Property(Cube, "string", "hologram");
 declare global {
     interface Face {
         windMode?: [number, number, number, number];
+        windData?: [number, number, number, number];
     }
 
     interface Texture {

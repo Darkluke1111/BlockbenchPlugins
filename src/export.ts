@@ -14,18 +14,38 @@ const path = requireNativeModule('path');
  * @returns The VS-style texture path (e.g., "blocks/fern") or empty string if not found
  */
 function resolveTextureLocation(projectPath: string | undefined, textureName: string): string {
-    if (!projectPath || !textureName) return "";
+    if (!projectPath || !textureName) {
+        return "";
+    }
 
-    // Check if path contains /shapes/
+    let texturesPath: string | null = null;
+
+    // Check if path contains /shapes/ (project path)
     const shapesIndex = projectPath.indexOf(path.sep + "shapes" + path.sep);
-    if (shapesIndex === -1) return "";
 
-    // Get the base path (up to and including the asset folder)
-    const basePath = projectPath.substring(0, shapesIndex);
-    const texturesPath = path.join(basePath, "textures");
+    if (shapesIndex !== -1) {
+        // Get the base path (up to and including the asset folder)
+        const basePath = projectPath.substring(0, shapesIndex);
+        texturesPath = path.join(basePath, "textures");
+    } else {
+        // Check if path contains /textures/ (texture source path)
+        const texturesIndex = projectPath.indexOf(path.sep + "textures" + path.sep);
+
+        if (texturesIndex !== -1) {
+            texturesPath = projectPath.substring(0, texturesIndex + path.sep.length + "textures".length);
+        } else {
+            return "";
+        }
+    }
+
+    if (!texturesPath) {
+        return "";
+    }
 
     // Check if textures folder exists
-    if (!fs.existsSync(texturesPath)) return "";
+    if (!fs.existsSync(texturesPath)) {
+        return "";
+    }
 
     // Search recursively for the texture file
     const textureFile = findTextureFile(texturesPath, textureName);
@@ -79,8 +99,16 @@ export function ex(options) {
     // Populate Textures
     const textures: Record<string, string> = {};
     for (const texture of Texture.all) {
-        // Try using existing textureLocation first, then resolve from file path
-        const location = texture.textureLocation || resolveTextureLocation(Project.save_path, texture.name);
+        // Try using existing textureLocation first, then resolve from project path or texture source
+        let location = texture.textureLocation;
+        if (!location) {
+            // Try project save path first
+            location = resolveTextureLocation(Project.save_path, texture.name);
+            // If no save path, try texture source path
+            if (!location && texture.source) {
+                location = resolveTextureLocation(texture.source, texture.name);
+            }
+        }
         textures[texture.name] = location;
     }
     
@@ -90,7 +118,6 @@ export function ex(options) {
     if (Project.allAngles != undefined) editor.allAngles = Project.allAngles;
     if (Project.entityTextureMode != undefined) editor.entityTextureMode = Project.entityTextureMode;
     if (Project.collapsedPaths != undefined) editor.collapsedPaths = Project.collapsedPaths;
-    if (Project.vsFormatConverted != undefined) editor.vsFormatConverted = Project.vsFormatConverted;
     if (Project.singleTexture != undefined) editor.singleTexture = Project.singleTexture;
 
     const data: VS_Shape = {

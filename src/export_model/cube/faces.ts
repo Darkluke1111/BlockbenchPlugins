@@ -20,16 +20,22 @@ function transformUV(uv: [number,number,number,number], rotation: number): { uv:
 export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>>): Partial<Record<VS_Direction, VS_Face>> {
     const reduced_faces = {};
 
+    // Get first available texture as fallback
+    const fallbackTexture = Texture.all.length > 0 ? Texture.all[0] : null;
+
     for (const direction of Object.values(VS_Direction)) {
         const face = faces[direction];
 
-        // Skip disabled faces - they should not be exported
+        // Skip disabled faces
         if (!face || face.enabled === false) {
             continue;
         }
 
-        // Skip faces with no texture - they shouldn't be exported at all
-        if (!face.texture) {
+        // Use face texture or fallback to first available texture
+        const faceTexture = face.texture || (fallbackTexture ? fallbackTexture.uuid : null);
+
+        // Skip if no texture available at all
+        if (!faceTexture) {
             continue;
         }
 
@@ -40,8 +46,7 @@ export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>
         const transformedUV = transformed.uv;
         const transformedRotation = transformed.rotation;
 
-        // Export face with texture
-        const texture_name = get_texture_name(face.texture);
+        const texture_name = get_texture_name(faceTexture);
         reduced_faces[direction] = new oneLiner({
             texture: `#${texture_name}`,
             ...(!isUvDefault && { uv: transformedUV }),
@@ -49,6 +54,7 @@ export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>
             autoUv: false,
             snapUv: false,
             windMode: face.windMode,
+            windData: face.windData,
         });
     }
     return reduced_faces;

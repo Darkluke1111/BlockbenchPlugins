@@ -48,6 +48,7 @@ jobs:
     - name: Build
       run: |
         npm install
+        npm run gen_schema
         npx webpack
 
     - name: release
