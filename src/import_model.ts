@@ -13,8 +13,6 @@ export function import_model(nodes: Array<VS_Element>, path: string, asHologram:
 
     
     const expanded =  nodes.map(node => expand_complex_elements(node));
-
-    console.log(JSON.stringify(expanded));
     
     traverse(null, [0, 0, 0], expanded, path, asHologram);
 }
