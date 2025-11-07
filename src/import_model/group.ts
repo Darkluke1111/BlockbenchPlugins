@@ -13,7 +13,7 @@ import * as util from "../util";
  */
 export function process_group(parent: Group | null, object_space_pos: [number,number,number], vsElement: VS_Element, path: string, asHologram: boolean): Group {
     const group = new Group({
-        name: vsElement.name + '_group',
+        name: vsElement.name,
         origin: vsElement.rotationOrigin ? util.vector_add(vsElement.rotationOrigin, object_space_pos) : object_space_pos,
         rotation: [vsElement.rotationX || 0, vsElement.rotationY || 0, vsElement.rotationZ || 0],
     });

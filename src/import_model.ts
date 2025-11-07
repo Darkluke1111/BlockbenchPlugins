@@ -1,6 +1,7 @@
 import { VS_Element } from "./vs_shape_def";
 
 import {traverse} from "./import_model/traverse";
+import { expand_complex_elements } from "./transform";
 
 /**
  * Recursively traverses the Vintage Story element tree and creates Blockbench groups and cubes.
@@ -9,5 +10,11 @@ import {traverse} from "./import_model/traverse";
  * @param asHologram Whether to import the model as a hologram.
  */
 export function import_model(nodes: Array<VS_Element>, path: string, asHologram: boolean) {
-    traverse(null, [0, 0, 0], nodes, path, asHologram);
+
+    
+    const expanded =  nodes.map(node => expand_complex_elements(node));
+
+    console.log(JSON.stringify(expanded));
+    
+    traverse(null, [0, 0, 0], expanded, path, asHologram);
 }

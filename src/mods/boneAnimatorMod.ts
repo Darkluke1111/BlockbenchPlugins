@@ -37,6 +37,8 @@ createBlockbenchMod(
             return context.original.call(this, multiplier);
         };
 
+
+
         Blockbench.BoneAnimator.prototype.flippedDisplayPosition = function (this: BoneAnimator, position, rotation, multiplier) {
             if (!rotation) {
                 this.displayPosition(position, multiplier);

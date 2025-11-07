@@ -21,6 +21,15 @@ const get_texture_location = function (domain, rel_path) {
     return "";
 };
 
+export function vector_equals(a: [number, number, number], b: [number, number, number]): boolean {
+    for (let i = 0; i < 3; i++) {
+        if(a[i] != b[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function vector_add(a: [number, number, number], b: [number, number, number]): [number, number, number] {
     const c: [number, number, number] = [0, 0, 0];
     for (let i = 0; i < a.length; i++) {

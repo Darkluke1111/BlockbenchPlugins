@@ -14,7 +14,7 @@ export function export_animations(): Array<VS_Animation> {
         const animators = Object.values(animation.animators || {});
         animators.forEach(animator => {
             if (animator.keyframes.length > 0 && animator.type === 'bone') {
-                const bone_name = animator.name.replace('_group', '');
+                const bone_name = animator.name;
 
                 animator.keyframes.forEach(kf => {
                     const frame = Math.round(kf.time * fps);
