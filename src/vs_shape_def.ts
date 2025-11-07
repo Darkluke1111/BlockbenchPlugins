@@ -41,8 +41,10 @@ export enum VS_Direction{ NORTH ="north", EAST = "east", SOUTH =  "south", WEST 
 
 export interface VS_Face {
     texture: string,
-    uv: [number,number,number,number],
+    uv?: [number,number,number,number],
     rotation?: number,
+    autoUv?: boolean,
+    snapUv?: boolean,
     windMode?: [number,number,number,number],
 }
 
