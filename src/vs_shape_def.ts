@@ -55,8 +55,10 @@ export interface VS_Face {
     enabled?: boolean,
     glow?: number,
     reflectiveMode?: ReflectiveMode,
-    uv: [number,number,number,number],
+    uv?: [number,number,number,number],
     rotation?: number,
+    autoUv?: boolean,
+    snapUv?: boolean,
     windMode?: [number,number,number,number],
     windData?: [number,number,number,number],
 }
