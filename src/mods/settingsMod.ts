@@ -2,18 +2,24 @@ import { createBlockbenchMod } from "../util/moddingTools";
 import * as PACKAGE from "../../package.json";
 import * as process from "process";
 
-createBlockbenchMod(
-    `${PACKAGE.name}:vs_settings_category_mod`,
-    {},
-    _context => {
-        //@ts-expect-error: addCategory is not available in blockbench types yet
-        Settings.addCategory("vintage_story", {name: "Vintage Story"});
-    },
-    _context => {
-        removeSettingsCategory("vintage_story");
-    }
+/*
+ * Making a custom settinsg category errors out when loading the plugin upon the start of Blockbench 
+ * (works fine when the plugin is loaded after Blockbench has alrady started).
+ * Probably an issue where Blockbench loads the plugin when the Settings dialog isn't fully initialized yet... =/
+ */
+// 
+// createBlockbenchMod(
+//     `${PACKAGE.name}:vs_settings_category_mod`,
+//     {},
+//     _context => {
+//         //@ts-expect-error: addCategory is not available in blockbench types yet
+//         Settings.addCategory("vintage_story", {name: "Vintage Story"});
+//     },
+//     _context => {
+//         removeSettingsCategory("vintage_story");
+//     }
 
-);
+// );
 
 function removeSettingsCategory(id: string) {
     //@ts-expect-error:  dialog is not available in blockbench types
@@ -34,7 +40,7 @@ createBlockbenchMod(
         const setting =  new Setting("game_path", {
             name: "Game Path",
             description: "The path to your Vintage Story game folder. This is the folder that contains the assets, mods and lib folders.",
-            category: "vintage_story",
+            category: "general",
             type: "click",
             icon: "fa-folder-plus",
             value: Settings.get("asset_path") || process.env.VINTAGE_STORY || "",
