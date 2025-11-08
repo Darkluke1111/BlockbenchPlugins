@@ -1,4 +1,3 @@
-import { todo } from "node:test";
 import { vector_equals, vector_sub } from "./util";
 import { VS_Element } from "./vs_shape_def";
 
@@ -47,8 +46,24 @@ export function expand_complex_elements(root: VS_Element): VS_Element {
 }
 
 function expand_complex_element(complex: VS_Element): VS_Element {
-    const new_parent: VS_Element = {...complex, from: complex.from, to: complex.from, faces: undefined, name: `${complex.name}`};
-    const new_geometry: VS_Element = {...complex, from: vector_sub(complex.from, complex.from), to: vector_sub(complex.to, complex.from), children: [], name: `${complex.name}_geo`};
+    const new_parent: VS_Element = {
+        ...complex, 
+        from: complex.from, 
+        to: complex.from, 
+        faces: undefined, 
+        name: `${complex.name}`
+    };
+    
+    const new_geometry: VS_Element = {
+        ...complex, 
+        from: vector_sub(complex.from, complex.from), 
+        rotationX: 0, 
+        rotationY: 0, 
+        rotationZ: 0, 
+        to: vector_sub(complex.to, complex.from), 
+        children: [], 
+        name: `${complex.name}_geo`
+    };
 
     new_parent.children!.push(new_geometry);
 
@@ -59,26 +74,6 @@ function expand_complex_element(complex: VS_Element): VS_Element {
         console.log("New geometry still has children!");
     }
     return new_parent;
-}
-
-export function collapse_to_complex_elements(root: VS_Element): VS_Element {
-    return transform_tree(root, (element) => {
-        // if simple group element, search for simple cube child to fuse with
-        if(is_simple_group(element)) {
-            const simple_cubes = element.children!.filter((child) => {
-                // simple cubes also need from=[0,0,0] to be fused
-                return is_simple_cube(child) && vector_equals(child.from, [0,0,0]);
-            });
-            // don't modify if none or multiple candidates are found (we might be able to fuse one if there are multiples? Should be rare so I don't care right now)
-            if(simple_cubes.length !== 1) {
-                return element;
-            }
-            //TODO: DO the actual fusing!
-            return todo;
-        } else {
-            return element;
-        }
-    });
 }
 
 export function is_simple_group(element: VS_Element): boolean {
