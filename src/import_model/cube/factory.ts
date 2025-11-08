@@ -14,6 +14,7 @@ export function create_cube(object_space_pos: [number,number,number], vsElement:
         from: util.vector_add(vsElement.from, object_space_pos),
         to: util.vector_add(vsElement.to, object_space_pos),
         uv_offset: vsElement.uv,
+        rotation: [vsElement.rotationX || 0, vsElement.rotationY || 0, vsElement.rotationZ || 0],
         origin: vsElement.rotationOrigin ? util.vector_add(vsElement.rotationOrigin, object_space_pos) : object_space_pos,
         faces: faces,
     };
