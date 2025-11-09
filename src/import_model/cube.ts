@@ -1,3 +1,4 @@
+import { VS_FACE_PROPS } from "../property";
 import { VS_Element } from "../vs_shape_def";
 import {process_faces} from "./cube/faces";
 import {create_cube} from "./cube/factory";
@@ -21,10 +22,14 @@ export function process_cube(parent: Group | null, object_space_pos: [number,num
     cube.addTo(parent ? parent : undefined).init();
 
     // Set windMode property for each face if it exists in the VS element. Can't be done in process_faces because the Cube constructor isn't handling our properties.
-    for (const direction in cube.faces) {
-        if (vsElement.faces && vsElement.faces[direction]?.windMode) {
-            cube.faces[direction].windMode = vsElement.faces[direction].windMode;
-            cube.faces[direction].windData = vsElement.faces[direction].windData;
+    if (vsElement.faces) {
+        for (const direction in cube.faces) {
+            for(const prop of VS_FACE_PROPS) {
+                const prop_name = prop.name;
+                const cube_face = cube.faces[direction];
+                const element_face = vsElement.faces[direction];
+                cube_face[prop_name] = element_face[prop_name];
+            }
         }
     }
 }

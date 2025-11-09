@@ -1,3 +1,4 @@
+import { VS_CUBE_PROPS } from "../property";
 import { VS_Element } from "../vs_shape_def";
 import {process_faces} from "./cube/faces";
 import {create_VS_element} from "./cube/factory";
@@ -13,6 +14,11 @@ export function process_cube(parent: Group | null, node: Cube, accu: Array<VS_El
     const parent_pos: [number,number,number] = parent ? parent.origin : [0, 0, 0];
     const reduced_faces = process_faces(node.faces);
     const vsElement = create_VS_element(parent, node, parent_pos, offset, reduced_faces);
+
+    for(const prop of VS_CUBE_PROPS) {
+        const prop_name = prop.name;
+        vsElement[prop_name] = node[prop_name];
+    }
 
     if (!node.hologram) {
         accu.push(vsElement);

@@ -1,3 +1,4 @@
+import { VS_FACE_PROPS } from "../../property";
 import { VS_Direction, VS_Face } from "../../vs_shape_def";
 
 /**
@@ -18,7 +19,7 @@ function transformUV(uv: [number,number,number,number], rotation: number): { uv:
  * @returns The processed face data for the VS element.
  */
 export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>>): Partial<Record<VS_Direction, VS_Face>> {
-    const reduced_faces = {};
+    const processed_faces = {};
 
     // Get first available texture as fallback
     const fallbackTexture = Texture.all.length > 0 ? Texture.all[0] : null;
@@ -47,17 +48,22 @@ export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>
         const transformedRotation = transformed.rotation;
 
         const texture_name = get_texture_name(faceTexture);
-        reduced_faces[direction] = new oneLiner({
+
+        const processed_face = {
             texture: `#${texture_name}`,
             ...(!isUvDefault && { uv: transformedUV }),
             ...(transformedRotation !== 0 && { rotation: transformedRotation }),
             autoUv: false,
             snapUv: false,
-            windMode: face.windMode,
-            windData: face.windData,
-        });
+        };
+
+        for(const prop of VS_FACE_PROPS) {
+            const prop_name = prop.name;
+            processed_face[prop_name] = face[prop_name];
+        }
+        processed_faces[direction] = new oneLiner(processed_face);
     }
-    return reduced_faces;
+    return processed_faces;
 }
 
 /**

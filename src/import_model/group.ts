@@ -1,5 +1,6 @@
 import { VS_Element } from "../vs_shape_def";
 import * as util from "../util";
+import { VS_CUBE_PROPS } from "../property";
 
 
 /**
@@ -21,8 +22,10 @@ export function process_group(parent: Group | null, object_space_pos: [number,nu
     if (asHologram) {
         group.hologram = path;
     }
-    if (vsElement.stepParentName) {
-        group.stepParentName = vsElement.stepParentName;
+    
+    for(const prop of VS_CUBE_PROPS) {
+        const prop_name = prop.name;
+        group[prop_name] = vsElement[prop_name];
     }
 
     group.addTo(parent ? parent : undefined).init();

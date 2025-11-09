@@ -2,6 +2,7 @@ import * as util from "./util";
 import {import_model} from "./import_model";
 import {import_animations} from "./import_animation";
 import { VS_Shape } from "./vs_shape_def";
+import { VS_PROJECT_PROPS } from "./property";
 
 export function im(content: VS_Shape, path: string, asHologram: boolean) {
 
@@ -27,11 +28,10 @@ export function im(content: VS_Shape, path: string, asHologram: boolean) {
 
     // Load editor properties
     if (content.editor) {
-        Project.backDropShape = content.editor.backDropShape;
-        Project.allAngles = content.editor.allAngles;
-        Project.entityTextureMode = content.editor.entityTextureMode;
-        Project.collapsedPaths = content.editor.collapsedPaths;
-        Project.singleTexture = content.editor.singleTexture;
+        for(const prop of VS_PROJECT_PROPS) {
+            const prop_name = prop.name;
+            Project[prop_name] = content.editor[prop_name];
+        }
     }
 
     // Build the model structure using the dedicated module
