@@ -44,7 +44,7 @@ export interface VS_Element {
     rotationZ?: number,
     faces?: Partial<Record<VS_Direction,VS_Face>>,
     stepParentName?: string,
-    attachmentPoints?: Array<AttachmentPoint>,
+    attachmentPoints?: Array<VS_AttachmentPoint>,
     children?: Array<VS_Element>,
 }
 
@@ -54,14 +54,14 @@ export interface VS_Face {
     texture: string,
     enabled?: boolean,
     glow?: number,
-    reflectiveMode?: ReflectiveMode,
+    reflectiveMode?: VS_ReflectiveMode,
     uv: [number,number,number,number],
     rotation?: number,
     windMode?: [number,number,number,number],
     windData?: [number,number,number,number],
 }
 
-export enum ReflectiveMode{NONE = 0, WEAK = 1, MEDIUM = 2, STRONG = 3, SPARKLY = 4, MILD = 5}
+export enum VS_ReflectiveMode{NONE = 0, WEAK = 1, MEDIUM = 2, STRONG = 3, SPARKLY = 4, MILD = 5}
 
 /**
  * Json Attributes also include
@@ -110,7 +110,7 @@ export interface VS_AnimationKey {
 /**
  * I'm not sure whether any of these are optional in VS shape files.
  */
-export interface AttachmentPoint {
+export interface VS_AttachmentPoint {
     code: string,
     posX: number,
     posY: number,
