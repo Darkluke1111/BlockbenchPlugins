@@ -11,6 +11,7 @@ import {process_group} from "./group";
  */
 export function traverse(parent: Group | null, nodes: Array<OutlinerNode>, accu: Array<VS_Element>, offset: [number,number,number]) {
     for (const node of nodes) {
+        if(!node.export) continue;
         if (node instanceof Group) {
             process_group(parent, node, accu, offset);
         } else if (node instanceof Cube) {
