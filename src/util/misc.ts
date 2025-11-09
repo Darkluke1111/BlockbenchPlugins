@@ -14,7 +14,7 @@ export function loadBackDropShape() {
         Blockbench.read([get_shape_location(null, backDropShape)], {
             readtype: "text", errorbox: false
         }, (files) => {
-            im(files[0].content, files[0].path, true);
+            im(autoParseJSON(files[0].content as string), files[0].path, true);
         });
     }
 }

@@ -3,8 +3,7 @@ import {import_model} from "./import_model";
 import {import_animations} from "./import_animation";
 import { VS_Shape } from "./vs_shape_def";
 
-export function im(data, path, asHologram) {
-    const content = autoParseJSON(data) as VS_Shape;
+export function im(content: VS_Shape, path: string, asHologram: boolean) {
 
     if(!Project) {
         throw new Error("No project loaded during import");

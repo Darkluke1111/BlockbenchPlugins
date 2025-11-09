@@ -2,6 +2,7 @@ import { ex } from "./export";
 import { im } from "./import";
 import * as vs_schema from "./generated/vs_shape_schema";
 import Ajv from "ajv";
+import { VS_Shape } from "./vs_shape_def";
 
 export const codecVS = new Codec("codecVS", {
             name: "Vintage Story Codec",
@@ -23,10 +24,10 @@ export const codecVS = new Codec("codecVS", {
             compile(options) {
                 // Removed for now since it doesn't work
                 // resetStepparentTransforms();
-                return ex(options);
+                return autoStringify(ex(options));
             },
             parse(data, file_path, _add) {
-                im(data, file_path, false);
+                im(autoParseJSON(data) as VS_Shape, file_path, false);
                 // Removed for now since it doesn't work
                 // loadBackDropShape();
                 // resolveStepparentTransforms();
