@@ -1,6 +1,6 @@
 import { VS_Element } from "../vs_shape_def";
 import * as util from "../util";
-import { VS_CUBE_PROPS } from "../property";
+import {VS_GROUP_PROPS } from "../property";
 
 
 /**
@@ -23,7 +23,7 @@ export function process_group(parent: Group | null, object_space_pos: [number,nu
         group.hologram = path;
     }
     
-    for(const prop of VS_CUBE_PROPS) {
+    for(const prop of VS_GROUP_PROPS) {
         const prop_name = prop.name;
         group[prop_name] = vsElement[prop_name];
     }
