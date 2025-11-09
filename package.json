@@ -1,6 +1,6 @@
 {
   "name": "vs_plugin",
-	"title": "Vintage Story Format Support",
+  "title": "Vintage Story Format Support",
   "devDependencies": {
     "@types/node": "^24.9.1",
     "blockbench-types": "https://github.com/SnaveSutit/blockbench-types.git",
@@ -10,6 +10,8 @@
     "globals": "^16.4.0",
     "jiti": "^2.6.1",
     "tsx": "^4.20.6",
+    "typedoc": "^0.28.14",
+    "typedoc-plugin-markdown": "^4.9.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
     "typescript-json-schema": "^0.65.1",
@@ -19,7 +21,8 @@
   "scripts": {
     "gen_schema": "npx tsx src/buildtime_scripts/gen_schema.ts",
     "build": "webpack --config webpack.config.js",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "gen_type_docs": "npx typedoc ./src/vs_shape_def.ts"
   },
   "dependencies": {
     "ajv": "^8.17.1",

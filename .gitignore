@@ -1,6 +1,7 @@
 node_modules/
 test_models/
 src/generated/
+docs/
 dist/
 *.zip
 *.psd

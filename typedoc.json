@@ -1,0 +1,6 @@
+{
+  "plugin": ["typedoc-plugin-markdown"],
+  "out": "./docs",
+  "entryFileName": "VS-Shape-Types.md",
+  "disableSources": true,
+}
