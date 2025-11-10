@@ -15,7 +15,7 @@ export function process_group(
     accu: Array<VS_Element>,
     offset: [number,number,number]
 ) {
-    if(node.hologram) {
+    if(node.backdrop) {
         return;
     }
     const parent_pos: [number,number,number] = parent ? parent.origin : [0, 0, 0];

@@ -5,7 +5,7 @@ import { VS_Shape } from "./vs_shape_def";
 import { VS_PROJECT_PROPS } from "./property";
 import { load_back_drop_shape } from "./util/misc";
 
-export function im(content: VS_Shape, path: string, asHologram: boolean) {
+export function im(content: VS_Shape, _path: string, asBackdrop: boolean) {
 
     if (!Project) {
         throw new Error("No project loaded during import");
@@ -28,7 +28,7 @@ export function im(content: VS_Shape, path: string, asHologram: boolean) {
     }
 
     // Load editor properties
-    if (!asHologram) {
+    if (!asBackdrop) {
         if (content.editor) {
             for (const prop of VS_PROJECT_PROPS) {
                 const prop_name = prop.name;
@@ -45,7 +45,7 @@ export function im(content: VS_Shape, path: string, asHologram: boolean) {
 
 
     // Build the model structure using the dedicated module
-    import_model(content, path, asHologram);
+    import_model(content, asBackdrop);
 
     // Import animations using the dedicated module
     if (content.animations) {

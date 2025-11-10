@@ -11,7 +11,7 @@ import {create_VS_element} from "./cube/factory";
  * @param offset The position offset to apply.
  */
 export function process_cube(parent: Group | null, node: Cube, accu: Array<VS_Element>, offset: [number,number,number]) {
-    if(node.hologram) {
+    if(node.backdrop) {
         return;
     }
     const parent_pos: [number,number,number] = parent ? parent.origin : [0, 0, 0];

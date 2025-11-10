@@ -8,10 +8,9 @@ import {create_cube} from "./cube/factory";
  * @param parent The parent Blockbench object (a Group).
  * @param object_space_pos The position in the object space.
  * @param vsElement The Vintage Story element to process.
- * @param path The file path.
- * @param asHologram Whether to import as a hologram.
+ * @param asBackdrop Whether to import as a backdrop.
  */
-export function process_cube(parent: Group | null, object_space_pos: [number,number,number], vsElement: VS_Element, path: string, asHologram: boolean) {
+export function process_cube(parent: Group | null, object_space_pos: [number,number,number], vsElement: VS_Element, asBackdrop: boolean) {
     const processed_faces = process_faces(vsElement.faces);
     const cube = create_cube(object_space_pos, vsElement, processed_faces);
 
@@ -19,8 +18,8 @@ export function process_cube(parent: Group | null, object_space_pos: [number,num
 
     cube.addTo(parent ? parent : undefined).init();
 
-    if (asHologram) {
-        cube.hologram = path;
+    if (asBackdrop) {
+        cube.backdrop = true;
         cube.locked = true;
     }
 

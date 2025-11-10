@@ -35,5 +35,5 @@ export function get_shape_location(domain, rel_path): string {
 };
 
 export function is_backdrop_project(): boolean {
-    return Group.all.some(g => g.hologram) || Cube.all.some(c => c.hologram);
+    return Group.all.some(g => g.backdrop) || Cube.all.some(c => c.backdrop);
 }

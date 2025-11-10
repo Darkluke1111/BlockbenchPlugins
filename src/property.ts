@@ -27,7 +27,7 @@ export const VS_GROUP_PROPS = [
         }
     ),
 ];
-new Property(Group, "string", "hologram");
+new Property(Group, "boolean", "backdrop");
 
 export const VS_CUBE_PROPS = [
     new Property(Cube, "string", "stepParentName",
@@ -51,7 +51,7 @@ export const VS_CUBE_PROPS = [
     new Property(Cube, "number", "renderPass"),
     new Property(Cube, "string", "seasonColorMap"),
 ];
-new Property(Cube, "string", "hologram");
+new Property(Cube, "boolean", "backdrop");
 
 export const VS_TEXTURE_PROPS = [
     new Property(Texture, "string", "textureLocation"),
@@ -92,7 +92,7 @@ declare global {
 
     interface Group {
         stepParentName?: string;
-        hologram?: string;
+        backdrop?: boolean;
     }
 
     interface Cube {
@@ -101,6 +101,6 @@ declare global {
         gradientShade?: boolean;
         renderPass?: number;
         seasonColorMap?: string;
-        hologram?: string;
+        backdrop?: boolean;
     }
 }

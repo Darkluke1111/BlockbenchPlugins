@@ -8,19 +8,18 @@ import {VS_GROUP_PROPS } from "../property";
  * @param parent The parent Blockbench object.
  * @param object_space_pos The position in the object space.
  * @param vsElement The Vintage Story element to process.
- * @param path The file path.
- * @param asHologram Whether to import as a hologram.
+ * @param asBackdrop Whether to import as a backdrop.
  * @returns The created Blockbench Group.
  */
-export function process_group(parent: Group | null, object_space_pos: [number,number,number], vsElement: VS_Element, path: string, asHologram: boolean): Group {
+export function process_group(parent: Group | null, object_space_pos: [number,number,number], vsElement: VS_Element, asBackdrop: boolean): Group {
     const group = new Group({
         name: vsElement.name,
         origin: vsElement.rotationOrigin ? util.vector_add(vsElement.rotationOrigin, object_space_pos) : object_space_pos,
         rotation: [vsElement.rotationX || 0, vsElement.rotationY || 0, vsElement.rotationZ || 0],
     });
 
-    if (asHologram) {
-        group.hologram = path;
+    if (asBackdrop) {
+        group.backdrop = true;
         group.locked = true;
     }
     
