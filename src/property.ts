@@ -10,12 +10,42 @@ export const VS_PROJECT_PROPS = [
 ];
 
 export const VS_GROUP_PROPS = [
-    new Property(Group, "string", "stepParentName"),
+    new Property(Group, "string", "stepParentName",
+        {
+            //@ts-expect-error: missing types
+            inputs: {
+                element_panel: {
+                    input: {
+                        label: "Stepparent", type: "text", condition() { return false; },
+                    },
+                    onChange() {
+                        Canvas.updateAllBones();
+                        Canvas.updateAllPositions();
+                    },
+                }
+            }
+        }
+    ),
 ];
 new Property(Group, "string", "hologram");
 
 export const VS_CUBE_PROPS = [
-    new Property(Group, "string", "stepParentName"),
+    new Property(Cube, "string", "stepParentName",
+        {
+            //@ts-expect-error: missing types
+            inputs: {
+                element_panel: {
+                    input: {
+                        label: "Stepparent", type: "text", condition() { return false; },
+                    },
+                    onChange() {
+                        Canvas.updateAllBones();
+                        Canvas.updateAllPositions();
+                    },
+                }
+            }
+        }
+    ),
     new Property(Cube, "string", "climateColorMap"),
     new Property(Cube, "boolean", "gradientShade"),
     new Property(Cube, "number", "renderPass"),
