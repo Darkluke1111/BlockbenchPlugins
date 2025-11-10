@@ -1,4 +1,6 @@
 {
+  "name": "vs_plugin",
+	"title": "Vintage Story Format Support",
   "devDependencies": {
     "@types/node": "^24.9.1",
     "blockbench-types": "https://github.com/SnaveSutit/blockbench-types.git",
