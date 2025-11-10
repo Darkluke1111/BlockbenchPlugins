@@ -10,7 +10,7 @@ createBlockbenchMod(`${PACKAGE.name}:node_preview_controller_mod`,
     inject_context => {
         Blockbench.NodePreviewController.prototype.updateTransform = function (this: NodePreviewController, node: OutlinerNode) {
             if (is_vs_project()) {
-                if (node instanceof Group && node.stepParentName && node.stepParentName !== "") {
+                if ((node instanceof Group || node instanceof Cube)&& node.stepParentName && node.stepParentName !== "") {
                     return updateStepChildTransform(this, node);                    
                 }
 
@@ -73,6 +73,15 @@ function updateStepChildTransform(controller: NodePreviewController, element: Ou
     // } else if (mesh.parent !== Project!.model_3d) {
     //     Project!.model_3d.add(mesh);
     // }
+
+    if((element instanceof Cube || element instanceof Group) && element.stepParentName && element.stepParentName != "") {
+        const step_parent = Cube.all.find(c => c.name === `${element.stepParentName}_geo`);
+        if(step_parent) {
+            step_parent.mesh.add(element.mesh);
+        } else {
+            Project!.model_3d.add(mesh);
+        }
+    }
 
     mesh.updateMatrixWorld();
 
