@@ -15,21 +15,31 @@ export function process_cube(parent: Group | null, object_space_pos: [number,num
     const processed_faces = process_faces(vsElement.faces);
     const cube = create_cube(object_space_pos, vsElement, processed_faces);
 
-    if (asHologram) {
-        cube.hologram = path;
-    }
+    
 
     cube.addTo(parent ? parent : undefined).init();
 
-    // Set windMode property for each face if it exists in the VS element. Can't be done in process_faces because the Cube constructor isn't handling our properties.
+    if (asHologram) {
+        cube.hologram = path;
+        cube.locked = true;
+    }
+
+    // Set face properties. Can't be done in process_faces because the Cube constructor isn't handling our properties.
     if (vsElement.faces) {
-        for (const direction in cube.faces) {
+        for (const direction in vsElement.faces) {
             for(const prop of VS_FACE_PROPS) {
                 const prop_name = prop.name;
                 const cube_face = cube.faces[direction];
                 const element_face = vsElement.faces[direction];
                 cube_face[prop_name] = element_face[prop_name];
             }
+        }
+    }
+
+    if(cube.stepParentName && cube.stepParentName != "") {
+        const step_parent = Cube.all.find(c => c.name === `${cube.stepParentName}_geo`);
+        if(step_parent) {
+            step_parent.mesh.add(cube.mesh);
         }
     }
 }

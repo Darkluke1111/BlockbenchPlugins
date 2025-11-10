@@ -15,6 +15,7 @@ export const VS_GROUP_PROPS = [
 new Property(Group, "string", "hologram");
 
 export const VS_CUBE_PROPS = [
+    new Property(Group, "string", "stepParentName"),
     new Property(Cube, "string", "climateColorMap"),
     new Property(Cube, "boolean", "gradientShade"),
     new Property(Cube, "number", "renderPass"),
@@ -65,6 +66,7 @@ declare global {
     }
 
     interface Cube {
+        stepParentName?: string;
         climateColorMap?: string;
         gradientShade?: boolean;
         renderPass?: number;

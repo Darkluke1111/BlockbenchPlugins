@@ -21,6 +21,7 @@ export function process_group(parent: Group | null, object_space_pos: [number,nu
 
     if (asHologram) {
         group.hologram = path;
+        group.locked = true;
     }
     
     for(const prop of VS_GROUP_PROPS) {
@@ -29,5 +30,13 @@ export function process_group(parent: Group | null, object_space_pos: [number,nu
     }
 
     group.addTo(parent ? parent : undefined).init();
+
+    if(group.stepParentName && group.stepParentName != "") {
+        const step_parent = Cube.all.find(c => c.name === `${group.stepParentName}_geo`);
+        if(step_parent) {
+            step_parent.mesh.add(group.mesh);
+        }
+    }
+
     return group;
 }

@@ -25,9 +25,5 @@ export function traverse(parent: Group | null, object_space_pos: [number,number,
         if (has_geometry(vsElement) && !has_children(vsElement)) {
             process_cube(parent, object_space_pos, vsElement, path, asHologram);
         }
-
-        if(is_complex(vsElement)) {
-            console.log("Someting went really wrong!");
-        }
     }
 }

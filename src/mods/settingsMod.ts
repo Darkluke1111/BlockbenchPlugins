@@ -65,7 +65,7 @@ createBlockbenchMod(
         return setting;
     },
     context => {
-        context?.delete();
+        //context?.delete();
     }
 
 );

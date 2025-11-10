@@ -15,6 +15,9 @@ export function process_group(
     accu: Array<VS_Element>,
     offset: [number,number,number]
 ) {
+    if(node.hologram) {
+        return;
+    }
     const parent_pos: [number,number,number] = parent ? parent.origin : [0, 0, 0];
     const converted_rotation = node.rotation;
 
@@ -29,7 +32,7 @@ export function process_group(
     }
 
     const vsElement: VS_Element = {
-        name: node.name.replace('_group', ''),
+        name: node.name,
         from: from,
         to: to,
         rotationOrigin: rotationOrigin,
@@ -44,10 +47,8 @@ export function process_group(
         vsElement[prop_name] = node[prop_name];
     }
 
-    if (!node.hologram) {
-        accu.push(vsElement);
-        traverse(node, node.children, vsElement.children!, offset);
-    } else {
-        traverse(node, node.children, accu, offset);
-    }
+
+    accu.push(vsElement);
+    traverse(node, node.children, vsElement.children!, offset);
+
 }
