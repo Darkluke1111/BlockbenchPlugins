@@ -18,6 +18,7 @@ import "./mods/boneAnimatorMod";
 import "./mods/formatMod";
 import "./mods/settingsMod";
 import "./mods/legacyFormatConverterMod";
+import "./mods/nodePreviewControllerMod";
 
 BBPlugin.register(PACKAGE.name, {
     title: PACKAGE.title,

@@ -1,5 +1,6 @@
 import { VS_Element } from "../vs_shape_def";
 import * as util from "../util";
+import {VS_GROUP_PROPS } from "../property";
 
 
 /**
@@ -7,24 +8,34 @@ import * as util from "../util";
  * @param parent The parent Blockbench object.
  * @param object_space_pos The position in the object space.
  * @param vsElement The Vintage Story element to process.
- * @param path The file path.
- * @param asHologram Whether to import as a hologram.
+ * @param asBackdrop Whether to import as a backdrop.
  * @returns The created Blockbench Group.
  */
-export function process_group(parent: Group | null, object_space_pos: [number,number,number], vsElement: VS_Element, path: string, asHologram: boolean): Group {
+export function process_group(parent: Group | null, object_space_pos: [number,number,number], vsElement: VS_Element, asBackdrop: boolean): Group {
     const group = new Group({
-        name: vsElement.name + '_group',
+        name: vsElement.name,
         origin: vsElement.rotationOrigin ? util.vector_add(vsElement.rotationOrigin, object_space_pos) : object_space_pos,
         rotation: [vsElement.rotationX || 0, vsElement.rotationY || 0, vsElement.rotationZ || 0],
     });
 
-    if (asHologram) {
-        group.hologram = path;
+    if (asBackdrop) {
+        group.backdrop = true;
+        group.locked = true;
     }
-    if (vsElement.stepParentName) {
-        group.stepParentName = vsElement.stepParentName;
+    
+    for(const prop of VS_GROUP_PROPS) {
+        const prop_name = prop.name;
+        group[prop_name] = vsElement[prop_name];
     }
 
     group.addTo(parent ? parent : undefined).init();
+
+    if(group.stepParentName && group.stepParentName != "") {
+        const step_parent = Cube.all.find(c => c.name === `${group.stepParentName}_geo`);
+        if(step_parent) {
+            step_parent.mesh.add(group.mesh);
+        }
+    }
+
     return group;
 }

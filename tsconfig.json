@@ -9,6 +9,7 @@
     "allowJs": true,
     "strictNullChecks": true,
 		"resolveJsonModule": true,
+    "skipLibCheck": true,
   },
   "exclude": [
     "node_modules"

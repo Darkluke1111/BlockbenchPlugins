@@ -31,6 +31,11 @@ export const events = {
 	LOAD_PROJECT: new PluginEvent<ModelProject>('loadProject'),
 
 	CONVERT_FORMAT: new PluginEvent<ConvertFormatEventData>('convert_format'),
+
+	ADD_CUBE: new PluginEvent<Cube>('add_cube'),
+	ADD_GROUP: new PluginEvent<Group>('add_group'),
+
+	UPDATE_FACES: new PluginEvent<OutlinerNode>('update_faces'),
 };
 
 function injectionHandler() {
@@ -62,8 +67,19 @@ Blockbench.on<EventName>('load_project', ({ project }: { project: ModelProject }
 	events.LOAD_PROJECT.dispatch(project);
 });
 
-
-
 Blockbench.on<EventName>('convert_format', (e: ConvertFormatEventData) => {
 	events.CONVERT_FORMAT.dispatch(e);
+});
+
+Blockbench.on<EventName>('add_cube', ({ cube }: { cube: Cube })  => {
+	events.ADD_CUBE.dispatch(cube);
+});
+
+Blockbench.on<EventName>('add_group', ({ group }: { group: Group })  => {
+	events.ADD_GROUP.dispatch(group);
+});
+
+//@ts-expect-error: type is missing
+Blockbench.on<EventName>('update_faces', ({ node }: { node: OutlinerNode })  => {
+	events.UPDATE_FACES.dispatch(node);
 });

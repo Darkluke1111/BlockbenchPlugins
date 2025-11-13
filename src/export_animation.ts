@@ -1,5 +1,6 @@
 import { VS_Animation, VS_Keyframe } from "./vs_shape_def";
 import * as util from "./util";
+import { is_backdrop_project } from "./util/misc";
 
 /**
  * Exports Blockbench animations to the Vintage Story animation format.
@@ -8,13 +9,18 @@ import * as util from "./util";
 export function export_animations(): Array<VS_Animation> {
     const animations: Array<VS_Animation> = [];
 
+    // Don't export any animations if project contains backdrops
+    if(is_backdrop_project()) {
+        return [];
+    }
+
     (Animation as unknown as typeof _Animation).all.forEach(animation => {
         const keyframes: Record<number,VS_Keyframe> = {};
         const fps = util.fps;
         const animators = Object.values(animation.animators || {});
         animators.forEach(animator => {
             if (animator.keyframes.length > 0 && animator.type === 'bone') {
-                const bone_name = animator.name.replace('_group', '');
+                const bone_name = animator.name;
 
                 animator.keyframes.forEach(kf => {
                     const frame = Math.round(kf.time * fps);

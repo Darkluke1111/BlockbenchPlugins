@@ -35,6 +35,7 @@ export function create_VS_element(parent: Group | null, node: Cube, parent_pos: 
         to: to,
         rotationOrigin: rotationOrigin,
         uv: node.uv_offset,
+        shade: node.shade,
         faces: faces,
         ...(converted_rotation[0] !== 0 && { rotationX: converted_rotation[0] }),
         ...(converted_rotation[1] !== 0 && { rotationY: converted_rotation[1] }),

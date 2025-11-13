@@ -25,7 +25,7 @@ export function import_animations(animations: Array<VS_Animation>) {
             const time = vsKeyframe.frame / FPS;
             for (const boneName in vsKeyframe.elements) {
                 const transform = vsKeyframe.elements[boneName];
-                const bone = Group.all.find(g => g.name === boneName + '_group');
+                const bone = Group.all.find(g => g.name === boneName);
 
                 if (bone) {
                     const animator = animation.getBoneAnimator(bone);

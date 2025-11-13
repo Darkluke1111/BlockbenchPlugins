@@ -1,15 +1,16 @@
 import * as util from "./util";
-import {import_model} from "./import_model";
-import {import_animations} from "./import_animation";
+import { import_model } from "./import_model";
+import { import_animations } from "./import_animation";
 import { VS_Shape } from "./vs_shape_def";
+import { VS_PROJECT_PROPS } from "./property";
+import { load_back_drop_shape } from "./util/misc";
 
-export function im(data, path, asHologram) {
-    const content = autoParseJSON(data) as VS_Shape;
+export function im(content: VS_Shape, _path: string, asBackdrop: boolean) {
 
-    if(!Project) {
+    if (!Project) {
         throw new Error("No project loaded during import");
     }
-    
+
     // Set project texture dimensions
     Project.texture_width = content.textureWidth || 16;
     Project.texture_height = content.textureHeight || 16;
@@ -27,16 +28,24 @@ export function im(data, path, asHologram) {
     }
 
     // Load editor properties
-    if (content.editor) {
-        Project.backDropShape = content.editor.backDropShape;
-        Project.allAngles = content.editor.allAngles;
-        Project.entityTextureMode = content.editor.entityTextureMode;
-        Project.collapsedPaths = content.editor.collapsedPaths;
-        Project.singleTexture = content.editor.singleTexture;
+    if (!asBackdrop) {
+        if (content.editor) {
+            for (const prop of VS_PROJECT_PROPS) {
+                const prop_name = prop.name;
+                Project[prop_name] = content.editor[prop_name];
+            }
+        }
+
+        if (Project.backDropShape && Project.backDropShape !== "") {
+            load_back_drop_shape(Project.backDropShape);
+        }
     }
 
+
+
+
     // Build the model structure using the dedicated module
-    import_model(content.elements, path, asHologram);
+    import_model(content, asBackdrop);
 
     // Import animations using the dedicated module
     if (content.animations) {

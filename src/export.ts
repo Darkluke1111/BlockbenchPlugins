@@ -1,6 +1,7 @@
 import {export_model} from "./export_model";
 import {export_animations} from "./export_animation";
-import { VS_EditorSettings, VS_Shape } from "./vs_shape_def";
+import { VS_EditorSettings, VS_Element, VS_Shape } from "./vs_shape_def";
+import { VS_PROJECT_PROPS } from "./property";
 
 // @ts-expect-error: requireNativeModule is missing in blockbench types --- IGNORE ---
 const fs = requireNativeModule('fs');
@@ -82,7 +83,7 @@ function findTextureFile(dir: string, textureName: string): string | null {
     return null;
 }
 
-export function ex(options) {
+export function ex(options): VS_Shape {
 
     if(!Project) {
         throw new Error("No project loaded during export");
@@ -114,11 +115,11 @@ export function ex(options) {
     
     // Populate Editor Info
     const editor: VS_EditorSettings = {};
-    if (Project.backDropShape != undefined) editor.backDropShape = Project.backDropShape;
-    if (Project.allAngles != undefined) editor.allAngles = Project.allAngles;
-    if (Project.entityTextureMode != undefined) editor.entityTextureMode = Project.entityTextureMode;
-    if (Project.collapsedPaths != undefined) editor.collapsedPaths = Project.collapsedPaths;
-    if (Project.singleTexture != undefined) editor.singleTexture = Project.singleTexture;
+
+    for(const prop of VS_PROJECT_PROPS) {
+        const prop_name = prop.name;
+        editor[prop_name] = Project[prop_name];
+    }
 
     const data: VS_Shape = {
         editor: editor,
@@ -130,5 +131,5 @@ export function ex(options) {
         animations: export_animations()
     };
 
-    return autoStringify(data);
+    return data;
 }
