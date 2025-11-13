@@ -6,8 +6,6 @@ const path = requireNativeModule('path');
 const fs = requireNativeModule('fs');
 
 export function load_back_drop_shape(backDropShape: string) {
-
-    console.log(`loading backdropshape: ${backDropShape}`);
     Blockbench.read([get_shape_location(null, backDropShape)], {
         readtype: "text", errorbox: false
     }, (files) => {
@@ -24,7 +22,6 @@ export function get_shape_location(domain, rel_path): string {
             name: rel_path,
             ext: '.json',
         });
-        console.log(f);
         const exists = fs.existsSync(f);
         if (exists) {
 
