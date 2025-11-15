@@ -22,10 +22,10 @@ import "./mods/nodePreviewControllerMod";
 
 BBPlugin.register(PACKAGE.name, {
     title: PACKAGE.title,
-    icon: 'icon',
+    icon: 'VS',
     author: 'Darkluke1111, codename_B',
-    description: 'Adds the Vintage Story format export/import options.',
-    version: '0.9.1',
+    description: 'Adds support for Vintage Story',
+    version: '0.10.0',
     variant: 'desktop',
 
     onload() {
