@@ -44,7 +44,7 @@ export interface VS_Element {
     rotationZ?: number,
     faces?: Partial<Record<VS_Direction,VS_Face>>,
     stepParentName?: string,
-    attachmentPoints?: Array<VS_AttachmentPoint>,
+    attachmentpoints?: Array<VS_AttachmentPoint>,
     children?: Array<VS_Element>,
 }
 
@@ -110,14 +110,15 @@ export interface VS_AnimationKey {
 }
 
 /**
- * I'm not sure whether any of these are optional in VS shape files.
+ * In VS shape files, attachment point numeric values are stored as strings.
+ * Other numeric values in VS_Element (like from, to, rotation) are stored as actual numbers.
  */
 export interface VS_AttachmentPoint {
     code: string,
-    posX: number,
-    posY: number,
-    posZ: number,
-    rotationX: number,
-    rotationY: number,
-    rotationZ: number,
+    posX: string,
+    posY: string,
+    posZ: string,
+    rotationX: string,
+    rotationY: string,
+    rotationZ: string,
 }

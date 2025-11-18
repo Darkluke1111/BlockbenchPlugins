@@ -13,12 +13,24 @@ export function transform_tree(element: VS_Element, transformation: (element: VS
 
 
 /**
- * An element is considered to be complex if it has children AND geometry attached OR it is part of an animation AND has geometry attached
+ * Checks if an element has geometry along with children or attachment points.
+ * These elements need hierarchy (group) but also have visual geometry (cube).
+ */
+export function has_geometry_with_hierarchy(element: VS_Element): boolean {
+    return has_geometry(element) && (has_children(element) || has_attachments(element));
+}
+
+/**
+ * An element is considered to be complex if it has:
+ * - geometry with hierarchy (children or attachment points), OR
+ * - geometry and is part of an animation
+ * Complex elements need to be split into a parent group and a geometry child.
  * @param element Element to test
  * @returns True if the element is complex, false otherwise
  */
 export function is_complex(element: VS_Element, animations: VS_Animation[]): boolean {
-    return (has_children(element) && has_geometry(element)) || (has_geometry(element) && has_animation(element, animations));
+    return has_geometry_with_hierarchy(element)
+        || (has_geometry(element) && has_animation(element, animations));
 }
 
 /**
@@ -56,15 +68,16 @@ function expand_complex_element(complex: VS_Element): VS_Element {
     };
     
     const new_geometry: VS_Element = {
-        ...complex, 
-        from: vector_sub(complex.from, complex.from), 
-        rotationOrigin: vector_sub(complex.from, complex.from), 
-        rotationX: 0, 
-        rotationY: 0, 
-        rotationZ: 0, 
-        to: vector_sub(complex.to, complex.from), 
+        ...complex,
+        from: vector_sub(complex.from, complex.from),
+        rotationOrigin: vector_sub(complex.from, complex.from),
+        rotationX: 0,
+        rotationY: 0,
+        rotationZ: 0,
+        to: vector_sub(complex.to, complex.from),
         stepParentName: undefined,
-        children: [], 
+        attachmentpoints: undefined,
+        children: [],
         name: `${complex.name}_geo`
     };
     new_parent.children!.push(new_geometry);
@@ -73,15 +86,19 @@ function expand_complex_element(complex: VS_Element): VS_Element {
 }
 
 export function is_simple_group(element: VS_Element): boolean {
-    return has_children(element) && !has_geometry(element);
+    return (has_children(element) || has_attachments(element)) && !has_geometry(element);
 }
 
 export function is_simple_cube(element: VS_Element): boolean {
-    return !has_children(element) && has_geometry(element);
+    return !has_children(element) && !has_attachments(element) && has_geometry(element);
 }
 
 export function has_children(element: VS_Element): boolean {
     return element.children !== undefined && element.children.length > 0;
+}
+
+export function has_attachments(element: VS_Element): boolean {
+    return element.attachmentpoints !== undefined && element.attachmentpoints.length > 0;
 }
 
 export function has_geometry(element: VS_Element): boolean {

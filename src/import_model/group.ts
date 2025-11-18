@@ -1,6 +1,7 @@
 import { VS_Element } from "../vs_shape_def";
 import * as util from "../util";
 import {VS_GROUP_PROPS } from "../property";
+import { process_attachment_points } from "./locator";
 
 
 /**
@@ -35,6 +36,11 @@ export function process_group(parent: Group | null, object_space_pos: [number,nu
         if(step_parent) {
             step_parent.mesh.add(group.mesh);
         }
+    }
+
+    // Process attachment points as locators
+    if (vsElement.attachmentpoints && vsElement.attachmentpoints.length > 0) {
+        process_attachment_points(group, object_space_pos, vsElement.attachmentpoints, asBackdrop);
     }
 
     return group;

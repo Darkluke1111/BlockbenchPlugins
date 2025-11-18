@@ -17,5 +17,6 @@ export function traverse(parent: Group | null, nodes: Array<OutlinerNode>, accu:
         } else if (node instanceof Cube) {
             process_cube(parent, node, accu, offset);
         }
+        // Locator nodes are handled as attachment points on their parent elements, so skip them here
     }
 }

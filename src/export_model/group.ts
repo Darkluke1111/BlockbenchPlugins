@@ -2,6 +2,7 @@ import { VS_Element } from "../vs_shape_def";
 import { traverse } from "./traverse";
 import * as util from "../util";
 import { VS_GROUP_PROPS } from "../property";
+import { process_locators } from "./locator";
 /**
  * Processes a Blockbench Group and converts it to a VS element.
  * @param parent The parent node in the hierarchy.
@@ -47,6 +48,14 @@ export function process_group(
         vsElement[prop_name] = node[prop_name];
     }
 
+    // Process child locators as attachment points
+    const locators = node.children.filter(child => child instanceof Locator) as Array<Locator>;
+    if (locators.length > 0) {
+        const attachmentPoints = process_locators(node, locators);
+        if (attachmentPoints.length > 0) {
+            vsElement.attachmentpoints = attachmentPoints;
+        }
+    }
 
     accu.push(vsElement);
     traverse(node, node.children, vsElement.children!, offset);
