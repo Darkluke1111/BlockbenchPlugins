@@ -35,3 +35,9 @@ You only need to rerun gen_schema when vs_shape_defs.ts has changed, otherwise f
 ```console
 npm run build
 ```
+
+You can also use
+```console
+npm run dev
+```
+instead for a development build that contains source maps for debugging. 

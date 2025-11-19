@@ -1,0 +1,12 @@
+{
+	"configurations": [
+		{
+			"name": "Debug Renderer",
+			"type": "chrome",
+			"request": "attach",
+			"port": 9223,
+			"webRoot": "${workspaceFolder}",
+			"timeout": 30000
+		}
+	]
+}

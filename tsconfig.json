@@ -4,6 +4,7 @@
     "types": ["blockbench-types", "node"],
     "module": "node16",
     "target": "es2022",
+    "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node16",
     "allowJs": true,

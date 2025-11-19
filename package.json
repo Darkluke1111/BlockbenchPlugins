@@ -20,7 +20,8 @@
   },
   "scripts": {
     "gen_schema": "npx tsx src/buildtime_scripts/gen_schema.ts",
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.js --mode production",
+    "dev": "webpack --config webpack.config.js --mode development",
     "lint": "npx eslint .",
     "gen_type_docs": "npx typedoc ./src/vs_shape_def.ts"
   },
