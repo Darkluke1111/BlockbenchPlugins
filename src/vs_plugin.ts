@@ -25,7 +25,7 @@ BBPlugin.register(PACKAGE.name, {
     icon: 'VS',
     author: 'Darkluke1111, codename_B',
     description: 'Adds support for Vintage Story',
-    version: '0.10.0',
+    version: '0.11.0',
     variant: 'desktop',
 
     onload() {
