@@ -9,7 +9,7 @@ const export_action = createAction(`${PACKAGE.name}:export_vs`, {
     name: 'Export into VS Format',
     icon: 'fa-cookie-bite',
     condition() {
-        return is_vs_project();
+        return is_vs_project(Project);
     },
     click: function () {
         if (!Project) {
@@ -30,7 +30,7 @@ const import_action = createAction(`${PACKAGE.name}:import_vs`, {
     name: 'Import from VS Format',
     icon: 'fa-cookie-bite',
     condition() {
-        return is_vs_project();
+        return is_vs_project(Project);
     },
     click: function () {
         Blockbench.import({
@@ -48,7 +48,7 @@ const import_backdrop_action = createAction(`${PACKAGE.name}:import_backdrop_act
     name: 'Import Backdrop from VS Format',
     icon: 'fa-cookie-bite',
     condition() {
-        return is_vs_project();
+        return is_vs_project(Project);
     },
     click: function () {
         Blockbench.import({

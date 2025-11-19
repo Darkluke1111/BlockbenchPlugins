@@ -14,7 +14,7 @@ createBlockbenchMod(
     context => {
         // Inject code here
         Blockbench.BoneAnimator.prototype.displayFrame = function (this: BoneAnimator, multiplier = 1) {
-            if (is_vs_project()) {
+            if (is_vs_project(Project)) {
                 if (!this.doRender()) return;
                 this.getGroup();
                         //@ts-expect-error: Missing in type --- IGNORE ---
