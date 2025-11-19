@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "vs_plugin",
   "title": "Vintage Story Format Support",
   "description": "A Blockbench plugin that adds support for Vintage Story models",
@@ -18,10 +19,10 @@
     "type": "git",
     "url": "https://github.com/Darkluke1111/BlockbenchPlugins"
   },
-
   "devDependencies": {
     "@types/node": "^24.9.1",
     "blockbench-types": "https://github.com/SnaveSutit/blockbench-types.git",
+    "esbuild": "0.27.0",
     "eslint": "^9.38.0",
     "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-vue": "^10.5.1",
@@ -32,19 +33,16 @@
     "typedoc-plugin-markdown": "^4.9.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
-    "typescript-json-schema": "^0.65.1",
-    "webpack-cli": "^6.0.1",
-    "zip-webpack-plugin": "^4.0.3"
+    "typescript-json-schema": "^0.65.1"
   },
   "scripts": {
     "gen_schema": "npx tsx src/buildtime_scripts/gen_schema.ts",
-    "build": "webpack --config webpack.config.js --mode production",
-    "dev": "webpack --config webpack.config.js --mode development",
+    "build": "node ./esbuild.ts  --mode=prod",
+    "dev": "node ./esbuild.ts  --mode=dev",
     "lint": "npx eslint .",
     "gen_type_docs": "npx typedoc ./src/vs_shape_def.ts"
   },
   "dependencies": {
-    "ajv": "^8.17.1",
-    "ts-loader": "^9.5.4"
+    "ajv": "^8.17.1"
   }
 }

@@ -1,6 +1,6 @@
 import { ex } from "./export";
 import { im } from "./import";
-import * as vs_schema from "./generated/vs_shape_schema";
+import {schema} from "./generated/vs_shape_schema";
 import Ajv from "ajv";
 import { VS_Shape } from "./vs_shape_def";
 
@@ -36,7 +36,7 @@ export const codecVS = new Codec("codecVS", {
 
 function validate_json(content) {
     const ajv = new Ajv();
-    const validate = ajv.compile(vs_schema);
+    const validate = ajv.compile(schema);
     const valid = validate(content);
     if (!valid) console.log(validate.errors);
     return valid;

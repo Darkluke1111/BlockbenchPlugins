@@ -20,6 +20,7 @@ import "./mods/settingsMod";
 import "./mods/legacyFormatConverterMod";
 import "./mods/nodePreviewControllerMod";
 import "./mods/sceneOffsetRemovalMod";
+import "./modifiers";
 
 BBPlugin.register(PACKAGE.name, {
     title: PACKAGE.title,
@@ -32,6 +33,7 @@ BBPlugin.register(PACKAGE.name, {
     min_version: "5.0.0",
     repository: PACKAGE.repository.url,
     tags: ["Vintage Story"],
+    about: PACKAGE.description,
     onload() {
         events.LOAD.dispatch();
     },
