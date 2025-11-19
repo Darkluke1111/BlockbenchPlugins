@@ -93,6 +93,21 @@ export function createBlockbenchMod<InjectContext = any, ExtractContext = any>(
 	});
 }
 
+
+/** Creates a new Blockbench.Panel and automatically handles it's deletion on the plugin unload and uninstall events.
+ * @param id A namespaced ID ('my-plugin-id:my-panel')
+ * @param options The options for the panel.
+ * @returns The created panel.
+ */
+export function createPanel(id: NamespacedString, options: Omit<PanelOptions, "id"> ): Panel {
+	const panel = new Panel(id, options as PanelOptions);
+	events.EXTRACT_MODS.subscribe(() => {
+		panel.delete();
+	}, true);
+
+	return panel;
+}
+
 /** Creates a new Blockbench.Action and automatically handles it's deletion on the plugin unload and uninstall events.
  * See https://www.blockbench.net/wiki/api/action for more information on the Blockbench.Action class.
  * @param id A namespaced ID ('my-plugin-id:my-action')
