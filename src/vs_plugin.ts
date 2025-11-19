@@ -19,8 +19,6 @@ import "./mods/formatMod";
 import "./mods/settingsMod";
 import "./mods/legacyFormatConverterMod";
 import "./mods/nodePreviewControllerMod";
-import "./mods/sceneOffsetRemovalMod";
-import "./modifiers";
 
 BBPlugin.register(PACKAGE.name, {
     title: PACKAGE.title,
