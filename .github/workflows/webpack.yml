@@ -1,4 +1,4 @@
-name: NodeJS with Webpack
+name: build
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
       run: |
         npm install
         npm run gen_schema
-        npx webpack
+        npm run build --mode=prod
 
     - name: Archive Plugin
       uses: actions/upload-artifact@v4
