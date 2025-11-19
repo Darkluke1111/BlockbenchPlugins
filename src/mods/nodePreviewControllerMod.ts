@@ -9,7 +9,7 @@ createBlockbenchMod(`${PACKAGE.name}:node_preview_controller_mod`,
     },
     inject_context => {
         Blockbench.NodePreviewController.prototype.updateTransform = function (this: NodePreviewController, node: OutlinerNode) {
-            if (is_vs_project()) {
+            if (is_vs_project(Project)) {
                 if ((node instanceof Group || node instanceof Cube)&& node.stepParentName && node.stepParentName !== "") {
                     return updateStepChildTransform(this, node);                    
                 }

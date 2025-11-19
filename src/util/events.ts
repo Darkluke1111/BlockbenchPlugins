@@ -6,6 +6,7 @@ import * as PACKAGE from '../../package.json';
 import { Subscribable } from './subscribable';
 
 interface ConvertFormatEventData {format: ModelFormat, oldFormat: ModelFormat};
+interface SelectFormatEventData {format: ModelFormat, project: ModelProject};
 
 export class PluginEvent<EventData = void> extends Subscribable<EventData> {
 	protected static events: Record<string, PluginEvent<any>> = {};
@@ -36,6 +37,7 @@ export const events = {
 	ADD_GROUP: new PluginEvent<Group>('add_group'),
 
 	UPDATE_FACES: new PluginEvent<OutlinerNode>('update_faces'),
+	SELECT_FORMAT: new PluginEvent<SelectFormatEventData>('select_format'),
 };
 
 function injectionHandler() {
@@ -83,3 +85,7 @@ Blockbench.on<EventName>('add_group', ({ group }: { group: Group })  => {
 Blockbench.on<EventName>('update_faces', ({ node }: { node: OutlinerNode })  => {
 	events.UPDATE_FACES.dispatch(node);
 });
+
+Blockbench.on<EventName>('select_format', (e: SelectFormatEventData) => {
+	events.SELECT_FORMAT.dispatch(e);
+})

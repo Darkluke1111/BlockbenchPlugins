@@ -10,7 +10,7 @@ const reExportAction = createAction(`${PACKAGE.name}:reExport`, {
     name: 'Reexport Test',
     icon: 'fa-flask-vial',
     condition() {
-        return is_vs_project();
+        return is_vs_project(Project);
     },
     click: function () {
         new Dialog("folder_select", {
@@ -70,7 +70,7 @@ const debugAction = createAction(`${PACKAGE.name}:printDebug`, {
     name: 'Print Debug Info',
     icon: 'icon',
     condition() {
-        return is_vs_project();
+        return is_vs_project(Project);
     },
     click: function () {
         console.log(Outliner.selected);
