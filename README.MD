@@ -16,7 +16,7 @@ For Blockbench to figure out texture paths from the base game on its own, I adde
 
 - ~~Animation export and import not implemented yet~~ Should be pretty stable now
 - ~~Automatic BackDropShape handling not implemented yet~~ Might still have a few bugs
-- Attachment points not implemented yet
+- ~~Attachment points not implemented yet~~ Should now work
 - ~~Reexported file structure is more complicated than it needs to be~~
 
 For other bugs or features that are not implemented yet, refer to the Issue section (https://github.com/Darkluke1111/BlockbenchPlugins/issues)
