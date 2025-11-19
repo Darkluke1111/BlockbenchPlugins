@@ -70,6 +70,6 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/UnpackMe_vs_plugin.zip
+        asset_path: ./dist/vs_plugin.js
         asset_name: UnpackMe_vs_plugin_v${{ steps.version.outputs.version }}.zip
         asset_content_type: application/zip    
