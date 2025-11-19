@@ -17,7 +17,7 @@ export function create_format(): ModelFormat {
         vertex_color_ambient_occlusion: false,
         animated_textures: false, // NOt sure if supported by VS
         bone_rig: true,
-        centered_grid: false,
+        centered_grid: true,
         rotate_cubes: true,
         stretch_cubes: false,
         integer_size: false,
