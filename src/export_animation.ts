@@ -59,12 +59,10 @@ export function export_animations(): Array<VS_Animation> {
             }
         });
 
-        
-
         const vsAnimation : VS_Animation = {
             name: animation.name,
             code: animation.name.toLowerCase().replace(/ /g, ''),
-            quantityframes: Math.round(animation.length * fps),
+            quantityframes: get_frame_quantity(animation, keyframes),
             onActivityStopped: "EaseOut",
             onAnimationEnd: animation.loop === 'loop' ? "Repeat" : "Hold",
             keyframes: Object.values(keyframes).sort((a, b) => a.frame - b.frame)
@@ -86,4 +84,31 @@ export function export_animations(): Array<VS_Animation> {
     });
 
     return animations;
+}
+
+/**
+ * Returns the length of an animation in frames so it is compatible with VS. Displays a warning to the user if necessary.
+ * @param animation The BB animation object.
+ * @param keyframes Keyframes
+ */
+function get_frame_quantity(animation: _Animation, keyframes: Record<number,VS_Keyframe>): number {
+    let quantityframes = Math.round(animation.length * util.fps);
+    const keyframe_frames = Object.keys(keyframes).map(kf => parseInt(kf));
+    const max_keyframe = Math.max(...keyframe_frames);
+    if (max_keyframe == quantityframes) {
+        display_animation_length_warning(animation.name);
+        quantityframes = max_keyframe + 1;
+    }
+    return quantityframes;
+}
+
+
+function display_animation_length_warning(animation_name: string) {
+    Blockbench.showMessageBox({
+        title: 'Animation Length Warning',
+        message: 
+            `The animation "${animation_name}" has keyframes on the last frame. ` +
+            `This is not supported by Vintage Story, so the animation length was inceased by 1. ` +
+            `If you want to prevent this, please move the keyframes away from the last frame.`
+    });
 }
