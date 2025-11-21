@@ -1,15 +1,7 @@
 import { vector_equals, vector_sub } from "./util";
+import { transform_tree } from "./util/element_tree";
 import { VS_Animation, VS_Element, VS_Shape } from "./vs_shape_def";
 
-
-export function transform_tree(element: VS_Element, transformation: (element: VS_Element) => VS_Element): VS_Element {
-    const element_transformed = transformation(element);
-
-    if(element_transformed.children) {
-        element_transformed.children = element_transformed.children?.map(child => transform_tree(child, transformation));
-    }
-    return element_transformed;
-}
 
 
 /**
