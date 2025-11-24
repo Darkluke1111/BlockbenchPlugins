@@ -9,7 +9,6 @@ export interface AttachmentPreset {
 }
 
 /**
- * Glint clothing system (original implementation)
  * Used for Glint character customization
  */
 export const GLINT_PRESET: AttachmentPreset = {
@@ -38,7 +37,6 @@ export const GLINT_PRESET: AttachmentPreset = {
 
 /**
  * Vintage Story Seraph clothing system
- * Based on the official Vintage Story Seraph model structure
  */
 export const VINTAGE_STORY_PRESET: AttachmentPreset = {
     name: "Vintage Story",
@@ -156,7 +154,7 @@ export function inferClothingSlotFromPath(filePath: string): string | null {
 export function getActiveSlotNames(): string[] {
     // Try to get from settings
     try {
-        const presetKey = Settings.get('attachment_preset') || 'glint';
+        const presetKey = Settings.get('attachment_preset') || 'vintage_story';
 
         if (presetKey === 'custom') {
             // Custom slots from settings
@@ -164,8 +162,8 @@ export function getActiveSlotNames(): string[] {
             if (customSlots && Array.isArray(customSlots) && customSlots.length > 0) {
                 return customSlots;
             }
-            // Fall back to Glint if custom slots not configured
-            return GLINT_PRESET.slots;
+            // Fall back to VS if custom slots not configured
+            return VINTAGE_STORY_PRESET.slots;
         }
 
         const preset = PRESETS[presetKey];
@@ -176,6 +174,6 @@ export function getActiveSlotNames(): string[] {
         console.warn('Error getting attachment preset from settings:', e);
     }
 
-    // Default to Glint
-    return GLINT_PRESET.slots;
+    // Default to VS
+    return VINTAGE_STORY_PRESET.slots;
 }
