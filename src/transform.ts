@@ -57,7 +57,7 @@ export function expand_complex_elements(shape: VS_Shape): VS_Shape {
     return shape;
 }
 
-function expand_complex_element(complex: VS_Element): VS_Element {
+export function expand_complex_element(complex: VS_Element): VS_Element {
     const new_parent: VS_Element = {
         ...complex, 
         from: complex.from, 
