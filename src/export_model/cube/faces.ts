@@ -59,7 +59,20 @@ export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>
 
         for(const prop of VS_FACE_PROPS) {
             const prop_name = prop.name;
-            processed_face[prop_name] = face[prop_name];
+            const value = face[prop_name];
+
+            // Skip properties with default/empty values
+            if (value !== undefined && value !== null) {
+                // Skip 0 for numeric properties (glow, reflectiveMode)
+                if (typeof value === 'number' && value === 0) {
+                    continue;
+                }
+                // Skip default arrays like [0,0,0,0] for windMode/windData
+                if (Array.isArray(value) && value.every(v => v === 0)) {
+                    continue;
+                }
+                processed_face[prop_name] = value;
+            }
         }
         processed_faces[direction] = new oneLiner(processed_face);
     }

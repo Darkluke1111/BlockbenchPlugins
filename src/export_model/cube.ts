@@ -20,7 +20,16 @@ export function process_cube(parent: Group | null, node: Cube, accu: Array<VS_El
 
     for(const prop of VS_CUBE_PROPS) {
         const prop_name = prop.name;
-        vsElement[prop_name] = node[prop_name];
+        const value = node[prop_name];
+
+        // Skip properties with default/empty values
+        if (value !== undefined && value !== null && value !== '' && value !== false) {
+            // For renderPass, skip if it's 0 (the default value)
+            if (prop_name === 'renderPass' && value === 0) {
+                continue;
+            }
+            vsElement[prop_name] = value;
+        }
     }
     accu.push(vsElement);
 }
