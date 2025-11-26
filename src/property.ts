@@ -75,6 +75,19 @@ export const VS_CUBE_PROPS = [
             Canvas.updateAllPositions();
         },
     }),
+    new Property(Cube, "boolean", "shade", {
+        default: true,
+        label: "Shade",
+        exposed: true,
+        inputs: {
+            element_panel: {
+                input: {
+                    label: 'Shade',
+                    type: 'checkbox'
+                }
+            }
+        },
+    }),
     new Property(Cube, "string", "climateColorMap", {
         default: '',
         label: "Climate Color Map",
