@@ -30,7 +30,7 @@ export function process_cube(parent: Group | null, node: Cube, accu: Array<VS_El
         }
 
         if (value !== undefined && value !== null && value !== '' && value !== false) {
-            if (prop_name === 'renderPass' && value === 0) {
+            if (prop_name === 'renderPass' && value === -1) {
                 continue;
             }
             vsElement[prop_name] = value;

@@ -115,7 +115,7 @@ export const VS_CUBE_PROPS = [
         },
     }),
     new Property(Cube, "number", "renderPass", {
-        default: 0,
+        default: -1,
         label: "Render Pass",
         exposed: true,
         inputs: {
@@ -123,7 +123,6 @@ export const VS_CUBE_PROPS = [
                 input: {
                     label: 'Render Pass',
                     type: 'number',
-                    min: 0,
                     step: 1
                 }
             }
