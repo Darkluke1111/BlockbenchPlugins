@@ -3,6 +3,7 @@ import * as PACKAGE from "../package.json";
 import { is_vs_project } from "./util";
 import { im } from "./import";
 import { is_backdrop_project } from "./util/misc";
+import { codecVS } from "./codec";
 
 
 const export_action = createAction(`${PACKAGE.name}:export_vs`, {
@@ -19,8 +20,7 @@ const export_action = createAction(`${PACKAGE.name}:export_vs`, {
             name: Project.name,
             type: 'json',
             extensions: ['json'],
-            // codec should be valid if action condition is met
-            content: Format.codec!.compile()
+            content: codecVS.compile()
         });
     }
 });
