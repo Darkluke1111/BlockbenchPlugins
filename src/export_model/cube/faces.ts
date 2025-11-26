@@ -21,24 +21,15 @@ function transformUV(uv: [number,number,number,number], rotation: number): { uv:
 export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>>): Partial<Record<VS_Direction, VS_Face>> {
     const processed_faces = {};
 
-    // Get first available texture as fallback
-    const fallbackTexture = Texture.all.length > 0 ? Texture.all[0] : null;
-
     for (const direction of Object.values(VS_Direction)) {
         const face = faces[direction];
 
-        // Skip disabled faces
-        if (!face || face.enabled === false) {
+        // Skip disabled faces or faces without textures
+        if (!face || face.enabled === false || !face.texture) {
             continue;
         }
 
-        // Use face texture or fallback to first available texture
-        const faceTexture = face.texture || (fallbackTexture ? fallbackTexture.uuid : null);
-
-        // Skip if no texture available at all
-        if (!faceTexture) {
-            continue;
-        }
+        const faceTexture = face.texture;
 
         const isUvDefault = face.uv[0] === 0 && face.uv[1] === 0 && face.uv[2] === 0 && face.uv[3] === 0;
 
