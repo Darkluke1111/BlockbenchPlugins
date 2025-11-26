@@ -84,12 +84,13 @@ function findTextureFile(dir: string, textureName: string): string | null {
 }
 
 /**
- * Saves a texture to disk alongside the exported model file.
+ * Saves a texture to disk, respecting VS folder structure (shapes -> textures).
  * @param texture - The Blockbench texture object
- * @param exportDir - The directory where the model is being exported
- * @returns The filename (without path) of the saved texture
+ * @param textureDir - The directory where the texture should be saved
+ * @param textureSubPath - The subdirectory path relative to textures folder (e.g., "egg" for textures/egg/)
+ * @returns The VS-style texture path (e.g., "egg/egg") or empty string if failed
  */
-function saveTextureToFile(texture: Texture, exportDir: string): string {
+function saveTextureToFile(texture: Texture, textureDir: string, textureSubPath: string): string {
     try {
         // Check if texture has data URL method
         if (typeof texture.getDataURL !== 'function') {
@@ -103,7 +104,13 @@ function saveTextureToFile(texture: Texture, exportDir: string): string {
             filename += '.png';
         }
 
-        const texturePath = path.join(exportDir, filename);
+        // Create the full texture directory path if it doesn't exist
+        const fullTextureDir = path.join(textureDir, textureSubPath);
+        if (!fs.existsSync(fullTextureDir)) {
+            fs.mkdirSync(fullTextureDir, { recursive: true });
+        }
+
+        const texturePath = path.join(fullTextureDir, filename);
 
         // Convert data URL to buffer and save
         const dataUrl = texture.getDataURL();
@@ -117,8 +124,11 @@ function saveTextureToFile(texture: Texture, exportDir: string): string {
 
         fs.writeFileSync(texturePath, buffer);
 
-        // Return just the filename without extension for VS format
-        return filename.replace(/\.[^.]+$/, '');
+        // Return VS-style path (subdirectory + filename without extension)
+        const filenameWithoutExt = filename.replace(/\.[^.]+$/, '');
+        // Convert backslashes to forward slashes for VS format
+        const normalizedSubPath = textureSubPath.split(path.sep).join('/');
+        return normalizedSubPath ? `${normalizedSubPath}/${filenameWithoutExt}` : filenameWithoutExt;
     } catch (e) {
         console.error(`Failed to save texture ${texture.name}:`, e);
         return "";
@@ -131,8 +141,39 @@ export function ex(options): VS_Shape {
         throw new Error("No project loaded during export");
     }
 
-    // Get export directory from options
+    // Get export path and directory from options
+    const exportPath = options?.path || "";
     const exportDir = options?.exportDir || "";
+
+    // Determine texture directory based on VS folder structure
+    let textureBaseDir = exportDir;
+    let textureSubPath = "";
+
+    if (exportPath) {
+        // Check if the export path contains /shapes/
+        const shapesIndex = exportPath.indexOf(path.sep + "shapes" + path.sep);
+
+        if (shapesIndex !== -1) {
+            // Get the base path (up to and including the asset folder)
+            const basePath = exportPath.substring(0, shapesIndex);
+
+            // Texture base directory is basePath + /textures/
+            textureBaseDir = path.join(basePath, "textures");
+
+            // Get the subdirectory between shapes/ and the filename
+            // e.g., for "shapes/egg/humanegg.json", subPath is "egg"
+            const afterShapes = exportPath.substring(shapesIndex + path.sep.length + "shapes".length + path.sep.length);
+            const lastSep = afterShapes.lastIndexOf(path.sep);
+            if (lastSep !== -1) {
+                textureSubPath = afterShapes.substring(0, lastSep);
+            }
+
+            console.log(`VS folder structure detected:`);
+            console.log(`  Export path: ${exportPath}`);
+            console.log(`  Texture base dir: ${textureBaseDir}`);
+            console.log(`  Texture subpath: ${textureSubPath}`);
+        }
+    }
 
     // Populate Texture Sizes
     const textureSizes: Record<string, [number,number]> = {};
@@ -160,7 +201,7 @@ export function ex(options): VS_Shape {
 
         // If still no location and we have an export directory, save the texture
         if ((!location || location === "") && exportDir) {
-            location = saveTextureToFile(texture, exportDir);
+            location = saveTextureToFile(texture, textureBaseDir, textureSubPath);
         }
 
         textures[texture.name] = location || "";
