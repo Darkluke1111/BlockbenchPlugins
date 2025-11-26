@@ -83,11 +83,56 @@ function findTextureFile(dir: string, textureName: string): string | null {
     return null;
 }
 
+/**
+ * Saves a texture to disk alongside the exported model file.
+ * @param texture - The Blockbench texture object
+ * @param exportDir - The directory where the model is being exported
+ * @returns The filename (without path) of the saved texture
+ */
+function saveTextureToFile(texture: Texture, exportDir: string): string {
+    try {
+        // Check if texture has data URL method
+        if (typeof texture.getDataURL !== 'function') {
+            console.warn(`Texture ${texture.name} does not have getDataURL method`);
+            return "";
+        }
+
+        // Ensure texture has proper extension
+        let filename = texture.name;
+        if (!filename.match(/\.(png|jpg|jpeg)$/i)) {
+            filename += '.png';
+        }
+
+        const texturePath = path.join(exportDir, filename);
+
+        // Convert data URL to buffer and save
+        const dataUrl = texture.getDataURL();
+        if (!dataUrl) {
+            console.warn(`Could not get data URL for texture: ${texture.name}`);
+            return "";
+        }
+
+        const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        fs.writeFileSync(texturePath, buffer);
+
+        // Return just the filename without extension for VS format
+        return filename.replace(/\.[^.]+$/, '');
+    } catch (e) {
+        console.error(`Failed to save texture ${texture.name}:`, e);
+        return "";
+    }
+}
+
 export function ex(options): VS_Shape {
 
     if(!Project) {
         throw new Error("No project loaded during export");
     }
+
+    // Get export directory from options
+    const exportDir = options?.exportDir || "";
 
     // Populate Texture Sizes
     const textureSizes: Record<string, [number,number]> = {};
@@ -101,16 +146,24 @@ export function ex(options): VS_Shape {
     const textures: Record<string, string> = {};
     for (const texture of Texture.all) {
         // Try using existing textureLocation first, then resolve from project path or texture source
-        let location = texture.textureLocation;
-        if (!location) {
+        let location = texture.textureLocation || "";
+
+        if (!location || location === "") {
             // Try project save path first
             location = resolveTextureLocation(Project.save_path, texture.name);
+
             // If no save path, try texture source path
-            if (!location && texture.source) {
+            if ((!location || location === "") && texture.source) {
                 location = resolveTextureLocation(texture.source, texture.name);
             }
         }
-        textures[texture.name] = location;
+
+        // If still no location and we have an export directory, save the texture
+        if ((!location || location === "") && exportDir) {
+            location = saveTextureToFile(texture, exportDir);
+        }
+
+        textures[texture.name] = location || "";
     }
     
     // Populate Editor Info

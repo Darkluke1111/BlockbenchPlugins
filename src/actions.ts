@@ -4,7 +4,12 @@ import { is_vs_project } from "./util";
 import { im } from "./import";
 import { is_backdrop_project } from "./util/misc";
 import { codecVS } from "./codec";
+import { ex } from "./export";
 
+// @ts-expect-error: requireNativeModule is missing in blockbench types --- IGNORE ---
+const fs = requireNativeModule('fs');
+// @ts-expect-error: requireNativeModule is missing in blockbench types --- IGNORE ---
+const path = requireNativeModule('path');
 
 const export_action = createAction(`${PACKAGE.name}:export_vs`, {
     name: 'Export into VS Format',
@@ -16,11 +21,29 @@ const export_action = createAction(`${PACKAGE.name}:export_vs`, {
         if (!Project) {
             throw new Error("No project loaded during export");
         }
+
+        // Use Blockbench's file save dialog
         Blockbench.export({
             name: Project.name,
             type: 'json',
             extensions: ['json'],
-            content: codecVS.compile()
+            savetype: 'text',
+            content: ''  // We'll save manually after getting the path
+        }, (exportPath) => {
+            // This callback receives the path where the user wants to save
+            if (!exportPath) return;
+
+            // Get the export directory
+            const exportDir = path.dirname(exportPath);
+
+            // Call ex() with the export directory
+            const data = ex({ path: exportPath, exportDir: exportDir });
+
+            // Save the JSON file
+            const jsonContent = autoStringify(data);
+            fs.writeFileSync(exportPath, jsonContent);
+
+            Blockbench.showQuickMessage('Model and textures exported successfully');
         });
     }
 });
