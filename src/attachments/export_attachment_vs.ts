@@ -6,7 +6,6 @@ import { VS_Element } from '../vs_shape_def';
 
 const fs = requireNativeModule('fs');
 
-/** Debug flag - set to true to enable verbose logging */
 const DEBUG = false;
 
 /**
@@ -143,17 +142,64 @@ export function exportAttachmentsVS(selection: Group[]) {
     // Track groups that had stepParentName temporarily set for cleanup
     const modifiedGroups: Group[] = [];
 
-    try {
-        // Process each attachment group with its own relative offset
-        selection.forEach(group => {
-            const originalStepParent = group.stepParentName;
-            const stepParentName = getStepParentName(group);
+    // Filter selection to only ROOT attachment groups
+    // A root attachment is one whose parent either:
+    // 1. Has no clothingSlot, OR
+    // 2. Has a different clothingSlot
+    const rootAttachments = selection.filter(element => {
+        const myClothingSlot = (element as any).clothingSlot;
+        if (!myClothingSlot || myClothingSlot.trim() === '') {
+            return false; // Not an attachment at all
+        }
 
-            if (stepParentName) {
+        const parent = element.parent;
+        if (!parent || !(parent instanceof Group)) {
+            return true; // No parent or not a group parent = root attachment
+        }
+
+        const parentClothingSlot = (parent as any).clothingSlot;
+        if (!parentClothingSlot || parentClothingSlot.trim() === '' || parentClothingSlot !== myClothingSlot) {
+            if (DEBUG) console.log(`[VS Attachment Export] "${element.name}" is a root attachment (parent has different/no clothingSlot)`);
+            return true; // Parent has different or no clothingSlot = root attachment
+        }
+
+        if (DEBUG) console.log(`[VS Attachment Export] Skipping "${element.name}" - child of attachment with same clothingSlot`);
+        return false; // Parent has same clothingSlot = child attachment
+    });
+
+    if (DEBUG) console.log(`[VS Attachment Export] Filtered ${selection.length} elements to ${rootAttachments.length} root attachments`);
+
+    try {
+        // Process each root attachment group with its own relative offset
+        rootAttachments.forEach(group => {
+
+            const originalStepParent = group.stepParentName;
+            let stepParentName = getStepParentName(group);
+
+            // If no stepParentName was determined, traverse UP the outliner hierarchy
+            // to find the first parent that does NOT have the same clothingSlot
+            if (!stepParentName || stepParentName.trim() === '') {
+                const myClothingSlot = (group as any).clothingSlot;
+                let currentParent = group.parent;
+
+                while (currentParent && currentParent instanceof Group) {
+                    const parentClothingSlot = (currentParent as any).clothingSlot;
+                    // Stop when we find a parent with a different (or no) clothingSlot
+                    if (!parentClothingSlot || parentClothingSlot.trim() === '' || parentClothingSlot !== myClothingSlot) {
+                        stepParentName = currentParent.name;
+                        if (DEBUG) console.log(`[VS Attachment Export] Found first non-matching parent for "${group.name}": "${stepParentName}"`);
+                        break;
+                    }
+                    currentParent = currentParent.parent;
+                }
+            }
+
+            if (stepParentName && stepParentName.trim() !== '') {
                 // Only modify if we're setting a new value
                 if (!originalStepParent || originalStepParent.trim() === '') {
                     (group as any).stepParentName = stepParentName;
                     modifiedGroups.push(group);
+                    if (DEBUG) console.log(`[VS Attachment Export] Set stepParentName="${stepParentName}" on "${group.name}"`);
                 }
             } else {
                 console.warn(`Could not determine a step-parent for attachment: ${group.name}`);
@@ -169,6 +215,7 @@ export function exportAttachmentsVS(selection: Group[]) {
                 // Adjust the offset by subtracting the parent's absolute position.
                 // This makes the attachment's root position relative to its parent.
                 offset = util.vector_sub(offset, parentGroup.origin);
+                if (DEBUG) console.log(`[VS Attachment Export] Calculated offset for "${group.name}" relative to "${stepParentName}": [${offset.join(', ')}]`);
             }
 
             // Use the main model traversal logic to process the attachment

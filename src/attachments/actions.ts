@@ -10,21 +10,7 @@ import { VS_Shape } from '../vs_shape_def';
 import { inferClothingSlotFromPath } from './presets';
 import * as util from '../util';
 
-/** Debug flag - set to true to enable verbose logging */
 const DEBUG = false;
-
-/** Platform-aware path separator */
-const isWindows = typeof process !== 'undefined' && process.platform === 'win32';
-
-/**
- * Normalizes path separators to the current platform's convention.
- * @param filePath The path to normalize.
- * @returns Path with platform-appropriate separators.
- */
-function normalizePath(filePath: string): string {
-    if (!filePath) return filePath;
-    return isWindows ? filePath.replace(/\//g, '\\') : filePath.replace(/\\/g, '/');
-}
 
 /**
  * Extracts just the filename (without extension) from a path or textureLocation.
@@ -40,10 +26,6 @@ function extractFilename(pathOrLocation: string): string {
 
 /**
  * Merges a Vintage Story attachment into the current project, intelligently handling textures.
- * This function is specialized for VS shapes and contains complex logic to find and reuse
- * existing textures in the project, preventing duplicates. It attempts to match textures by
- * name, by `textureLocation` property, and finally by filename. This is necessary to accommodate
- * various states a user's project might be in.
  * @param content The VS_Shape data to merge.
  * @param filePath The path to the file being imported, used for clothing slot inference.
  */
@@ -93,23 +75,21 @@ function mergeVSAttachment(content: VS_Shape, filePath?: string) {
                 }
             }
         } else if (existingByLocation) {
-            const texPath = normalizePath(existingByLocation.path);
-            const texture = new Texture({ name, path: texPath }).add().load();
+            const texture = new Texture({ name, path: existingByLocation.path }).add().load();
             texture.textureLocation = textureLocation;
             if (content.textureSizes && content.textureSizes[name]) {
                 texture.uv_width = content.textureSizes[name][0];
                 texture.uv_height = content.textureSizes[name][1];
             }
-            if (DEBUG) console.log(`[Import VS] Created texture "${name}" using path from existing texture with same location (path: ${texPath})`);
+            if (DEBUG) console.log(`[Import VS] Created texture "${name}" using path from existing texture with same location (path: ${existingByLocation.path})`);
         } else if (existingByFilename) {
-            const texPath = normalizePath(existingByFilename.path);
-            const texture = new Texture({ name, path: texPath }).add().load();
+            const texture = new Texture({ name, path: existingByFilename.path }).add().load();
             texture.textureLocation = textureLocation;
             if (content.textureSizes && content.textureSizes[name]) {
                 texture.uv_width = content.textureSizes[name][0];
                 texture.uv_height = content.textureSizes[name][1];
             }
-            if (DEBUG) console.log(`[Import VS] Created texture "${name}" using path from existing texture with matching filename "${locationFilename}" (path: ${texPath})`);
+            if (DEBUG) console.log(`[Import VS] Created texture "${name}" using path from existing texture with matching filename "${locationFilename}" (path: ${existingByFilename.path})`);
         } else {
             const texturePath = util.get_texture_location(null, textureLocation);
             const texture = new Texture({ name, path: texturePath }).add().load();
@@ -122,6 +102,116 @@ function mergeVSAttachment(content: VS_Shape, filePath?: string) {
     }
 
     import_model(content, false, filePath);
+}
+
+function mergeBBModel(content: any, filePath: string) {
+    try {
+        if (DEBUG) console.log(`[Import BB] Starting merge of .bbmodel attachment`);
+
+        const textureMap = new Map<any, any>();
+
+        if (content.textures && Array.isArray(content.textures)) {
+            content.textures.forEach((texData: any, oldIndex: number) => {
+                let texture = Texture.all.find(t => t.name === texData.name || (t.path && t.path === texData.path));
+
+                if (!texture) {
+                    texture = new Texture(texData).add();
+                    if (texData.path && !texData.path.startsWith('data:')) {
+                        texture.load();
+                    }
+                    if (DEBUG) console.log(`[Import BB] Added texture: ${texData.name}`);
+                } else {
+                    if (DEBUG) console.log(`[Import BB] Using existing texture: ${texData.name}`);
+                }
+
+                textureMap.set(oldIndex, texture);
+                if (texData.uuid) {
+                    textureMap.set(texData.uuid, texture);
+                }
+            });
+        }
+
+        const elementMap = new Map();
+        if (content.elements && Array.isArray(content.elements)) {
+            content.elements.forEach(elem => {
+                elementMap.set(elem.uuid, elem);
+            });
+        }
+
+        const processOutlinerItem = (item: any, parentGroup: Group | null): any => {
+            if (typeof item === 'string') {
+                const elemData = elementMap.get(item);
+                if (elemData && elemData.type === 'cube') {
+                    const cubeProps = { ...elemData };
+                    delete cubeProps.uuid;
+
+                    if (cubeProps.faces) {
+                        Object.keys(cubeProps.faces).forEach(faceKey => {
+                            const face = cubeProps.faces[faceKey];
+                            if (face && face.texture !== undefined && face.texture !== null) {
+                                const mappedTexture = textureMap.get(face.texture);
+                                if (mappedTexture) {
+                                    face.texture = mappedTexture.uuid;
+                                    if (DEBUG) console.log(`[Import BB] Remapped texture for ${cubeProps.name}.${faceKey}: ${face.texture}`);
+                                }
+                            }
+                        });
+                    }
+
+                    const cube = new Cube(cubeProps);
+                    cube.addTo(parentGroup).init();
+                    if (DEBUG) console.log(`[Import BB] Created cube: ${cube.name}`);
+                    return cube;
+                }
+            } else if (typeof item === 'object' && item !== null) {
+                const groupName = item.name || '';
+                const searchRoot = parentGroup ? (parentGroup.children || []) : Outliner.root;
+                let existingGroup = null;
+
+                for (const child of searchRoot) {
+                    if (child instanceof Group && (child.name || '').toLowerCase() === groupName.toLowerCase()) {
+                        existingGroup = child;
+                        break;
+                    }
+                }
+
+                let targetGroup: Group;
+
+                if (existingGroup) {
+                    targetGroup = existingGroup;
+                    if (DEBUG) console.log(`[Import BB] Merging into existing group: ${groupName}`);
+                } else {
+                    const groupProps = { ...item };
+                    delete groupProps.uuid;
+                    delete groupProps.children;
+
+                    targetGroup = new Group(groupProps);
+                    targetGroup.addTo(parentGroup).init();
+                    if (DEBUG) console.log(`[Import BB] Created new group: ${groupName}`);
+                }
+
+                if (item.children && Array.isArray(item.children)) {
+                    item.children.forEach((childItem: any) => {
+                        processOutlinerItem(childItem, targetGroup);
+                    });
+                }
+
+                return targetGroup;
+            }
+        };
+
+        if (content.outliner && Array.isArray(content.outliner)) {
+            content.outliner.forEach(item => {
+                processOutlinerItem(item, null);
+            });
+        }
+
+        Canvas.updateAll();
+        if (DEBUG) console.log(`[Import BB] Merge complete. Groups: ${Group.all.length}, Cubes: ${Cube.all.length}`);
+    } catch (e) {
+        console.error('[Import BB] CRITICAL ERROR in mergeBBModel:', e);
+        Blockbench.showQuickMessage(`Import failed: ${e.message}`, 5000);
+    }
 }
 
 /**
@@ -277,6 +367,10 @@ function createImportAction(config: ImportActionConfig) {
                 });
 
                 const currentProject = Project;
+                // WORKAROUND: Use a timeout to wait for Blockbench's internal processes to complete.
+                // After an import, the outliner and other project data are not updated instantaneously.
+                // Running processImportedAttachments immediately would mean it can't find the new elements.
+                // This delay gives Blockbench time to settle before we run our post-processing logic.
                 setTimeout(() => {
                     if (!currentProject || Project !== currentProject) {
                         console.warn(`[${config.logPrefix}] Project changed or closed, skipping post-import processing`);
@@ -307,7 +401,7 @@ export function createActions() {
         extensions: [codec.extension],
         type: codec.name,
         logPrefix: 'Import BB',
-        mergeFn: (model, filePath) => Codecs.project.merge(model, filePath)
+        mergeFn: (model, filePath) => mergeBBModel(model, filePath)
     });
 
     const importVSAction = createImportAction({
@@ -364,6 +458,7 @@ function processImportedAttachments(elementsBefore: Set<any>, filePath: string, 
         const stepParentName = element.stepParentName?.trim();
         if (stepParentName) {
             const allMatches = findAllGroupsByName(stepParentName, Outliner.root);
+
             let parentGroup = allMatches.find(g => !newElementsSet.has(g)) || null;
 
             if (!parentGroup && allMatches.length === 0) {
@@ -374,7 +469,7 @@ function processImportedAttachments(elementsBefore: Set<any>, filePath: string, 
             if (parentGroup && parentGroup !== element && !(element instanceof Group && isDescendantOf(parentGroup, element))) {
                 try {
                     element.addTo(parentGroup);
-                    if (DEBUG) console.log(`[${logPrefix}] Reparented "${element.name}" under "${stepParentName}" in outliner`);
+                    if (DEBUG) console.log(`[${logPrefix}] Reparented "${element.name}" under "${stepParentName}" in outliner (keeping stepParentName for mesh positioning)`);
                 } catch (e) {
                     console.error(`[${logPrefix}] Failed to reparent "${element.name}" to "${stepParentName}":`, e);
                 }
@@ -391,8 +486,16 @@ function processImportedAttachments(elementsBefore: Set<any>, filePath: string, 
             const originalGroup = findGroupByName(baseName, Outliner.root);
             if (originalGroup && originalGroup !== group) {
                 [...group.children].forEach(child => {
-                    if (child === originalGroup || isDescendantOf(originalGroup, child)) {
-                        if (DEBUG) console.warn(`[${logPrefix}] Skipping move to prevent circular parenting for "${child.name}"`);
+                    if (child === originalGroup || child.uuid === originalGroup.uuid) {
+                        if (DEBUG) console.warn(`[${logPrefix}] Skipping move - child "${child.name}" is the target group`);
+                        return;
+                    }
+                    if (child.parent === originalGroup) {
+                        if (DEBUG) console.warn(`[${logPrefix}] Skipping move - child "${child.name}" already under "${originalGroup.name}"`);
+                        return;
+                    }
+                    if (isDescendantOf(originalGroup, child)) {
+                        if (DEBUG) console.warn(`[${logPrefix}] Skipping move - "${originalGroup.name}" is descendant of "${child.name}"`);
                         return;
                     }
                     try {
@@ -410,22 +513,31 @@ function processImportedAttachments(elementsBefore: Set<any>, filePath: string, 
     const masterClothingSlot = inferClothingSlotFromPath(filePath) || 'Unknown';
 
     if (masterClothingSlot) {
-        if (DEBUG) console.log(`[${logPrefix}] Applying master clothing slot "${masterClothingSlot}" to new elements.`);
+        if (DEBUG) console.log(`[${logPrefix}] Applying master clothing slot "${masterClothingSlot}" to ${newElements.length} new elements.`);
+
         function applySlotRecursive(element: any, slot: string) {
             if (element instanceof Group || element instanceof Cube) {
                 if (!element.clothingSlot || element.clothingSlot.trim() === '') {
                     element.clothingSlot = slot;
+                    if (DEBUG) console.log(`[${logPrefix}] Applied slot "${slot}" to ${element instanceof Group ? 'group' : 'cube'}: ${element.name}`);
                 }
             }
             if (element.children) {
                 element.children.forEach((child: any) => applySlotRecursive(child, slot));
             }
         }
-        newElements.forEach(element => applySlotRecursive(element, masterClothingSlot));
+
+        const topLevelNewElements = newElements.filter(element => {
+            const parent = element.parent;
+            return !parent || !newElementsSet.has(parent);
+        });
+
+        if (DEBUG) console.log(`[${logPrefix}] Found ${topLevelNewElements.length} top-level new elements to process`);
+
+        topLevelNewElements.forEach(element => applySlotRecursive(element, masterClothingSlot));
     }
 
     Undo.finishEdit('Import and parent attachment');
     Canvas.updateAll();
     updateSelection?.();
 }
-

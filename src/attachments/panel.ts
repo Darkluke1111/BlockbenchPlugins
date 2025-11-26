@@ -234,7 +234,8 @@ const vuePanel = {
             ['new_project', (this as any).refresh],
             ['update_selection', (this as any).refresh],
             ['undo', (this as any).refresh],
-            ['redo', (this as any).refresh]
+            ['redo', (this as any).refresh],
+            ['attachments_changed', (this as any).refresh]
         ];
 
         (this as any)._bbListeners.forEach(([evt, fn]: [string, any]) => Blockbench.on(evt, fn));

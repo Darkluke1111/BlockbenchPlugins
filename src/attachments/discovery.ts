@@ -8,10 +8,16 @@ export interface IAttachmentSection {
 /**
  * Checks if a group is just a structural parent (only contains other attachments, no real content).
  * These should be filtered out from display since they're just pass-through parents.
+ * IMPORTANT: Groups that themselves have a clothingSlot are NOT structural parents - they are the attachment root!
  */
 function isStructuralParentOnly(node: any): boolean {
     if (!(node instanceof Group)) return false;
     if (!node.children || node.children.length === 0) return false;
+
+    // If this group itself has a clothingSlot, it's NOT a structural parent - it's the attachment root
+    if (node.clothingSlot && node.clothingSlot.trim() !== '') {
+        return false;
+    }
 
     // Check if ALL children are attachments (have clothingSlot set)
     // If so, this group is just a structural parent
