@@ -25,6 +25,29 @@ function extractFilename(pathOrLocation: string): string {
 }
 
 /**
+ * Helper to create, add, and load a VS attachment texture with proper properties.
+ * @param name The name of the texture.
+ * @param path The path to the texture file (can be null, in which case Blockbench might prompt).
+ * @param textureLocation The textureLocation string for the texture.
+ * @param content The VS_Shape content object, used to get textureSizes.
+ * @returns The created and loaded Texture instance.
+ */
+function createVSAttachmentTexture(
+    name: string,
+    path: string | null,
+    textureLocation: string,
+    content: VS_Shape
+): Texture {
+    const texture = new Texture({ name, path: path || undefined }).add().load();
+    texture.textureLocation = textureLocation;
+    if (content.textureSizes && content.textureSizes[name]) {
+        texture.uv_width = content.textureSizes[name][0];
+        texture.uv_height = content.textureSizes[name][1];
+    }
+    return texture;
+}
+
+/**
  * Merges a Vintage Story attachment into the current project, intelligently handling textures.
  * @param content The VS_Shape data to merge.
  * @param filePath The path to the file being imported, used for clothing slot inference.
@@ -75,29 +98,14 @@ function mergeVSAttachment(content: VS_Shape, filePath?: string) {
                 }
             }
         } else if (existingByLocation) {
-            const texture = new Texture({ name, path: existingByLocation.path }).add().load();
-            texture.textureLocation = textureLocation;
-            if (content.textureSizes && content.textureSizes[name]) {
-                texture.uv_width = content.textureSizes[name][0];
-                texture.uv_height = content.textureSizes[name][1];
-            }
+            createVSAttachmentTexture(name, existingByLocation.path, textureLocation, content);
             if (DEBUG) console.log(`[Import VS] Created texture "${name}" using path from existing texture with same location (path: ${existingByLocation.path})`);
         } else if (existingByFilename) {
-            const texture = new Texture({ name, path: existingByFilename.path }).add().load();
-            texture.textureLocation = textureLocation;
-            if (content.textureSizes && content.textureSizes[name]) {
-                texture.uv_width = content.textureSizes[name][0];
-                texture.uv_height = content.textureSizes[name][1];
-            }
+            createVSAttachmentTexture(name, existingByFilename.path, textureLocation, content);
             if (DEBUG) console.log(`[Import VS] Created texture "${name}" using path from existing texture with matching filename "${locationFilename}" (path: ${existingByFilename.path})`);
         } else {
             const texturePath = util.get_texture_location(null, textureLocation);
-            const texture = new Texture({ name, path: texturePath }).add().load();
-            if (content.textureSizes && content.textureSizes[name]) {
-                texture.uv_width = content.textureSizes[name][0];
-                texture.uv_height = content.textureSizes[name][1];
-            }
-            texture.textureLocation = textureLocation;
+            createVSAttachmentTexture(name, texturePath, textureLocation, content);
         }
     }
 
