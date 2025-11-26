@@ -19,30 +19,50 @@ export const VS_GROUP_PROPS = [
             Canvas.updateAllPositions();
         },
     }),
-    new Property(Group, "string", "clothingSlot", {
-        default: '',
-        label: "Clothing Slot",
-        exposed: true,
-        options: () => {
-            const { getActiveSlotNames } = require('./attachments/presets');
-            const slots = getActiveSlotNames();
-            const options: {[key: string]: string} = { '': 'None' };
-            slots.forEach((slot: string) => {
-                options[slot] = slot;
-            });
-            return options;
-        },
-        onChange() {
-            try {
-                if ((Interface as any).Panels?.attachments_panel?.vue) {
-                    (Interface as any).Panels.attachments_panel.vue.updateAttachments();
-                }
-            } catch (e) {
-                console.warn('Could not refresh attachments panel:', e);
-            }
-        },
-    }),
 ];
+
+// Blockbench-only properties (not exported to VS JSON format)
+new Property(Group, "string", "clothingSlot", {
+    default: '',
+    label: "Clothing Slot",
+    exposed: true,
+    options: () => {
+        const { getActiveSlotNames } = require('./attachments/presets');
+        const slots = getActiveSlotNames();
+        const options: {[key: string]: string} = { '': 'None' };
+        slots.forEach((slot: string) => {
+            options[slot] = slot;
+        });
+        return options;
+    },
+    inputs: {
+        element_panel: {
+            input: {
+                label: 'Clothing Slot',
+                type: 'select',
+                options: () => {
+                    const { getActiveSlotNames } = require('./attachments/presets');
+                    const slots = getActiveSlotNames();
+                    const options: {[key: string]: string} = { '': 'None' };
+                    slots.forEach((slot: string) => {
+                        options[slot] = slot;
+                    });
+                    return options;
+                }
+            }
+        }
+    },
+    onChange() {
+        try {
+            if ((Interface as any).Panels?.attachments_panel?.vue) {
+                (Interface as any).Panels.attachments_panel.vue.updateAttachments();
+            }
+        } catch (e) {
+            console.warn('Could not refresh attachments panel:', e);
+        }
+    },
+});
+
 new Property(Group, "boolean", "backdrop");
 
 export const VS_CUBE_PROPS = [
@@ -55,38 +75,120 @@ export const VS_CUBE_PROPS = [
             Canvas.updateAllPositions();
         },
     }),
-    new Property(Cube, "string", "clothingSlot", {
+    new Property(Cube, "string", "climateColorMap", {
         default: '',
-        label: "Clothing Slot",
+        label: "Climate Color Map",
         exposed: true,
-        options: () => {
-            const { getActiveSlotNames } = require('./attachments/presets');
-            const slots = getActiveSlotNames();
-            const options: {[key: string]: string} = { '': 'None' };
-            slots.forEach((slot: string) => {
-                options[slot] = slot;
-            });
-            return options;
-        },
-        onChange() {
-            try {
-                if ((Interface as any).Panels?.attachments_panel?.vue) {
-                    (Interface as any).Panels.attachments_panel.vue.updateAttachments();
+        inputs: {
+            element_panel: {
+                input: {
+                    label: 'Climate Color Map',
+                    type: 'text'
                 }
-            } catch (e) {
-                console.warn('Could not refresh attachments panel:', e);
             }
         },
     }),
-    new Property(Cube, "string", "climateColorMap"),
-    new Property(Cube, "boolean", "gradientShade"),
-    new Property(Cube, "number", "renderPass"),
-    new Property(Cube, "string", "seasonColorMap"),
+    new Property(Cube, "boolean", "gradientShade", {
+        default: false,
+        label: "Gradient Shade",
+        exposed: true,
+        inputs: {
+            element_panel: {
+                input: {
+                    label: 'Gradient Shade',
+                    type: 'checkbox'
+                }
+            }
+        },
+    }),
+    new Property(Cube, "number", "renderPass", {
+        default: 0,
+        label: "Render Pass",
+        exposed: true,
+        inputs: {
+            element_panel: {
+                input: {
+                    label: 'Render Pass',
+                    type: 'number',
+                    min: 0,
+                    step: 1
+                }
+            }
+        },
+    }),
+    new Property(Cube, "string", "seasonColorMap", {
+        default: '',
+        label: "Season Color Map",
+        exposed: true,
+        inputs: {
+            element_panel: {
+                input: {
+                    label: 'Season Color Map',
+                    type: 'text'
+                }
+            }
+        },
+    }),
 ];
+
+// Blockbench-only properties (not exported to VS JSON format)
+new Property(Cube, "string", "clothingSlot", {
+    default: '',
+    label: "Clothing Slot",
+    exposed: true,
+    options: () => {
+        const { getActiveSlotNames } = require('./attachments/presets');
+        const slots = getActiveSlotNames();
+        const options: {[key: string]: string} = { '': 'None' };
+        slots.forEach((slot: string) => {
+            options[slot] = slot;
+        });
+        return options;
+    },
+    inputs: {
+        element_panel: {
+            input: {
+                label: 'Clothing Slot',
+                type: 'select',
+                options: () => {
+                    const { getActiveSlotNames } = require('./attachments/presets');
+                    const slots = getActiveSlotNames();
+                    const options: {[key: string]: string} = { '': 'None' };
+                    slots.forEach((slot: string) => {
+                        options[slot] = slot;
+                    });
+                    return options;
+                }
+            }
+        }
+    },
+    onChange() {
+        try {
+            if ((Interface as any).Panels?.attachments_panel?.vue) {
+                (Interface as any).Panels.attachments_panel.vue.updateAttachments();
+            }
+        } catch (e) {
+            console.warn('Could not refresh attachments panel:', e);
+        }
+    },
+});
+
 new Property(Cube, "boolean", "backdrop");
 
 export const VS_TEXTURE_PROPS = [
-    new Property(Texture, "string", "textureLocation"),
+    new Property(Texture, "string", "textureLocation", {
+        default: '',
+        label: "Texture Location",
+        exposed: true,
+        inputs: {
+            element_panel: {
+                input: {
+                    label: 'Texture Location',
+                    type: 'text'
+                }
+            }
+        },
+    }),
 ];
 
 export const VS_FACE_PROPS = [
