@@ -124,12 +124,25 @@ function mergeBBModel(content: any, filePath: string) {
 
                 if (!texture) {
                     texture = new Texture(texData).add();
-                    if (texData.path && !texData.path.startsWith('data:')) {
+                    // Load texture from source (base64) or path
+                    if (texData.source) {
+                        // Texture has embedded base64 data - load it directly
+                        texture.fromDataURL(texData.source);
+                        if (DEBUG) console.log(`[Import BB] Loaded texture from base64: ${texData.name}`);
+                    } else if (texData.path && !texData.path.startsWith('data:')) {
                         texture.load();
+                        if (DEBUG) console.log(`[Import BB] Loaded texture from path: ${texData.name}`);
                     }
                     if (DEBUG) console.log(`[Import BB] Added texture: ${texData.name}`);
                 } else {
-                    if (DEBUG) console.log(`[Import BB] Using existing texture: ${texData.name}`);
+                    // Update UV size for existing texture to match the imported data
+                    if (texData.uv_width !== undefined) {
+                        texture.uv_width = texData.uv_width;
+                    }
+                    if (texData.uv_height !== undefined) {
+                        texture.uv_height = texData.uv_height;
+                    }
+                    if (DEBUG) console.log(`[Import BB] Using existing texture: ${texData.name}, updated UV size to ${texture.uv_width}x${texture.uv_height}`);
                 }
 
                 textureMap.set(oldIndex, texture);
@@ -146,7 +159,16 @@ function mergeBBModel(content: any, filePath: string) {
             });
         }
 
+        // Blockbench 5.0+ format: groups stored separately
+        const groupMap = new Map();
+        if (content.groups && Array.isArray(content.groups)) {
+            content.groups.forEach(grp => {
+                groupMap.set(grp.uuid, grp);
+            });
+        }
+
         const processOutlinerItem = (item: any, parentGroup: Group | null): any => {
+            // Handle string UUIDs (4.x format - direct element references)
             if (typeof item === 'string') {
                 const elemData = elementMap.get(item);
                 if (elemData && elemData.type === 'cube') {
@@ -172,39 +194,107 @@ function mergeBBModel(content: any, filePath: string) {
                     return cube;
                 }
             } else if (typeof item === 'object' && item !== null) {
-                const groupName = item.name || '';
-                const searchRoot = parentGroup ? (parentGroup.children || []) : Outliner.root;
-                let existingGroup = null;
+                // Blockbench 5.0+ format: outliner item with uuid reference
+                // Check if this is a 5.0 format item (has uuid but not name)
+                if (item.uuid && !item.name) {
+                    // This is a 5.0 format outliner item - look up the actual data
+                    const elemData = elementMap.get(item.uuid);
+                    const groupData = groupMap.get(item.uuid);
 
-                for (const child of searchRoot) {
-                    if (child instanceof Group && (child.name || '').toLowerCase() === groupName.toLowerCase()) {
-                        existingGroup = child;
-                        break;
+                    if (elemData && elemData.type === 'cube') {
+                        // It's an element reference
+                        const cubeProps = { ...elemData };
+                        delete cubeProps.uuid;
+
+                        if (cubeProps.faces) {
+                            Object.keys(cubeProps.faces).forEach(faceKey => {
+                                const face = cubeProps.faces[faceKey];
+                                if (face && face.texture !== undefined && face.texture !== null) {
+                                    const mappedTexture = textureMap.get(face.texture);
+                                    if (mappedTexture) {
+                                        face.texture = mappedTexture.uuid;
+                                        if (DEBUG) console.log(`[Import BB] Remapped texture for ${cubeProps.name}.${faceKey}: ${face.texture}`);
+                                    }
+                                }
+                            });
+                        }
+
+                        const cube = new Cube(cubeProps);
+                        cube.addTo(parentGroup).init();
+                        if (DEBUG) console.log(`[Import BB] Created cube (5.0): ${cube.name}`);
+                        return cube;
+                    } else if (groupData) {
+                        // It's a group reference
+                        const groupName = groupData.name || '';
+                        const searchRoot = parentGroup ? (parentGroup.children || []) : Outliner.root;
+                        let existingGroup = null;
+
+                        for (const child of searchRoot) {
+                            if (child instanceof Group && (child.name || '').toLowerCase() === groupName.toLowerCase()) {
+                                existingGroup = child;
+                                break;
+                            }
+                        }
+
+                        let targetGroup: Group;
+
+                        if (existingGroup) {
+                            targetGroup = existingGroup;
+                            if (DEBUG) console.log(`[Import BB] Merging into existing group (5.0): ${groupName}`);
+                        } else {
+                            const groupProps = { ...groupData };
+                            delete groupProps.uuid;
+
+                            targetGroup = new Group(groupProps);
+                            targetGroup.addTo(parentGroup).init();
+                            if (DEBUG) console.log(`[Import BB] Created new group (5.0): ${groupName}`);
+                        }
+
+                        // Process children from the outliner item (not from groupData)
+                        if (item.children && Array.isArray(item.children)) {
+                            item.children.forEach((childItem: any) => {
+                                processOutlinerItem(childItem, targetGroup);
+                            });
+                        }
+
+                        return targetGroup;
                     }
-                }
-
-                let targetGroup: Group;
-
-                if (existingGroup) {
-                    targetGroup = existingGroup;
-                    if (DEBUG) console.log(`[Import BB] Merging into existing group: ${groupName}`);
                 } else {
-                    const groupProps = { ...item };
-                    delete groupProps.uuid;
-                    delete groupProps.children;
+                    // Blockbench 4.x format: full group object with all data
+                    const groupName = item.name || '';
+                    const searchRoot = parentGroup ? (parentGroup.children || []) : Outliner.root;
+                    let existingGroup = null;
 
-                    targetGroup = new Group(groupProps);
-                    targetGroup.addTo(parentGroup).init();
-                    if (DEBUG) console.log(`[Import BB] Created new group: ${groupName}`);
+                    for (const child of searchRoot) {
+                        if (child instanceof Group && (child.name || '').toLowerCase() === groupName.toLowerCase()) {
+                            existingGroup = child;
+                            break;
+                        }
+                    }
+
+                    let targetGroup: Group;
+
+                    if (existingGroup) {
+                        targetGroup = existingGroup;
+                        if (DEBUG) console.log(`[Import BB] Merging into existing group: ${groupName}`);
+                    } else {
+                        const groupProps = { ...item };
+                        delete groupProps.uuid;
+                        delete groupProps.children;
+
+                        targetGroup = new Group(groupProps);
+                        targetGroup.addTo(parentGroup).init();
+                        if (DEBUG) console.log(`[Import BB] Created new group: ${groupName}`);
+                    }
+
+                    if (item.children && Array.isArray(item.children)) {
+                        item.children.forEach((childItem: any) => {
+                            processOutlinerItem(childItem, targetGroup);
+                        });
+                    }
+
+                    return targetGroup;
                 }
-
-                if (item.children && Array.isArray(item.children)) {
-                    item.children.forEach((childItem: any) => {
-                        processOutlinerItem(childItem, targetGroup);
-                    });
-                }
-
-                return targetGroup;
             }
         };
 
@@ -446,11 +536,61 @@ function isDescendantOf(node: any, possibleAncestor: any): boolean {
 }
 
 /**
+ * Finds a group in the existing model that matches the given clothing slot.
+ * Prioritizes groups that:
+ * 1. Have the same clothing slot AND same name (case-insensitive)
+ * 2. Have the same clothing slot (any name)
+ * @param clothingSlot The clothing slot to search for
+ * @param groupName Optional name to help prioritize matches
+ * @param existingElements Elements that existed before import (to exclude new elements)
+ * @returns The best matching group, or null if none found
+ */
+function findBestMatchingGroupBySlot(clothingSlot: string, groupName: string | null, existingElements: Set<any>): Group | null {
+    if (!clothingSlot || clothingSlot.trim() === '') return null;
+
+    const normalizedSlot = clothingSlot.trim().toLowerCase();
+    const normalizedName = groupName ? groupName.trim().toLowerCase() : '';
+
+    let bestMatch: Group | null = null;
+    let exactNameMatch: Group | null = null;
+
+    function search(elements: any[]) {
+        for (const element of elements) {
+            if (element instanceof Group && existingElements.has(element)) {
+                const elemSlot = (element.clothingSlot || '').trim().toLowerCase();
+
+                if (elemSlot === normalizedSlot) {
+                    // This group has matching clothing slot
+                    if (normalizedName && (element.name || '').trim().toLowerCase() === normalizedName) {
+                        // Perfect match: same slot AND same name
+                        exactNameMatch = element;
+                        return; // Stop searching, we found the best possible match
+                    }
+                    if (!bestMatch) {
+                        // First match with this slot
+                        bestMatch = element;
+                    }
+                }
+            }
+
+            if (element.children && element.children.length > 0) {
+                search(element.children);
+                if (exactNameMatch) return; // Early exit if we found exact match
+            }
+        }
+    }
+
+    search(Outliner.root);
+    return exactNameMatch || bestMatch;
+}
+
+/**
  * Performs post-import processing on newly added elements to automate project organization.
  * The process runs in a specific order:
- * 1. **Re-parenting:** Moves elements under their designated parent based on the `stepParentName` property.
- * 2. **Merge Duplicates:** Merges groups that were duplicated on import (e.g., `head2` into `head`).
- * 3. **Apply Clothing Slot:** Assigns a master clothing slot inferred from the file path to all new elements.
+ * 1. **Smart Clothing Slot Matching:** Matches top-level imported groups to existing groups with same clothing slot.
+ * 2. **Re-parenting:** Moves elements under their designated parent based on the `stepParentName` property.
+ * 3. **Merge Duplicates:** Merges groups that were duplicated on import (e.g., `head2` into `head`).
+ * 4. **Apply Clothing Slot:** Assigns a master clothing slot inferred from the file path to all new elements.
  * This function is critical for a smooth user workflow, as it handles tedious manual organization tasks.
  * @param elementsBefore A `Set` of all elements that existed before the import.
  * @param filePath Path to the first imported file, used for clothing slot inference.
@@ -461,7 +601,63 @@ function processImportedAttachments(elementsBefore: Set<any>, filePath: string, 
     const newElements = [...elementsAfter].filter(e => !elementsBefore.has(e));
     const newElementsSet = new Set(newElements);
 
-    if (DEBUG) console.log(`[${logPrefix}] Processing ${newElements.length} new elements for reparenting`);
+    // Track matches for user feedback
+    const matchingTable: { imported: string; matchedTo: string; slot: string }[] = [];
+
+    // STEP 1: Smart Clothing Slot Matching
+    // Find top-level groups from the import and try to match them to existing groups by clothing slot
+    const topLevelNewGroups = newElements.filter(element => {
+        if (!(element instanceof Group)) return false;
+        const parent = element.parent;
+        return !parent || !newElementsSet.has(parent);
+    }) as Group[];
+
+    if (DEBUG) console.log(`[${logPrefix}] Found ${topLevelNewGroups.length} top-level new groups for smart matching`);
+
+    topLevelNewGroups.forEach(newGroup => {
+        const clothingSlot = newGroup.clothingSlot?.trim();
+        if (!clothingSlot) return;
+
+        // Try to find a matching group in the existing model
+        const matchedGroup = findBestMatchingGroupBySlot(clothingSlot, newGroup.name, elementsBefore);
+
+        if (matchedGroup) {
+            // Move all children of newGroup to the matched group
+            const childrenToMove = [...newGroup.children];
+
+            if (DEBUG) console.log(`[${logPrefix}] Smart Match: "${newGroup.name}" (slot: ${clothingSlot}) -> "${matchedGroup.name}"`);
+
+            childrenToMove.forEach(child => {
+                try {
+                    child.addTo(matchedGroup);
+                } catch (e) {
+                    console.error(`[${logPrefix}] Failed to move "${child.name}" to matched group "${matchedGroup.name}":`, e);
+                }
+            });
+
+            // Track this match for display
+            matchingTable.push({
+                imported: newGroup.name || 'Unnamed',
+                matchedTo: matchedGroup.name || 'Unnamed',
+                slot: clothingSlot
+            });
+
+            // Remove the now-empty imported group
+            if (newGroup.children.length === 0) {
+                newGroup.remove();
+            }
+        }
+    });
+
+    // Display matching table if any matches were found
+    if (matchingTable.length > 0) {
+        console.log(`[${logPrefix}] Smart Matching Results:`);
+        console.table(matchingTable);
+        Blockbench.showQuickMessage(`Matched ${matchingTable.length} attachment group(s) to existing model`, 3000);
+    }
+
+    // STEP 2: Re-parenting based on stepParentName
+    if (DEBUG) console.log(`[${logPrefix}] Processing ${newElements.length} new elements for stepParent reparenting`);
     newElements.forEach(element => {
         const stepParentName = element.stepParentName?.trim();
         if (stepParentName) {
@@ -485,6 +681,7 @@ function processImportedAttachments(elementsBefore: Set<any>, filePath: string, 
         }
     });
 
+    // STEP 3: Merge Duplicates
     const groupsToDelete: Group[] = [];
     const updatedGroups = collectGroupsDepthFirst(Outliner.root);
     updatedGroups.forEach(group => {
@@ -518,6 +715,7 @@ function processImportedAttachments(elementsBefore: Set<any>, filePath: string, 
     });
     groupsToDelete.forEach(group => group.remove());
 
+    // STEP 4: Apply Clothing Slot from file path
     const masterClothingSlot = inferClothingSlotFromPath(filePath) || 'Unknown';
 
     if (masterClothingSlot) {
