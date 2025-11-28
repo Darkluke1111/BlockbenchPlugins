@@ -76,7 +76,8 @@ function updateStepChildTransform(controller: NodePreviewController, element: Ou
 
     if((element instanceof Cube || element instanceof Group) && element.stepParentName && element.stepParentName != "") {
         const step_parent = Cube.all.find(c => c.name === `${element.stepParentName}_geo`);
-        if(step_parent) {
+        // Guard against self-parenting (would cause THREE.js "can't add as child of itself" error)
+        if(step_parent && step_parent !== element && step_parent.mesh !== element.mesh) {
             step_parent.mesh.add(element.mesh);
         } else {
             Project!.model_3d.add(mesh);

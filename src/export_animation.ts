@@ -62,7 +62,7 @@ export function export_animations(): Array<VS_Animation> {
         const vsAnimation : VS_Animation = {
             name: animation.name,
             code: animation.name.toLowerCase().replace(/ /g, ''),
-            quantityframes: get_frame_quantity(animation, keyframes),
+            quantityframes: Math.round(animation.length * fps) + 1,
             onActivityStopped: "EaseOut",
             onAnimationEnd: animation.loop === 'loop' ? "Repeat" : "Hold",
             keyframes: Object.values(keyframes).sort((a, b) => a.frame - b.frame)

@@ -95,12 +95,6 @@ const convert_format = (event) => {
         }
     }
 
-    // Ensure root group is at VS standard origin (8,0,8)
-    const rootGroup = Outliner.root.filter(node => node instanceof Group).map(node => node as Group)[0];
-    if (rootGroup && !(rootGroup.origin[0] === 8 && rootGroup.origin[1] === 0 && rootGroup.origin[2] === 8)) {
-        rootGroup.origin = [8, 0, 8];
-    }
-
     // Mark as converted
     Project.vsFormatConverted = true;
 

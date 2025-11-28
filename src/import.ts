@@ -45,7 +45,7 @@ export function im(content: VS_Shape, _path: string, asBackdrop: boolean) {
 
 
     // Build the model structure using the dedicated module
-    import_model(content, asBackdrop);
+    import_model(content, asBackdrop, _path);
 
     // Import animations using the dedicated module
     if (content.animations) {

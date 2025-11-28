@@ -45,7 +45,12 @@ export function process_group(
 
     for(const prop of VS_GROUP_PROPS) {
         const prop_name = prop.name;
-        vsElement[prop_name] = node[prop_name];
+        const value = node[prop_name];
+
+        // Skip properties with default/empty values
+        if (value !== undefined && value !== null && value !== '' && value !== false) {
+            vsElement[prop_name] = value;
+        }
     }
 
     // Process child locators as attachment points

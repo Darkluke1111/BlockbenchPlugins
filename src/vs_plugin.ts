@@ -19,6 +19,7 @@ import "./mods/formatMod";
 import "./mods/settingsMod";
 import "./mods/legacyFormatConverterMod";
 import "./mods/nodePreviewControllerMod";
+import "./mods/attachmentsMod";
 
 BBPlugin.register(PACKAGE.name, {
     title: PACKAGE.title,
