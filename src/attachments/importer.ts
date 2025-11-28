@@ -1,9 +1,147 @@
-
 import { import_model } from '../import_model';
 import { VS_Shape } from '../vs_shape_def';
 import { handleVSTextures } from './texture_handler';
 
+
 const DEBUG = false;
+
+function logDebug(message: string, ...args: any[]) {
+    if (DEBUG) console.log(message, ...args);
+}
+
+function isRecord(value: unknown): value is Record<string, any> {
+    return typeof value === 'object' && value !== null;
+}
+
+function asArray<T = unknown>(value: unknown): T[] {
+    return Array.isArray(value) ? (value as T[]) : [];
+}
+
+function getErrorMessage(e: unknown): string {
+    if (e instanceof Error) return e.message;
+    return String(e);
+}
+
+function buildUuidMap<T extends { uuid?: unknown }>(items: unknown): Map<UUID, T> {
+    const map = new Map<UUID, T>();
+    for (const item of asArray<T>(items)) {
+        const uuid = item.uuid;
+        if (typeof uuid === 'string') map.set(uuid, item);
+    }
+    return map;
+}
+
+function buildTextureMap(model: BBModel): Map<TextureRef, any> {
+    const map = new Map<TextureRef, any>();
+
+    for (const [oldIndex, texData] of asArray<BBTextureData>(model.textures).entries()) {
+        const texName = typeof texData.name === 'string' ? texData.name : undefined;
+        const texPath = typeof texData.path === 'string' ? texData.path : undefined;
+
+        const existing = Texture.all.find(
+            (t: any) => (texName && t.name === texName) || (texPath && t.path && t.path === texPath)
+        );
+
+        let texture = existing;
+        if (!texture) {
+            texture = new Texture(texData).add();
+
+            // Load texture from embedded base64 or from disk path (when available)
+            if (typeof texData.source === 'string' && texData.source.length > 0) {
+                texture.fromDataURL(texData.source);
+                logDebug(`[Import BB] Loaded texture from base64: ${texName ?? '(unnamed)'}`);
+            } else if (typeof texPath === 'string' && texPath.length > 0 && !texPath.startsWith('data:')) {
+                texture.load();
+                logDebug(`[Import BB] Loaded texture from path: ${texName ?? texPath}`);
+            }
+
+            logDebug(`[Import BB] Added texture: ${texName ?? '(unnamed)'}`);
+        } else {
+            // Update UV size for existing texture to match the imported data
+            if (typeof texData.uv_width === 'number') texture.uv_width = texData.uv_width;
+            if (typeof texData.uv_height === 'number') texture.uv_height = texData.uv_height;
+
+            logDebug(
+                `[Import BB] Using existing texture: ${texture.name}, updated UV size to ${texture.uv_width}x${texture.uv_height}`
+            );
+        }
+
+        map.set(oldIndex, texture);
+        if (typeof texData.uuid === 'string') map.set(texData.uuid, texture);
+    }
+
+    return map;
+}
+
+function remapCubeFaceTextures(cubeProps: Record<string, any>, textureMap: Map<TextureRef, any>) {
+    const faces = cubeProps?.faces;
+    if (!faces || !isRecord(faces)) return;
+
+    for (const faceKey of Object.keys(faces)) {
+        const face = faces[faceKey];
+        if (!face || !isRecord(face)) continue;
+
+        const textureRef = face.texture as TextureRef | undefined;
+        if (textureRef === undefined || textureRef === null) continue;
+
+        const mapped = textureMap.get(textureRef);
+        if (!mapped) continue;
+
+        face.texture = mapped.uuid;
+    }
+}
+
+function createCubeFromElementData(elemData: BBCubeElement, parentGroup: any, textureMap: Map<TextureRef, any>) {
+    const cubeProps: Record<string, any> = { ...elemData };
+    delete cubeProps.uuid;
+
+    remapCubeFaceTextures(cubeProps, textureMap);
+
+    const cube = new Cube(cubeProps);
+    cube.addTo(parentGroup).init();
+    logDebug(`[Import BB] Created cube: ${cube.name ?? '(unnamed)'}`);
+}
+
+function findExistingGroupByName(parentGroup: any, groupName: string): any | null {
+    if (!groupName) return null;
+    const searchRoot = parentGroup ? parentGroup.children || [] : Outliner.root;
+
+    for (const child of searchRoot) {
+        if (child instanceof Group && (child.name || '').toLowerCase() === groupName.toLowerCase()) {
+            return child;
+        }
+    }
+
+    return null;
+}
+
+function getOrCreateGroup(groupSeed: Record<string, any>, parentGroup: any): any {
+    const groupName = typeof groupSeed.name === 'string' ? groupSeed.name : '';
+
+    const existing = findExistingGroupByName(parentGroup, groupName);
+    if (existing) {
+        logDebug(`[Import BB] Merging into existing group: ${groupName}`);
+        return existing;
+    }
+
+    const groupProps: Record<string, any> = { ...groupSeed };
+    delete groupProps.uuid;
+    delete groupProps.children;
+
+    const group = new Group(groupProps);
+    group.addTo(parentGroup).init();
+    logDebug(`[Import BB] Created new group: ${groupName || '(unnamed group)'}`);
+
+    return group;
+}
+
+function isCubeElement(value: unknown): value is BBCubeElement {
+    return (
+        isRecord(value) &&
+        typeof value.uuid === 'string' &&
+        value.type === 'cube'
+    );
+}
 
 /**
  * Merges a Vintage Story attachment into the current project, intelligently handling textures.
@@ -16,211 +154,85 @@ export function mergeVSAttachment(content: VS_Shape, filePath?: string) {
 }
 
 /**
- * Remaps texture references in cube faces from old indices/UUIDs to new texture UUIDs
- * @param cubeProps The cube properties object containing faces
- * @param textureMap Map of old texture indices/UUIDs to new Texture objects
+ * Merges a Blockbench .bbmodel attachment into the current project.
+ * Supports both Blockbench 4.x outliner (groups are inline, elements referenced by UUID strings)
+ * and Blockbench 5.x+ outliner (outliner nodes reference separate `elements` / `groups` lists by UUID).
  */
-function remapCubeFaceTextures(cubeProps: any, textureMap: Map<any, any>) {
-    if (!cubeProps.faces) return;
-
-    Object.keys(cubeProps.faces).forEach(faceKey => {
-        const face = cubeProps.faces[faceKey];
-        if (face && face.texture !== undefined && face.texture !== null) {
-            const mappedTexture = textureMap.get(face.texture);
-            if (mappedTexture) {
-                face.texture = mappedTexture.uuid;
-                if (DEBUG) console.log(`[Import BB] Remapped texture for ${cubeProps.name}.${faceKey}: ${face.texture}`);
-            }
-        }
-    });
-}
-
-/**
- * Creates a cube from element data, remapping textures and adding to parent group
- * @param elemData The element data from the .bbmodel file
- * @param textureMap Map of old texture indices/UUIDs to new Texture objects
- * @param parentGroup The parent group to add the cube to (or null for root)
- * @param formatLabel Label for debug logging (e.g., "4.x" or "5.0")
- * @returns The created Cube instance
- */
-function createCubeFromElementData(
-    elemData: any,
-    textureMap: Map<any, any>,
-    parentGroup: Group | null,
-    formatLabel: string = ''
-): Cube {
-    const cubeProps = { ...elemData };
-    delete cubeProps.uuid;
-
-    remapCubeFaceTextures(cubeProps, textureMap);
-
-    const cube = new Cube(cubeProps);
-    cube.addTo(parentGroup).init();
-
-    const label = formatLabel ? ` (${formatLabel})` : '';
-    if (DEBUG) console.log(`[Import BB] Created cube${label}: ${cube.name}`);
-
-    return cube;
-}
-
-export function mergeBBModel(content: any, filePath: string) {
+export function mergeBBModel(content: unknown, _filePath: string) {
     try {
-        if (DEBUG) console.log(`[Import BB] Starting merge of .bbmodel attachment`);
-
-        const textureMap = new Map<any, any>();
-
-        if (content.textures && Array.isArray(content.textures)) {
-            content.textures.forEach((texData: any, oldIndex: number) => {
-                let texture = Texture.all.find(t => t.name === texData.name || (t.path && t.path === texData.path));
-
-                if (!texture) {
-                    texture = new Texture(texData).add();
-                    // Load texture from source (base64) or path
-                    if (texData.source) {
-                        // Texture has embedded base64 data - load it directly
-                        texture.fromDataURL(texData.source);
-                        if (DEBUG) console.log(`[Import BB] Loaded texture from base64: ${texData.name}`);
-                    } else if (texData.path && !texData.path.startsWith('data:')) {
-                        texture.load();
-                        if (DEBUG) console.log(`[Import BB] Loaded texture from path: ${texData.name}`);
-                    }
-                    if (DEBUG) console.log(`[Import BB] Added texture: ${texData.name}`);
-                } else {
-                    // Update UV size for existing texture to match the imported data
-                    if (texData.uv_width !== undefined) {
-                        texture.uv_width = texData.uv_width;
-                    }
-                    if (texData.uv_height !== undefined) {
-                        texture.uv_height = texData.uv_height;
-                    }
-                    if (DEBUG) console.log(`[Import BB] Using existing texture: ${texData.name}, updated UV size to ${texture.uv_width}x${texture.uv_height}`);
-                }
-
-                textureMap.set(oldIndex, texture);
-                if (texData.uuid) {
-                    textureMap.set(texData.uuid, texture);
-                }
-            });
+        if (!isRecord(content)) {
+            Blockbench.showQuickMessage('Import failed: invalid .bbmodel content', 5000);
+            return;
         }
 
-        const elementMap = new Map();
-        if (content.elements && Array.isArray(content.elements)) {
-            content.elements.forEach(elem => {
-                elementMap.set(elem.uuid, elem);
-            });
-        }
+        const model = content as BBModel;
+        logDebug(`[Import BB] Starting merge of .bbmodel attachment`);
 
-        // Blockbench 5.0+ format: groups stored separately
-        const groupMap = new Map();
-        if (content.groups && Array.isArray(content.groups)) {
-            content.groups.forEach(grp => {
-                groupMap.set(grp.uuid, grp);
-            });
-        }
-
-        const processOutlinerItem = (item: any, parentGroup: Group | null): any => {
-            // Handle string UUIDs (4.x format - direct element references)
-            if (typeof item === 'string') {
-                const elemData = elementMap.get(item);
-                if (elemData && elemData.type === 'cube') {
-                    return createCubeFromElementData(elemData, textureMap, parentGroup, '4.x');
-                }
-            } else if (typeof item === 'object' && item !== null) {
-                // Blockbench 5.0+ format: outliner item with uuid reference
-                // Check if this is a 5.0 format item (has uuid but not name)
-                if (item.uuid && !item.name) {
-                    // This is a 5.0 format outliner item - look up the actual data
-                    const elemData = elementMap.get(item.uuid);
-                    const groupData = groupMap.get(item.uuid);
-
-                    if (elemData && elemData.type === 'cube') {
-                        // It's an element reference
-                        return createCubeFromElementData(elemData, textureMap, parentGroup, '5.0');
-                    } else if (groupData) {
-                        // It's a group reference
-                        const groupName = groupData.name || '';
-                        const searchRoot = parentGroup ? (parentGroup.children || []) : Outliner.root;
-                        let existingGroup = null;
-
-                        for (const child of searchRoot) {
-                            if (child instanceof Group && (child.name || '').toLowerCase() === groupName.toLowerCase()) {
-                                existingGroup = child;
-                                break;
-                            }
-                        }
-
-                        let targetGroup: Group;
-
-                        if (existingGroup) {
-                            targetGroup = existingGroup;
-                            if (DEBUG) console.log(`[Import BB] Merging into existing group (5.0): ${groupName}`);
-                        } else {
-                            const groupProps = { ...groupData };
-                            delete groupProps.uuid;
-
-                            targetGroup = new Group(groupProps);
-                            targetGroup.addTo(parentGroup).init();
-                            if (DEBUG) console.log(`[Import BB] Created new group (5.0): ${groupName}`);
-                        }
-
-                        // Process children from the outliner item (not from groupData)
-                        if (item.children && Array.isArray(item.children)) {
-                            item.children.forEach((childItem: any) => {
-                                processOutlinerItem(childItem, targetGroup);
-                            });
-                        }
-
-                        return targetGroup;
-                    }
-                } else {
-                    // Blockbench 4.x format: full group object with all data
-                    const groupName = item.name || '';
-                    const searchRoot = parentGroup ? (parentGroup.children || []) : Outliner.root;
-                    let existingGroup = null;
-
-                    for (const child of searchRoot) {
-                        if (child instanceof Group && (child.name || '').toLowerCase() === groupName.toLowerCase()) {
-                            existingGroup = child;
-                            break;
-                        }
-                    }
-
-                    let targetGroup: Group;
-
-                    if (existingGroup) {
-                        targetGroup = existingGroup;
-                        if (DEBUG) console.log(`[Import BB] Merging into existing group: ${groupName}`);
-                    } else {
-                        const groupProps = { ...item };
-                        delete groupProps.uuid;
-                        delete groupProps.children;
-
-                        targetGroup = new Group(groupProps);
-                        targetGroup.addTo(parentGroup).init();
-                        if (DEBUG) console.log(`[Import BB] Created new group: ${groupName}`);
-                    }
-
-                    if (item.children && Array.isArray(item.children)) {
-                        item.children.forEach((childItem: any) => {
-                            processOutlinerItem(childItem, targetGroup);
-                        });
-                    }
-
-                    return targetGroup;
-                }
-            }
+        const textureMap = buildTextureMap(model);
+        const elementByUuid = buildUuidMap<Record<string, any>>(model.elements);
+        const groupByUuid = buildUuidMap<Record<string, any>>(model.groups);
+        const processChildren = (children: BBOutlinerItem[], parent: any) => {
+            for (const child of children) processOutlinerItem(child, parent);
         };
 
-        if (content.outliner && Array.isArray(content.outliner)) {
-            content.outliner.forEach(item => {
-                processOutlinerItem(item, null);
-            });
+        const tryCreateCubeByUuid = (uuid: UUID, parent: any): boolean => {
+            const elemData = elementByUuid.get(uuid);
+            if (!isCubeElement(elemData)) return false;
+            createCubeFromElementData(elemData, parent, textureMap);
+            return true;
+        };
+
+        const tryProcessGroupByUuid = (uuid: UUID, node: Record<string, any>, parent: any): boolean => {
+            const groupData = groupByUuid.get(uuid);
+            if (!groupData) return false;
+
+            // Merge groupMap data with outliner hints (e.g., children structure)
+            const seed = { ...groupData, ...node };
+            const targetGroup = getOrCreateGroup(seed, parent);
+
+            const children = asArray<BBOutlinerItem>(node.children);
+            processChildren(children, targetGroup);
+            return true;
+        };
+
+        const processUuidStringItem = (uuid: UUID, parent: any) => {
+            // Blockbench 4.x: element references are UUID strings
+            if (tryCreateCubeByUuid(uuid, parent)) return;
+        };
+
+        const processInlineGroupNode = (node: Record<string, any>, parent: any) => {
+            const targetGroup = getOrCreateGroup(node, parent);
+            const children = asArray<BBOutlinerItem>(node.children);
+            processChildren(children, targetGroup);
+        };
+
+        const processObjectNode = (node: Record<string, any>, parent: any) => {
+            const uuid = typeof node.uuid === 'string' ? node.uuid : undefined;
+
+            // Blockbench 5.x+: outliner node references separate `elements` / `groups` lists by UUID.
+            if (uuid) {
+                if (tryCreateCubeByUuid(uuid, parent)) return;
+                if (tryProcessGroupByUuid(uuid, node, parent)) return;
+            }
+
+            // Blockbench 4.x: the node itself is an inline group object
+            processInlineGroupNode(node, parent);
+        };
+
+        const processOutlinerItem = (item: BBOutlinerItem, parent: any) => {
+            if (typeof item === 'string') return processUuidStringItem(item, parent);
+            if (!isRecord(item)) return;
+            return processObjectNode(item, parent);
+        };
+
+        for (const item of asArray<BBOutlinerItem>(model.outliner)) {
+            processOutlinerItem(item, null);
         }
 
         Canvas.updateAll();
-        if (DEBUG) console.log(`[Import BB] Merge complete. Groups: ${Group.all.length}, Cubes: ${Cube.all.length}`);
+        logDebug(`[Import BB] Merge complete. Groups: ${Group.all.length}, Cubes: ${Cube.all.length}`);
     } catch (e) {
         console.error('[Import BB] CRITICAL ERROR in mergeBBModel:', e);
-        Blockbench.showQuickMessage(`Import failed: ${e.message}`, 5000);
+        Blockbench.showQuickMessage(`Import failed: ${getErrorMessage(e)}`, 5000);
     }
 }
