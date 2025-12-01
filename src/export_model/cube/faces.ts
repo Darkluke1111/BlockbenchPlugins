@@ -21,24 +21,15 @@ function transformUV(uv: [number,number,number,number], rotation: number): { uv:
 export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>>): Partial<Record<VS_Direction, VS_Face>> {
     const processed_faces = {};
 
-    // Get first available texture as fallback
-    const fallbackTexture = Texture.all.length > 0 ? Texture.all[0] : null;
-
     for (const direction of Object.values(VS_Direction)) {
         const face = faces[direction];
 
-        // Skip disabled faces
-        if (!face || face.enabled === false) {
+        // Skip disabled faces or faces without textures
+        if (!face || face.enabled === false || !face.texture) {
             continue;
         }
 
-        // Use face texture or fallback to first available texture
-        const faceTexture = face.texture || (fallbackTexture ? fallbackTexture.uuid : null);
-
-        // Skip if no texture available at all
-        if (!faceTexture) {
-            continue;
-        }
+        const faceTexture = face.texture;
 
         const isUvDefault = face.uv[0] === 0 && face.uv[1] === 0 && face.uv[2] === 0 && face.uv[3] === 0;
 
@@ -59,7 +50,20 @@ export function process_faces(faces: Partial<Record<CardinalDirection, CubeFace>
 
         for(const prop of VS_FACE_PROPS) {
             const prop_name = prop.name;
-            processed_face[prop_name] = face[prop_name];
+            const value = face[prop_name];
+
+            // Skip properties with default/empty values
+            if (value !== undefined && value !== null) {
+                // Skip 0 for numeric properties (glow, reflectiveMode)
+                if (typeof value === 'number' && value === 0) {
+                    continue;
+                }
+                // Skip default arrays like [0,0,0,0] for windMode/windData
+                if (Array.isArray(value) && value.every(v => v === 0)) {
+                    continue;
+                }
+                processed_face[prop_name] = value;
+            }
         }
         processed_faces[direction] = new oneLiner(processed_face);
     }
