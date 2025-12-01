@@ -18,8 +18,7 @@ export function deleteSection(elements: any[]) {
         elements.forEach(element => element.remove());
 
         Undo.finishEdit('delete attachment section');
-
-        // Dispatch a global event that the panel can listen to, decoupling the logic from the UI.
-        Blockbench.dispatch('attachments_changed', {});
+        
+        Blockbench.dispatchEvent('attachments_changed', {});
     }
 }
