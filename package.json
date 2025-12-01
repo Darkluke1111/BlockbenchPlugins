@@ -37,8 +37,8 @@
   },
   "scripts": {
     "gen_schema": "npx tsx src/buildtime_scripts/gen_schema.ts",
-    "build": "tsx ./esbuild.ts  --mode=prod",
-    "dev": "tsx ./esbuild.ts  --mode=dev",
+    "build": "node ./esbuild.ts  --mode=prod",
+    "dev": "node ./esbuild.ts  --mode=dev",
     "lint": "npx eslint .",
     "gen_type_docs": "npx typedoc ./src/vs_shape_def.ts"
   },
