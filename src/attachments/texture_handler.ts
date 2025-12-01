@@ -24,6 +24,10 @@ function createVSAttachmentTexture(
     if (content.textureSizes && content.textureSizes[name]) {
         texture.uv_width = content.textureSizes[name][0];
         texture.uv_height = content.textureSizes[name][1];
+    } else if (content.textureWidth && content.textureHeight) {
+        // Fall back to global texture dimensions if not specified per-texture
+        texture.uv_width = content.textureWidth;
+        texture.uv_height = content.textureHeight;
     }
     return texture;
 }
