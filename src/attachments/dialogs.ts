@@ -27,11 +27,15 @@ export function showClothingSlotDialog(inferredSlot: string | null, filePath: st
         new Dialog({
             id: 'clothing_slot_selector',
             title: 'Select Clothing Slot',
-            lines: [
-                `<p>Choose the clothing slot for imported elements from:</p>`, 
-                `<p><strong>${fileName}</strong></p>`, 
-                inferredSlot ? `<p><em>Auto-detected: ${inferredSlot}</em></p>` : ''
-            ],
+            component: {
+                template: `
+                    <div>
+                        <p>Choose the clothing slot for imported elements from:</p>
+                        <p><strong>${fileName}</strong></p>
+                        ${inferredSlot ? `<p><em>Auto-detected: ${inferredSlot}</em></p>` : ''}
+                    </div>
+                `
+            },
             form: {
                 clothing_slot: {
                     label: 'Clothing Slot',
